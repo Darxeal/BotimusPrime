@@ -44,20 +44,20 @@ class Offense:
         dodge_shot = DodgeShot(car, self.info, target)
         ground_shot = GroundShot(car, self.info, target)
 
-        if dodge_shot.intercept.time < ground_shot.intercept.time - 0.1 \
-        or distance(dodge_shot.intercept.ground_pos, target) < 4000 \
-        or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2 \
-            and norm(ground_shot.intercept.ball.vel) > 500):
-
+        if (
+            dodge_shot.intercept.time < ground_shot.intercept.time - 0.1 \
+            or distance(dodge_shot.intercept.ground_pos, target) < 4000 \
+            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2 \
+            and norm(ground_shot.intercept.ball.vel) > 500)
+        ):
             if distance(dodge_shot.intercept.ground_pos, target) < 4000\
             and abs(dodge_shot.intercept.ground_pos[0]) < 3000:
-
                 return CloseShot(car, self.info, target)
             return dodge_shot
         return ground_shot
 
  
-    def high_shot(self, car: Car, target: vec3, intercept: Intercept) -> Maneuver:
+    def high_shot(self, car: Car, target: vec3) -> Maneuver:
         direct_shot = self.direct_shot(car, target)
 
         wall_shot = self.wall_shot(car, target)
@@ -65,11 +65,14 @@ class Offense:
             return wall_shot
 
         aerial = AerialShot(car, self.info, target)
-        if aerial.intercept.is_viable and car.boost > aerial.intercept.ball.pos[2] / 50 + 5:
-            if aerial.intercept.time < direct_shot.intercept.time:
-                if not self.info.about_to_score:
-                    if abs(aerial.intercept.ball.pos[1] - target[1]) > 2000:
-                        return aerial
+        if (
+            aerial.intercept.is_viable
+            and car.boost > aerial.intercept.ball.pos[2] / 50 + 5
+            and aerial.intercept.time < direct_shot.intercept.time
+            and not self.info.about_to_score
+            and abs(aerial.intercept.ball.pos[1] - target[1]) > 2000
+        ):
+            return aerial
 
         return direct_shot
         
@@ -88,7 +91,7 @@ class Offense:
 
 
         if ball.pos[2] > 300 or abs(ball.vel[2]) > 500:
-            return self.high_shot(car, target, intercept)
+            return self.high_shot(car, target)
 
         if align(car.pos, ball, target) < 0.1 and abs(ball.pos[1]) < 3000 and abs(ball.pos[0]) > 1000:
             return MirrorShot(car, self.info, target)
@@ -112,10 +115,12 @@ class Offense:
     def double_tap(self, car: Car, target: vec3) -> Maneuver:
         if car.boost < 5:
             return None
-        predicate = lambda car, ball: abs(ball.pos[0]) < 1000 \
-                                    and ball.pos[2] > 400 \
-                                    and distance(ball, target) < 4000 \
-                                    and align(car.pos, ball, target) > 0.3
+        predicate = lambda car, ball: (
+            abs(ball.pos[0]) < 1000
+            and ball.pos[2] > 400
+            and distance(ball, target) < 4000
+            and align(car.pos, ball, target) > 0.3
+        )
         intercept = AerialIntercept(car, self.info.ball_predictions, predicate)
         if intercept.is_viable and car.boost > (intercept.time - car.time) * 5:
             target_pos = intercept.ball.pos + direction(target, intercept.ball.pos) * 60

@@ -1,5 +1,6 @@
 from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator, GameInfoState
 
+
 class StateSettingTool:
     def __init__(self, agent):
         self.agent = agent
@@ -14,10 +15,12 @@ class StateSettingTool:
     
     def execute(self):
         if self._changed:
-            self.agent.set_game_state(GameState(ball=self.ball, cars={self.agent.index: self.car}, game_info=self.gameinfo))
+            self.agent.set_game_state(GameState(
+                ball=self.ball,
+                cars={self.agent.index: self.car},
+                game_info=self.gameinfo
+            ))
             self.begin()
-
-
 
     def car_stop(self):
         self._changed = True
@@ -58,10 +61,6 @@ class StateSettingTool:
         self.car.double_jumped = 0
         self.car.jumped = 0
 
-    def slowmo(self, speed=0.1):
+    def game_speed(self, speed=1):
         self._changed = True
         self.gameinfo.game_speed = speed
-
-    def reset_gamespeed(self):
-        self._changed = True
-        self.gameinfo.game_speed = 1

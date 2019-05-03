@@ -165,7 +165,7 @@ class DrawingTool:
             steps.append(vec3(test_car.pos))
         self.polyline(steps)
 
-    def ball_trajectory(self, ball_predictions, step=1, time_limit=None):
+    def ball_trajectory(self, ball_predictions: list, step=1, time_limit=None):
         for i in range(step, len(ball_predictions), step):
             if time_limit is not None and ball_predictions[i].t > time_limit:
                 break
@@ -185,7 +185,7 @@ class DrawingTool:
 
     def fps(self, dt: float):
         fps = int(1 / max(0.00000001, dt))
-        if fps <= 60:
+        if fps <= 120:
             self.log(fps)
 
 

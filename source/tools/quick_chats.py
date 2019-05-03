@@ -19,13 +19,9 @@ class QuickChatTool:
 
     def step(self, packet: GameTickPacket):
         time = packet.game_info.seconds_elapsed
-        if time > self.last_time_chat_sent + self.chat_interval and len(self.queue) > 0:
+        if self.queue and time > self.last_time_chat_sent + self.chat_interval:
             self.last_time_chat_sent = time
             self.agent.send_quick_chat(False, self.queue.popleft())
-
-                    
-
-class QuickChats:
 
     Information_IGotIt = 0
     Information_NeedBoost = 1
