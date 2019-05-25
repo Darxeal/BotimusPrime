@@ -2,7 +2,9 @@
 A python offline Rocket League bot made with the RLBot framework.
 Currently uses the pypi version of [RLUtilities](https://github.com/samuelpmish/RLUtilities/). Huge thanks to @chip!
 
-This is the V2 (Wintertide) version. You can get the older version from the Releases tab.
+This is the latest (Wintertide) version. You can get older versions from the Releases tab.
+
+If you have any questions or feedback, contant me on discord ``Darxeal#1784``
 
 ## How to use
 - Go to [rlbot.org](http://www.rlbot.org/) and download RLBot.
@@ -13,7 +15,7 @@ This is the V2 (Wintertide) version. You can get the older version from the Rele
 
 Note: If you aren't using the GUI version, you should also do ``pip install -r requirements.txt``
 
-## Achievments
+## Achievements
 - 2nd place in [RLBot 2018 Tournament - 1v1](https://www.youtube.com/watch?v=TPb-6NzXkRw) (old version)
 - 2nd place in [RLBot Wintertide Tournament - 1v1](https://www.youtube.com/watch?v=vRqfJO701oE)
 
