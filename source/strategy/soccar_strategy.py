@@ -13,7 +13,6 @@ from utils.arena import Arena
 
 from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.kickoffs.better_kickoff import BetterKickoff
 from maneuvers.driving.stop import Stop
 from maneuvers.air.fast_recovery import FastRecovery
 from maneuvers.strikes.dodge_shot import DodgeShot
@@ -27,6 +26,7 @@ from maneuvers.shadow_defense import ShadowDefense
 from strategy.offense import Offense
 
 
+#This file is a Wintertide-deadline mess and definitely not something you should learn from..
 
 class SoccarStrategy:
     def __init__(self, info: GameInfo):
@@ -138,13 +138,13 @@ class SoccarStrategy:
                     return DodgeStrike(car, info, their_goal), "I have to carefully save this"
                 return any_shot, "I need to save this!"
 
-            return self.clear_into_corner(my_hit), "save into corner"
+            return self.clear_into_corner(my_hit), "Save, clear into corner"
 
 
         # fallback
         if align(car.pos, my_hit.ball, my_goal) > 0.2:
             if ground_distance(my_hit, my_goal) < 4000 and should_commit and abs(car.pos[1]) < abs(my_hit.pos[1]):
-                return self.clear_into_corner(my_hit), "clear into corner because fallback"
+                return self.clear_into_corner(my_hit), "Clear into corner because it's dangerous"
             return ShadowDefense(car, info, my_hit.ground_pos, 6000), "I need to get back into position."
 
         # clear

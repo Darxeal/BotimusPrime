@@ -45,18 +45,17 @@ def inject_botimus_into_exercises(exercises):
         ]
 
 def make_default_playlist():
-    # exercises = [
-    #     WallShot("wall"),
-    #     WallShot2("wall2"),
-    #     Dribbling("dribbling"),
-    #     CenteredShot("rolling"),
-    #     CenteredShot("bouncy", ball_vel_z=700),
-    #     CornerShot("corner shot"),
-    #     MirrorShot("mirror shot"),
-    #     AerialShot("aerial")
-    # ]
+    exercises = [
+        WallShot("wall"),
+        WallShot2("wall2"),
+        Dribbling("dribbling"),
+        CenteredShot("rolling"),
+        CenteredShot("bouncy", ball_vel_z=700),
+        CornerShot("corner shot"),
+        MirrorShot("mirror shot"),
+        AerialShot("aerial")
+    ]
 
-    exercises = [AerialSave("as")]
 
     inject_botimus_into_exercises(exercises)
 

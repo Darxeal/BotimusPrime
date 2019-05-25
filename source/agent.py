@@ -65,14 +65,22 @@ class BotimusPrime(BaseAgent):
         self.strategy.packet = packet
         
 
-        #reset maneuver when an opponent hits the ball
+        #reset maneuver when another car hits the ball
         touch = packet.game_ball.latest_touch
-        if touch.time_seconds > self.last_touch_time:
+        if ((
+            touch.time_seconds > self.last_touch_time
+            and touch.player_name != packet.game_cars[self.index].name
+        ) or (
+            touch.player_name == '' and # if latest touch info is missing
+            any([distance(self.info.ball, car) < 300 for car in self.info.opponents + self.info.teammates])
+        )):
             self.last_touch_time = touch.time_seconds
-            if touch.player_name != packet.game_cars[self.index].name and self.info.my_car.on_ground \
-            and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving):
+            if (
+                self.info.my_car.on_ground
+                and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving)
+            ):
                 self.maneuver = None
-                self.reset_time = self.time
+                #self.reset_time = self.time
 
 
         # choose maneuver
@@ -104,7 +112,7 @@ class BotimusPrime(BaseAgent):
 
 
         if self.RENDERING:
-            self.history.render(self.draw)
+            # self.history.render(self.draw)
             self.draw.execute()
 
         self.maybe_chat(packet)

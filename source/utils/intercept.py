@@ -22,7 +22,10 @@ class Intercept:
 
         #if no slice is found, use the last one
         if self.ball is None:
-            self.ball = ball_predictions[-1]
+            if not ball_predictions:
+                self.ball = Ball()
+            else:
+                self.ball = ball_predictions[-1]
             self.is_viable = False
 
         self.time = self.ball.t

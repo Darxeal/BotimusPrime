@@ -1,7 +1,6 @@
 from maneuvers.kit import *
 
 from maneuvers.driving.arrive import Arrive
-from maneuvers.jumps.jump_turn import JumpTurn
 
 
 class Catch(Maneuver):

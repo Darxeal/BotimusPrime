@@ -47,7 +47,7 @@ class Strike(Maneuver):
         self._last_update_time = self.car.time
         if not self.intercept.is_viable or self.intercept.time > self._initial_time + self.max_additional_time:
             self.finished = True
-            print("strike ran out of additional time")
+            
 
     def update_requirement(self):
         return self.intercept.time > self.car.time + self.stop_updating

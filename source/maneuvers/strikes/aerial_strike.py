@@ -23,7 +23,7 @@ class AerialStrike(Strike):
         self._last_update_time = self.car.time
         if not self.intercept.is_viable:
             self.finished = True
-            print("cancelled aerial because it isnt viable anymore")
+            
 
     def configure(self, intercept: AerialIntercept):
         
@@ -39,7 +39,7 @@ class AerialStrike(Strike):
     def step(self, dt):
         if self.car.time > self.aerial.t_arrival:
             self.finished = True
-            print("aerial expired")
+            
         if not self.aerialing:
             super().step(dt)
             if angle_to(self.car, self.arrive.target) < 0.2 \
