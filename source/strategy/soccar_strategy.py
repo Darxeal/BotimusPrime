@@ -105,12 +105,9 @@ class SoccarStrategy:
 
         should_commit = True
         if info.teammates:
-            best_team_intercept, _ = self.best_intercept(info.teammates + [car])
+            best_team_intercept, _ = self.best_intercept(info.teammates, 500)
             if best_team_intercept.time < my_hit.time - 0.05:
                 should_commit = False
-
-            if distance(car, my_goal) > distance(info.teammates[0], my_goal):
-                self.aggresivity = 50
 
 
         if not car.on_ground:
@@ -174,63 +171,11 @@ class SoccarStrategy:
                 return double_tap, "lets fricking style on them (or fail miserably)"
 
 
-        if distance(their_best_hit.ground_pos, their_goal) < distance(their_best_hit.ground_pos, my_goal):
-            opponents_align = -align(opponent.pos, their_best_hit.ball, their_goal)
-        else:
-            opponents_align = align(opponent.pos, their_best_hit.ball, my_goal)
-
-        # I can get to ball faster than them
-        if should_commit and my_hit.time < their_best_hit.time - 0.8:
-            strike = offense.any_shot(car, their_goal, my_hit)
-
-            if not isinstance(strike, Strike):
-                return strike, "getting into a better position"
-
-            if strike.intercept.time < their_best_hit.time - 0.8 \
-            and (not info.about_to_score or strike.intercept.time < info.time_of_goal - 1):
-
-                if strike.intercept.time - car.time > 4 and car.boost < 30 \
-                and distance(strike.intercept.ground_pos, their_goal) > 3000 and distance(their_best_hit.ground_pos, my_goal) > 5000:
-
-                    return Refuel(car, info, my_hit.ground_pos), "I can reach the ball faster, but its too far and I dont have enough boost"
-
-                if abs(strike.intercept.ground_pos[0]) > Arena.size[0] - 800 and car.boost < 30:
-
-                    return Refuel(car, info, my_hit.ground_pos), "I can reach the ball faster but its too retarded"
-
-                if abs(strike.intercept.ball.pos[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
-                    return strike, "I can reach the ball faster!"
-
-        # they are out of position
-        if (
-            should_commit
-            and opponents_align < -0.1 - self.aggresivity / 20 
-            and my_hit.time < their_best_hit.time - opponents_align * 1.5
-        ):
-
-            strike = offense.any_shot(car, their_goal, my_hit)
-
-            if not isinstance(strike, Strike) or strike.intercept.is_viable \
-            and (not info.about_to_score or strike.intercept.time < info.time_of_goal - 0.5):
-
-                if (
-                    car.boost < 40
-                    and (distance(my_hit, their_goal) > 5000 or abs(my_hit.pos[0]) > Arena.size[0] - 1500)
-                    and distance(opponent, their_best_hit) > 3000
-                ):
-                    return Refuel(car, info, my_hit.ground_pos), "they're out of position, but lets get boost"
-
-                if not isinstance(strike, Strike) or abs(strike.intercept.ball.pos[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
-                    return strike, "They are out of position."
-
-        if distance(their_best_hit.ball, my_goal) > 7000 and \
-            (distance(their_best_hit, opponent) > 3000 or align(opponent.pos, their_best_hit.ball, my_goal) < 0) and car.boost < 30:
-            return Refuel(car, info, my_hit.ground_pos), "they're too far, lets get boost"
-
-        if car.boost < 35 and distance(their_best_hit, opponent) > 3000:
-            refuel = Refuel(car, info, my_hit.ground_pos)
-            if estimate_time(car, refuel.pad.pos, 1400) < 1.5:
-                return refuel, "I should get boost"
+        if should_commit:
+            return offense.any_shot(car, their_goal, my_hit), ""
+        
+        if car.boost < 50:
+            return Refuel(car, info, my_goal), ""
 
         shadow_distance = 5500
         shadow_distance -= self.aggresivity * 500
