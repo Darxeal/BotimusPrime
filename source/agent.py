@@ -1,11 +1,10 @@
-from rlbot.agents.base_agent import BaseAgent, GameTickPacket
+from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
 
 from RLUtilities.GameInfo import GameInfo
 from RLUtilities.Simulation import Input
 from RLUtilities.LinearAlgebra import norm
 
 from tools.drawing import DrawingTool
-from tools.maneuver_history import ManeuverHistory
 from tools.quick_chats import QuickChatTool
 
 from maneuvers.kit import Maneuver
@@ -27,7 +26,7 @@ class BotimusPrime(BaseAgent):
 
     def initialize_agent(self):
         self.info: GameInfo = GameInfo(self.index, self.team)
-        self.controls: Input = Input()
+        self.controls: SimpleControllerState = SimpleControllerState()
         self.maneuver: Maneuver = None
 
         self.time = 0
@@ -37,7 +36,6 @@ class BotimusPrime(BaseAgent):
         self.ticks = 0
 
         self.draw: DrawingTool = DrawingTool(self.renderer)
-        self.history: ManeuverHistory = ManeuverHistory()
 
         self.strategy = SoccarStrategy(self.info)
 
@@ -54,8 +52,6 @@ class BotimusPrime(BaseAgent):
         self.time = packet.game_info.seconds_elapsed
         dt = self.time - self.prev_time
         if packet.game_info.is_kickoff_pause and not isinstance(self.maneuver, Kickoff):
-            if self.history.history:
-                self.history.history.clear()
             self.maneuver = None
 
         self.prev_time = self.time
@@ -91,10 +87,9 @@ class BotimusPrime(BaseAgent):
 
             self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
 
-            self.maneuver, reason = self.strategy.get_maneuver_with_reason()
+            self.maneuver = self.strategy.choose_maneuver()
             
             name = str(type(self.maneuver).__name__)
-            self.history.add(name, reason)
 
             self.last_ball_vel = norm(self.info.ball.vel)
 
@@ -102,7 +97,16 @@ class BotimusPrime(BaseAgent):
         # execute maneuver
         if self.maneuver is not None:
             self.maneuver.step(dt)
-            self.controls = self.maneuver.controls
+
+            # I have to convert from RLU Input to SimpleControllerState, because Input doesnt have 'use_item'
+            self.controls.steer = self.maneuver.controls.steer
+            self.controls.throttle = self.maneuver.controls.throttle
+            self.controls.jump = self.maneuver.controls.jump
+            self.controls.pitch = self.maneuver.controls.pitch
+            self.controls.yaw = self.maneuver.controls.yaw
+            self.controls.roll = self.maneuver.controls.roll
+            self.controls.handbrake = self.maneuver.controls.handbrake
+            self.controls.boost = self.maneuver.controls.boost
 
             if self.RENDERING:
                 self.maneuver.render(self.draw)
@@ -112,7 +116,6 @@ class BotimusPrime(BaseAgent):
 
 
         if self.RENDERING:
-            # self.history.render(self.draw)
             self.draw.execute()
 
         self.maybe_chat(packet)
