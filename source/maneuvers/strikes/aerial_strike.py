@@ -18,7 +18,7 @@ class AerialStrike(Strike):
         super().__init__(car, info, target)
     
     def update(self):
-        self.intercept = AerialIntercept(self.car, self.info.ball_predictions, self.intercept_predicate, 1000)
+        self.intercept = AerialIntercept(self.car, self.info.ball_predictions, self.intercept_predicate)
         self.configure(self.intercept)
         self._last_update_time = self.car.time
         if not self.intercept.is_viable:
