@@ -42,7 +42,7 @@ class AerialStrike(Strike):
             
         if not self.aerialing:
             super().step(dt)
-            if angle_to(self.car, self.arrive.target) < 0.2 \
+            if angle_between(ground(self.car.vel), ground_direction(self.car, self.aerial.target)) < 0.1 \
             and ground_distance(self.car, self.arrive.target) < self.aerial.target[2] * 3 + 500 \
             and norm(self.car.vel) > self.arrive.drive.target_speed - 300:
                 self.aerialing = True
