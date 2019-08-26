@@ -75,7 +75,7 @@ class SoccarStrategy:
         corners = [my_goal + vec3(Arena.size[0], 0, 0), my_goal - vec3(Arena.size[0], 0, 0)]
         corner = Strike.pick_easiest_target(car, my_hit.ball, corners)
         corner[1] *= 0.8
-        return DodgeShot(car, self.info, corner)
+        return self.offense.any_shot(car, corner, my_hit)
 
     def choose_maneuver(self):
         info = self.info

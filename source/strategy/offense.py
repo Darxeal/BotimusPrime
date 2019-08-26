@@ -45,13 +45,15 @@ class Offense:
         ground_shot = GroundShot(car, self.info, target)
 
         if (
-            dodge_shot.intercept.time < ground_shot.intercept.time - 0.1 \
-            or distance(dodge_shot.intercept.ground_pos, target) < 4000 \
+            dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
+            or distance(dodge_shot.intercept.ground_pos, target) < 4000
             or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2 \
             and norm(ground_shot.intercept.ball.vel) > 500)
         ):
-            if distance(dodge_shot.intercept.ground_pos, target) < 4000\
-            and abs(dodge_shot.intercept.ground_pos[0]) < 3000:
+            if (
+                distance(dodge_shot.intercept.ground_pos, target) < 4000
+                and abs(dodge_shot.intercept.ground_pos[0]) < 3000
+            ):
                 return CloseShot(car, self.info, target)
             return dodge_shot
         return ground_shot
