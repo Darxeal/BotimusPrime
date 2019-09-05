@@ -1,4 +1,5 @@
 from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
+from rlbot.utils.game_state_util import GameState
 
 from RLUtilities.GameInfo import GameInfo
 from RLUtilities.Simulation import Input
@@ -11,11 +12,15 @@ from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.shadow_defense import ShadowDefense
 
-from strategy.soccar_strategy import SoccarStrategy
+from strategy.twitch_chat import TwitchChatStrategy
 
 from utils.vector_math import distance
 
+from utils.intercept import Intercept
+from maneuvers.air.fast_recovery import FastRecovery
 
+from tools.maneuver_history import *
+from time import time
 
 class BotimusPrime(BaseAgent):
     
@@ -36,16 +41,12 @@ class BotimusPrime(BaseAgent):
         self.ticks = 0
 
         self.draw: DrawingTool = DrawingTool(self.renderer)
+        self.history = ManeuverHistory()
 
-        self.strategy = SoccarStrategy(self.info)
-
-        # variables related to quick chats
-        self.chat = QuickChatTool(self)
-        self.last_ball_vel = 0
-        self.said_gg = False
-        self.last_time_said_all_yours = 0
-        self.num_of_our_goals_reacted_to = 0
-        self.num_of_their_goals_reacted_to = 0
+        self.strategy = TwitchChatStrategy(self.info, self.draw, self.history)
+        self.paused = False
+        self.pause_target = False
+        self.last_time_paused = -99
 
 
     def get_output(self, packet: GameTickPacket):
@@ -57,6 +58,7 @@ class BotimusPrime(BaseAgent):
         self.prev_time = self.time
         if self.ticks < 6:
             self.ticks += 1
+
         self.info.read_packet(packet)
         self.strategy.packet = packet
         
@@ -75,120 +77,76 @@ class BotimusPrime(BaseAgent):
                 self.info.my_car.on_ground
                 and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving)
             ):
-                self.maneuver = None
+                pass
+                # self.maneuver = None
                 #self.reset_time = self.time
 
 
         # choose maneuver
-        if self.maneuver is None and self.time > self.reset_time + 0.01 and self.ticks > 5:
+        if self.maneuver is None and self.time > self.reset_time + 0.01 and self.ticks > 5 and packet.game_info.is_round_active:
 
-            if self.RENDERING:
-                self.draw.clear()
+            info = self.info
+            car = info.my_car
+            their_goal = info.their_goal.center
+            my_goal = info.my_goal.center
+            my_hit = Intercept(car, info.ball_predictions)
+            their_hit = Intercept(info.opponents[0], info.ball_predictions)
 
-            self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
+            if not car.on_ground:
+                self.maneuver = FastRecovery(car)
+                self.history.add("Recovery", "AUTOMATIC", "In progress")
 
-            self.maneuver = self.strategy.choose_maneuver()
+            elif info.ball.pos[0] == 0 and info.ball.pos[1] == 0:
+                self.maneuver = Kickoff(car, info)
+                self.history.add("Kickoff", "AUTOMATIC", "In progress")
             
-            name = str(type(self.maneuver).__name__)
+            else:
+                self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
+                self.draw.string2D(500, 300, "Waiting for new commands...", 3)
+                self.draw.ball_prediction(self.info)
 
-            self.last_ball_vel = norm(self.info.ball.vel)
+                if not self.paused:
+                    self.set_game_state(GameState(console_commands=["Pause"]))
+                    self.paused = True
+                    self.pause_target = True
 
+                self.paused = True
+                print("getting command")
+                self.maneuver = self.strategy.get_maneuver()
+
+            if self.maneuver is None:
+                self.pause_target = True
+
+            else:
+                self.pause_target = False
+                print("chosen " + str(type(self.maneuver).__name__))
         
         # execute maneuver
         if self.maneuver is not None:
             self.maneuver.step(dt)
 
-            # I have to convert from RLU Input to SimpleControllerState, because Input doesnt have 'use_item'
-            self.controls.steer = self.maneuver.controls.steer
-            self.controls.throttle = self.maneuver.controls.throttle
-            self.controls.jump = self.maneuver.controls.jump
-            self.controls.pitch = self.maneuver.controls.pitch
-            self.controls.yaw = self.maneuver.controls.yaw
-            self.controls.roll = self.maneuver.controls.roll
-            self.controls.handbrake = self.maneuver.controls.handbrake
-            self.controls.boost = self.maneuver.controls.boost
+            self.controls = self.maneuver.controls
 
             if self.RENDERING:
                 self.maneuver.render(self.draw)
 
-            if self.maneuver.finished:
-                self.maneuver = None
 
+            if self.maneuver.finished:
+                print(str(type(self.maneuver).__name__) + " finished")
+                self.maneuver = None
+                self.history.history[len(self.history.history) - 1].status = "Finished"
+
+                if self.RENDERING:
+                    self.draw.clear()
 
         if self.RENDERING:
+            self.history.render(self.draw)
             self.draw.execute()
 
-        self.maybe_chat(packet)
-        self.chat.step(packet)
+        if time() > self.last_time_paused + 0.1:
+            if self.paused != self.pause_target:
+                self.set_game_state(GameState(console_commands=["Pause"]))
+                self.paused = self.pause_target
+            self.last_time_paused = time()
 
         return self.controls
-
-    def maybe_chat(self, packet: GameTickPacket):
-        chat = self.chat
-
-        for team in packet.teams:
-            if team.team_index == self.team:
-                our_score = team.score
-            else:
-                their_score = team.score
-
-        # last second goal
-        if their_score > self.num_of_their_goals_reacted_to or our_score > self.num_of_our_goals_reacted_to:
-            if abs(their_score - our_score) < 2 and packet.game_info.game_time_remaining < 5:
-                for _ in range(6):
-                    self.chat.send_random([
-                        chat.Reactions_OMG,
-                        chat.PostGame_Gg,
-                        chat.Reactions_HolyCow,
-                        chat.Reactions_NoWay,
-                        chat.Reactions_Wow,
-                        chat.Reactions_OMG
-                    ])
-
-        # they scored
-        if their_score > self.num_of_their_goals_reacted_to:
-            self.num_of_their_goals_reacted_to = their_score
-            for _ in range(2):
-                if self.last_ball_vel > 2000:
-                    self.chat.send_random([
-                        chat.Compliments_NiceShot,
-                        chat.Compliments_NiceOne,
-                        chat.Reactions_Wow,
-                        chat.Reactions_OMG,
-                        chat.Reactions_Noooo
-                    ])
-                else:
-                    self.chat.send_random([
-                        chat.Reactions_Whew,
-                        chat.Apologies_Whoops,
-                        chat.Apologies_Oops,
-                        chat.Apologies_Cursing
-                    ])
-
-        # we scored
-        if our_score > self.num_of_our_goals_reacted_to:
-            self.num_of_our_goals_reacted_to = our_score
-
-            if self.last_ball_vel > 3000:
-                self.chat.send(chat.Reactions_Siiiick)
-
-            if self.last_ball_vel < 300:
-                self.chat.send(chat.Compliments_WhatASave)
-
-        # game is over
-        if packet.game_info.is_match_ended and not self.said_gg:
-            self.said_gg = True
-
-            self.chat.send(chat.PostGame_Gg)
-            self.chat.send(chat.PostGame_WellPlayed)
-
-            if our_score < their_score:
-                self.chat.send(chat.PostGame_OneMoreGame)
-
-        # all yours :D
-        if self.time > self.last_time_said_all_yours + 40:
-            if isinstance(self.maneuver, ShadowDefense) and distance(self.info.my_car, self.info.ball) > 6000:
-                self.last_time_said_all_yours = self.time
-                self.chat.send(chat.Information_AllYours)
-
-

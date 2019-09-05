@@ -174,7 +174,6 @@ class DrawingTool:
     def ball_prediction(self, info: GameInfo, time_limit=None):
         self.group('prediction')
         self.color(self.yellow)
-        self.alpha(0.5)
         self.ball_trajectory(info.ball_predictions, 4, time_limit)
         self.group()
 

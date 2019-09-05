@@ -52,7 +52,7 @@ class ShadowDefense(Maneuver):
             else:
                 self.wait.step(dt)
                 self.controls = self.wait.controls
-        self.finished = self.travel._driving and self.car.time > self.start_time + 0.5
+        self.finished = self.travel._driving and self.car.time > self.start_time + 5
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)

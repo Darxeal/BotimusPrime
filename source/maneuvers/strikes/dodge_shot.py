@@ -12,8 +12,6 @@ class DodgeShot(DodgeStrike):
         return (
             norm(contact_ray.start) > 0
             and ball.pos[2] < max_height + 50
-            and (Arena.inside(ball.pos, 100) or distance(ball, self.target) < 1000)
-            and abs(car.pos[0]) < Arena.size[0] - 300
         )
 
     def configure(self, intercept: Intercept):

@@ -45,7 +45,7 @@ class Carry(Maneuver):
 
         self.drive.step(dt)
         self.controls = self.drive.controls
-        self.finished = self.ball.pos[2] < 100 or ground_distance(self.ball, self.car) > 1500
+        self.finished = self.ball.pos[2] < 100 or ground_distance(self.ball, self.car) > 3000
 
     def render(self, draw: DrawingTool):
         draw.color(draw.pink)

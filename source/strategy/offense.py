@@ -51,8 +51,8 @@ class Offense:
             and norm(ground_shot.intercept.ball.vel) > 500)
         ):
             if (
-                distance(dodge_shot.intercept.ground_pos, target) < 4000
-                and abs(dodge_shot.intercept.ground_pos[0]) < 3000
+                distance(dodge_shot.intercept.ground_pos, target) < 3000
+                and abs(dodge_shot.intercept.ground_pos[0]) < 2000
             ):
                 return CloseShot(car, self.info, target)
             return dodge_shot
