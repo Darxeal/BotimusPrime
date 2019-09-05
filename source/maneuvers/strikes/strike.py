@@ -76,8 +76,10 @@ class Strike(Maneuver):
         draw.point(self.intercept.ball.pos)
 
         if self.target is not None:
-            draw.color(draw.yellow)
-            draw.point(self.target)
+            draw.color(draw.cyan)
+            pos = self.intercept.ground_pos
+            tdir = ground_direction(pos, self.target)
+            draw.triangle(pos + tdir * 150, tdir, length=100)
 
         if not self._has_drawn_prediction:
             self._has_drawn_prediction = True

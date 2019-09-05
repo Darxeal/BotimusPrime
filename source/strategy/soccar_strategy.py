@@ -75,7 +75,7 @@ class SoccarStrategy:
         corners = [my_goal + vec3(Arena.size[0], 0, 0), my_goal - vec3(Arena.size[0], 0, 0)]
         corner = Strike.pick_easiest_target(car, my_hit.ball, corners)
         corner[1] *= 0.8
-        return self.offense.any_shot(car, corner, my_hit)
+        return DodgeShot(car, self.info, corner)
 
     def choose_maneuver(self):
         info = self.info
@@ -97,6 +97,9 @@ class SoccarStrategy:
         if their_score > my_score:
             if self.packet.game_info.game_time_remaining < 30:
                 self.aggresivity = 99999
+
+        if len(info.opponents) == 1 and self.packet.game_cars[opponent.id].name == "Self-driving car":
+            self.aggresivity = 100
 
         should_commit = True
         if info.teammates:
