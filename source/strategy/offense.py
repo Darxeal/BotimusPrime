@@ -47,8 +47,8 @@ class Offense:
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
             or distance(dodge_shot.intercept.ground_pos, target) < 4000
-            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2 \
-            and norm(ground_shot.intercept.ball.vel) > 500)
+            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2)
+            or norm(ground_shot.intercept.ball.vel) < 500
         ):
             if (
                 distance(dodge_shot.intercept.ground_pos, target) < 4000

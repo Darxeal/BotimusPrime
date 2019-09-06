@@ -18,7 +18,7 @@ class Travel(Maneuver):
 
         self.dodge_duration = 1.6
         self.halflip_duration = 2
-        self.wavedash_duration = 1.3
+        self.wavedash_duration = 1.0
 
         # decide whether to start driving backwards and halfflip later
         forward_est = estimate_time(car, target, estimate_max_car_speed(car))

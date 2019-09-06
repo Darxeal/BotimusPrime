@@ -98,8 +98,8 @@ class SoccarStrategy:
             if self.packet.game_info.game_time_remaining < 30:
                 self.aggresivity = 99999
 
-        if len(info.opponents) == 1 and self.packet.game_cars[opponent.id].name == "Self-driving car":
-            self.aggresivity = 100
+        # if len(info.opponents) == 1 and self.packet.game_cars[opponent.id].name == "Self-driving car":
+        #     self.aggresivity = 100
 
         should_commit = True
         if info.teammates:
@@ -184,13 +184,13 @@ class SoccarStrategy:
                 opponents_align = align(opponent.pos, their_best_hit.ball, my_goal)
 
             # I can get to ball faster than them
-            if should_commit and my_hit.time < their_best_hit.time + (1.5 - my_align) + self.aggresivity / 10:
+            if should_commit and my_hit.time < their_best_hit.time + (1.5 - my_align) + self.aggresivity / 100:
                 strike = offense.any_shot(car, their_goal, my_hit)
 
                 if not isinstance(strike, Strike):
                     return strike
 
-                if strike.intercept.time < their_best_hit.time + self.aggresivity / 10 \
+                if strike.intercept.time < their_best_hit.time + self.aggresivity / 100 \
                 and (not info.about_to_score or strike.intercept.time < info.time_of_goal - 1):
 
                     if strike.intercept.time - car.time > 4 and car.boost < 30 \
@@ -208,7 +208,7 @@ class SoccarStrategy:
             # they are out of position
             if (
                 should_commit
-                and opponents_align < 0 + self.aggresivity / 20 
+                and opponents_align < 0 + self.aggresivity / 100
                 and my_hit.time < their_best_hit.time - opponents_align
             ):
 

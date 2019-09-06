@@ -31,14 +31,14 @@ class ShadowDefense(Maneuver):
     def step(self, dt):
         ball = self.info.ball
 
-        if (
-            distance(self.car, ball) < 1000
-            and align(self.car.pos, ball, self.info.my_goal.center) > 0.2
-        ):
-            shift = normalize(cross(direction(ball, self.car), vec3(0, 0, 1))) * 1000
-            self.travel.target = nearest_point(self.car.pos, [ball.pos + shift, ball.pos - shift])
-        else:
-            self.travel.target = self.target
+        # if (
+        #     distance(self.car, ball) < 1000
+        #     and align(self.car.pos, ball, self.info.my_goal.center) > 0.2
+        # ):
+        #     shift = normalize(cross(direction(ball, self.car), vec3(0, 0, 1))) * 1000
+        #     self.travel.target = nearest_point(self.car.pos, [ball.pos + shift, ball.pos - shift])
+        # else:
+        #     self.travel.target = self.target
 
         self.travel.step(dt)
         self.controls = self.travel.controls

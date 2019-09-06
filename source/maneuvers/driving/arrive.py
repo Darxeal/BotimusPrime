@@ -4,16 +4,22 @@ from maneuvers.driving.drive import Drive
 from maneuvers.driving.travel import Travel
 
 class Arrive(Maneuver):
-
-    def __init__(self, car: Car, target=vec3(0, 0, 0), time=0, target_direction: vec3 = None):
+    '''
+    Arrive at a target position at a certain time (game seconds).
+    You can also specify `target_direction`, and it will try to arrive
+    at an angle. However this does work well only if the car is already
+    roughly facing the specified direction, and only if it's far enough.
+    '''
+    def __init__(self, car: Car):
         super().__init__(car)
 
-        self.target_direction = target_direction
-        self.target = target
-        self.time = time
-        self.drive = Drive(car, target)
+        self.target_direction: vec3 = None
+        self.target: vec3 = None
+        self.time: float = 0
+        self.drive = Drive(car)
         self.travel = Travel(car)
         self.lerp_t = 0.6
+        self.allow_dodges_and_wavedashes: bool = True
 
     def step(self, dt):
         target = self.target
@@ -38,7 +44,12 @@ class Arrive(Maneuver):
 
         self.drive.target_speed = target_speed
 
-        if car.boost < 1 and dist_to_target > 3000:
+        if (
+            self.allow_dodges_and_wavedashes
+            # and car.boost < 50
+            and dist_to_target > clamp(norm(car.vel) + 500, 1400, 2300)
+            or not self.travel._driving
+        ):
             self.travel.target = target
             self.travel.step(dt)
             self.controls = self.travel.controls

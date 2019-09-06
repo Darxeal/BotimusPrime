@@ -13,9 +13,14 @@ class Intercept:
         self.is_viable = True
 
         #find the first reachable ball slice that also meets the predicate
-        speed = 1100 if backwards else estimate_max_car_speed(car)
         for ball in ball_predictions:
-            if estimate_time(car, ball.pos, speed, -1 if backwards else 1) < ball.t - car.time \
+            time_left = ball.t - car.time
+            if backwards:
+                speed = 1000
+            else:
+                speed = estimate_max_car_speed(car) + math.floor(time_left / 1.5) * 500
+
+            if estimate_time(car, ball.pos, speed, -1 if backwards else 1) < time_left \
             and (predicate is None or predicate(car, ball)):
                 self.ball = ball
                 break

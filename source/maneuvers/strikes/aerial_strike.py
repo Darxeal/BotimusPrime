@@ -16,6 +16,7 @@ class AerialStrike(Strike):
 
         self.aerialing = False
         super().__init__(car, info, target)
+        self.arrive.allow_dodges_and_wavedashes = False
     
     def update(self):
         self.intercept = AerialIntercept(self.car, self.info.ball_predictions, self.intercept_predicate)
