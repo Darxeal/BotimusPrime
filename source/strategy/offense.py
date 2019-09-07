@@ -86,11 +86,11 @@ class Offense:
             100 < ball.pos[2] < 2000
             and abs(ball.vel[2]) < 1500
             and ground_distance(car, intercept) < 1000
-            and abs(ball.pos[1] - self.info.my_goal.center[1]) > 500
+            and abs(ball.pos[1] - self.info.my_goal.center[1]) > 1000
         ):
             is_opponent_close = False
             for opponent in self.info.opponents:
-                if ground_distance(opponent, car) < ball.pos[2] / 2 + 500:
+                if ground_distance(opponent, car) < ball.pos[2] + 500:
                     is_opponent_close = True
                     break
             if not is_opponent_close:
@@ -100,7 +100,7 @@ class Offense:
         if ball.pos[2] > 300 or abs(ball.vel[2]) > 500:
             return self.high_shot(car, target)
 
-        if align(car.pos, ball, target) < 0.1 and abs(ball.pos[1]) < 3000 and abs(ball.pos[0]) > 1000:
+        if align(car.pos, ball, target) < 0.6 and abs(ball.pos[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
         
         return self.direct_shot(car, target)

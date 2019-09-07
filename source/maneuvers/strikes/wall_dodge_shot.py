@@ -6,7 +6,7 @@ class WallDodgeShot(DodgeStrike):
 
     def intercept_predicate(self, car: Car, ball: Ball):
         return ball.pos[2] > 1000 and abs(ball.pos[0]) > Arena.size[0] - 300 \
-        and (ground_distance(car, ball) + ball.pos[2] - car.pos[2]) / estimate_max_car_speed(car) * 1.2 < ball.t - car.time
+        and (ground_distance(car, ball) + ball.pos[2] - car.pos[2]) / estimate_max_car_speed(car, ball.t - car.time) * 1.2 < ball.t - car.time
 
     def configure(self, intercept: Intercept):
         self.arrive.drive.drive_on_walls = True

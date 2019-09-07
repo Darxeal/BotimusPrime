@@ -35,7 +35,7 @@ class Travel(Maneuver):
         target = ground(self.target)
 
         car_vel = norm(car.vel)
-        time_left = distance(car, target) / max(car_vel + 500, 1400)
+        time_left = (distance(car, target) - self.finish_distance) / max(car_vel + 500, 1400)
         vf = dot(car.forward(), car.vel)
 
         if self._driving and car.on_ground:
@@ -71,10 +71,10 @@ class Travel(Maneuver):
             self.action = self.drive
             self.drive.backwards = False
 
-        if distance(car, target) < self.finish_distance:
+        if distance(car, target) < self.finish_distance and self._driving:
             self.finished = True
 
-        if not self.waste_boost:
+        if not self.waste_boost and car.boost > 70:
             self.controls.boost = 0
 
     def render(self, draw: DrawingTool):

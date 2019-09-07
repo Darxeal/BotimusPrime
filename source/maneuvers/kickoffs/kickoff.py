@@ -8,12 +8,9 @@ class Kickoff(Maneuver):
         super().__init__(car)
         self.info = info
 
-        is_corner_kickoff = abs(car.pos[0]) > 1000
-
         self.action = Arrive(car)
         self.action.target = info.ball.pos
         self.action.target_direction = direction(info.ball, info.their_goal.center)
-        # self.action.lerp_t = 0.3 if is_corner_kickoff else 0.45
         self.action.lerp_t = 0.4
         self.action.allow_dodges_and_wavedashes = False
 
@@ -21,7 +18,7 @@ class Kickoff(Maneuver):
         self.dodge = AirDodge(car, 0.05, info.ball.pos)
 
     def step(self, dt):
-        if not self.dodging and distance(self.car, self.info.ball) < 800:
+        if not self.dodging and distance(self.car, self.info.ball) < 900:
 
             # detect if an opponent is going for kickoff
             is_opponent_going_for_kickoff = False

@@ -16,9 +16,9 @@ class Intercept:
         for ball in ball_predictions:
             time_left = ball.t - car.time
             if backwards:
-                speed = 1000
+                speed = 1200
             else:
-                speed = estimate_max_car_speed(car) + math.floor(time_left / 1.5) * 500
+                speed = estimate_max_car_speed(car, time_left)
 
             if estimate_time(car, ball.pos, speed, -1 if backwards else 1) < time_left \
             and (predicate is None or predicate(car, ball)):

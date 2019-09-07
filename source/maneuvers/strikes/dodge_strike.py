@@ -24,8 +24,11 @@ class DodgeStrike(Strike):
         else:
             self.arrive.target = intercept.ground_pos - ground_direction(intercept.ground_pos, self.target) * 110
 
-        self.dodge.jump.duration =  0.05 + clamp((intercept.ball.pos[2]-92) / 600, 0, 1.5)
+        additional_jump = clamp((intercept.ball.pos[2]-95) / 550, 0, 1.5)
+        self.dodge.jump.duration = 0.1 + additional_jump
         self.dodge.target = intercept.ball.pos
+        self.arrive.additional_shift = additional_jump * 500
+        self.arrive.turn_radius_shift_limit_multiplier = 1.3
 
 
     def step(self, dt):

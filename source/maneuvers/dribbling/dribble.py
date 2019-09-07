@@ -38,7 +38,7 @@ class Dribble(Maneuver):
             
             # flick if opponent is close
             for opponent in self.info.opponents:
-                if distance(opponent, car) < max(800, norm(opponent.vel)) and distance(car.pos, self.info.ball.pos) < 350:
+                if distance(opponent.pos + opponent.vel, car) < max(800, norm(opponent.vel)) and distance(car.pos, self.info.ball.pos) < 350:
                     self.flicking = True
         else:
             self.flick.step(dt)

@@ -34,7 +34,7 @@ class Carry(Maneuver):
 
         if abs(shift[1]) > abs(max_shift[1]) or shift[0] < 0:
             shift = max_shift
-        shift *= 40
+        shift *= 30
 
         shift[1] *= clamp(norm(car.vel)/1000, 1, 2)
 

@@ -6,7 +6,7 @@ class Strike(Maneuver):
 
     allow_backwards = False
     update_interval = 0.3
-    stop_updating = 0.8
+    stop_updating = 0.3
     max_additional_time = 1
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):

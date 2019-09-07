@@ -5,19 +5,16 @@ from RLUtilities.Simulation import Car, Ball
 from utils.vector_math import *
 from utils.math import *
 
-def estimate_max_car_speed(car: Car):
-    return clamp(max(norm(car.vel), 1300) + car.boost * 30, 1400, 2300)
+def estimate_max_car_speed(car: Car, time_left=0):
+    return clamp(max(norm(car.vel), 1300) + car.boost * 50 * time_left, 1400 + math.floor(time_left * 0.5) * 500, 2300)
 
 def estimate_time(car: Car, target, speed, dd=1) -> float:
     dist = distance(car, target)
-    if dist < 100:
-        return 0
     travel = dist / speed
-    turning = angle_between(car.forward() * dd, direction(car, target)) / math.pi * 2
-    if turning < 1:
-        turning **= 2
-    acceleration = (speed * dd - dot(car.vel, car.forward())) / 2100 * 0.6 * dd
-    return travel + acceleration + turning * 0.7
+    turning = angle_between(car.forward() * dd, direction(car, target)) / math.pi * 1.5
+    turning **= 2
+    acceleration = (speed * dd - dot(car.vel, car.forward())) / 2100 * dd
+    return travel + acceleration * 0.4 + turning * 0.4
 
 def turn_radius(speed: float) -> float:
     spd = clamp(speed, 0, 2300)

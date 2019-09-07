@@ -9,6 +9,7 @@ from tools.quick_chats import QuickChatTool
 
 from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.shadow_defense import ShadowDefense
 
 from strategy.soccar_strategy import SoccarStrategy
@@ -51,7 +52,11 @@ class BotimusPrime(BaseAgent):
     def get_output(self, packet: GameTickPacket):
         self.time = packet.game_info.seconds_elapsed
         dt = self.time - self.prev_time
-        if packet.game_info.is_kickoff_pause and not isinstance(self.maneuver, Kickoff):
+        if (
+            packet.game_info.is_kickoff_pause
+            and not isinstance(self.maneuver, Kickoff)
+            and not isinstance(self.maneuver, DiagonalKickoff)
+        ):
             self.maneuver = None
 
         self.prev_time = self.time
@@ -72,8 +77,10 @@ class BotimusPrime(BaseAgent):
         )):
             self.last_touch_time = touch.time_seconds
             if (
-                self.info.my_car.on_ground
+                self.info.my_car.on_ground and not self.controls.jump
                 and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving)
+                and not isinstance(self.maneuver, DiagonalKickoff)
+                and not isinstance(self.maneuver, Kickoff)
             ):
                 self.maneuver = None
                 #self.reset_time = self.time

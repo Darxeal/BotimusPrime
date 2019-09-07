@@ -7,7 +7,7 @@ class Refuel(Maneuver):
         super().__init__(car)
         self.info = info
 
-        pos = (target + car.pos + info.my_goal.center * 2) / 4
+        pos = (target + car.pos * 2 + info.my_goal.center * 2) / 5
         self.pad = self.nearest_boostpad(car, info, pos)
         self.travel = Travel(car, self.pad.pos, waste_boost=True)
 
