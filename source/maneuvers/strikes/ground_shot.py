@@ -5,6 +5,7 @@ from maneuvers.strikes.strike import Strike
 class GroundShot(Strike):
 
     max_distance_from_wall = 110
+    max_additional_time = 0.3
 
     def intercept_predicate(self, car: Car, ball: Ball):
         if ball.pos[2] > 200 or abs(ball.pos[1]) > Arena.size[1] - 400:

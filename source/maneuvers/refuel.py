@@ -7,7 +7,7 @@ class Refuel(Maneuver):
         super().__init__(car)
         self.info = info
 
-        pos = (target + car.pos + info.my_goal.center * 2) / 4
+        pos = (target + car.pos * 2 + info.my_goal.center * 2) / 5
         self.pad = self.nearest_boostpad(car, info, pos)
         self.travel = Travel(car, self.pad.pos, waste_boost=True)
 
@@ -25,7 +25,7 @@ class Refuel(Maneuver):
     def step(self, dt):
         if norm(self.car.vel) > 1400:
             if distance(self.car, self.pad) < norm(self.car.vel) * 0.3:
-                self.travel.action.target_speed = 1000
+                self.travel.action.target_speed = 1300
         self.travel.step(dt)
         self.controls = self.travel.controls
         self.finished = (not self.pad.is_active \

@@ -9,6 +9,7 @@ from tools.quick_chats import QuickChatTool
 
 from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.shadow_defense import ShadowDefense
 
 from strategy.soccar_strategy import SoccarStrategy
@@ -72,7 +73,7 @@ class BotimusPrime(BaseAgent):
         )):
             self.last_touch_time = touch.time_seconds
             if (
-                self.info.my_car.on_ground
+                self.info.my_car.on_ground and not self.controls.jump
                 and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving)
             ):
                 self.maneuver = None

@@ -3,10 +3,13 @@ from maneuvers.kit import *
 from RLUtilities.Maneuvers import Aerial as RLUAerial
 
 class Aerial(RLUAerial):
-
+    '''Wrapper for the RLU Aerial class'''
+    
     def step(self, dt):
         super().step(dt)
-        if self.total_timer > 1 and self.car.on_ground:
+
+        # abort if failed to take off
+        if self.total_timer > 0.5 and self.car.on_ground:
             self.finished = True
 
     def render(self, draw: DrawingTool):

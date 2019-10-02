@@ -1,9 +1,9 @@
 from maneuvers.kit import * 
 
-from maneuvers.strikes.ground_shot import GroundShot
+from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.strike import Strike
 
-class MirrorShot(GroundShot):
+class MirrorShot(DodgeShot):
     def __init__(self, car: Car, info: GameInfo, target: vec3):
         self.actual_target = target
 

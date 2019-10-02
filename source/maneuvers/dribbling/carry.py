@@ -3,7 +3,10 @@ from maneuvers.kit import *
 from maneuvers.driving.drive import Drive
 
 class Carry(Maneuver):
-
+    '''
+    Carry the ball on roof towards a target.
+    Finishes if the ball hits the floor.
+    '''
     def __init__(self, car: Car, ball: Ball, target: vec3):
         super().__init__(car)
 
@@ -16,6 +19,7 @@ class Carry(Maneuver):
         ball = Ball(self.ball)
         car = self.car
 
+        # simulate ball until it gets near the floor
         while (ball.pos[2] > 120 or ball.vel[2] > 0) and ball.t < car.time + 10:
             ball.step(1/60)
 
@@ -31,7 +35,7 @@ class Carry(Maneuver):
 
         if abs(shift[1]) > abs(max_shift[1]) or shift[0] < 0:
             shift = max_shift
-        shift *= 45
+        shift *= 30
 
         shift[1] *= clamp(norm(car.vel)/1000, 1, 2)
 

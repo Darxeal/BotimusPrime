@@ -103,11 +103,11 @@ class DrawingTool:
 
     def point(self, pos: vec3, size: float = 5):
         self._check_limit()
-        self._renderer.draw_rect_3d(loc(pos), size, size, 1, self._color, 1)
+        self._renderer.draw_rect_3d(loc(pos) + vec3(0,0,5), size, size, 1, self._color, 1)
 
     def line(self, pos1: vec3, pos2: vec3):
         self._check_limit()
-        self._renderer.draw_line_3d(loc(pos1), loc(pos2), self._color)
+        self._renderer.draw_line_3d(loc(pos1) + vec3(0,0,5), loc(pos2) + vec3(0,0,5), self._color)
 
     def string(self, pos: vec3, text, scale=1):
         self._check_limit()

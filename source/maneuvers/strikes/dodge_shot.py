@@ -4,7 +4,7 @@ from maneuvers.strikes.dodge_strike import DodgeStrike
 
 class DodgeShot(DodgeStrike):
 
-    max_base_height = 220
+    max_base_height = 250
 
     def intercept_predicate(self, car: Car, ball: Ball):
         max_height = align(car, ball, self.target) * 60 + self.max_base_height

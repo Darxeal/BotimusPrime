@@ -38,7 +38,7 @@ class Drive(Maneuver):
         self.controls.steer = clamp11(2.5 * phi)
 
         #powersliding
-        if abs(phi) > 1.5 and self.car.pos[2] < 200:
+        if abs(phi) > 1.5 and self.car.pos[2] < 200 and ground_distance(self.car, target) < 2500:
             self.controls.handbrake = 1
         else:
             self.controls.handbrake = 0
@@ -86,31 +86,5 @@ class Drive(Maneuver):
         draw.color(draw.cyan)
         draw.square(self.target_pos, 50)
         target_direction = direction(self.car.pos, self.target_pos)
-        draw.triangle(self.car.pos + target_direction * 100, target_direction, up=self.car.up())
-
-        # speedometer
-        car = self.car
-        width = 5
-        length = 40
-        forw_offset = 20
-        p1 = world(car, vec3(-length + forw_offset, -width, 0))
-        p2 = world(car, vec3(-length + forw_offset,  width, 0))
-        p3 = world(car, vec3( length + forw_offset,  width, 0))
-        p4 = world(car, vec3( length + forw_offset, -width, 0))
-        draw.line(p1, p2)
-        draw.line(p2, p3)
-        draw.line(p3, p4)
-        draw.line(p4, p1)
-
-        x = rangemap(1400, 0, 2300, -length, length) + forw_offset
-        draw.color(draw.gray)
-        draw.line(world(car, vec3(x, -width, 0)), world(car, vec3(x, width, 0)))
-
-        x = rangemap(clamp(self.target_speed, 0, 2290), 0, 2300, -length, length) + forw_offset
-        draw.color(draw.lime)
-        draw.line(world(car, vec3(x, -width, 0)), world(car, vec3(x, width, 0)))
-
-        x = rangemap(norm(self.car.vel), 0, 2300, -length, length) + forw_offset
-        draw.color(draw.yellow)
-        draw.line(world(car, vec3(x, -width, 0)), world(car, vec3(x, width, 0)))
+        draw.triangle(self.car.pos + target_direction * 150, target_direction, up=self.car.up())
         

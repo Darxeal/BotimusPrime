@@ -16,7 +16,7 @@ class Travel(Maneuver):
         self._time_on_ground = 0
         self._driving = True
 
-        self.dodge_duration = 1.6
+        self.dodge_duration = 1.5
         self.halflip_duration = 2
         self.wavedash_duration = 1.3
 
@@ -35,7 +35,7 @@ class Travel(Maneuver):
         target = ground(self.target)
 
         car_vel = norm(car.vel)
-        time_left = distance(car, target) / max(car_vel + 500, 1400)
+        time_left = (distance(car, target) - self.finish_distance) / max(car_vel + 500, 1400)
         vf = dot(car.forward(), car.vel)
 
         if self._driving and car.on_ground:
@@ -71,10 +71,10 @@ class Travel(Maneuver):
             self.action = self.drive
             self.drive.backwards = False
 
-        if distance(car, target) < self.finish_distance:
+        if distance(car, target) < self.finish_distance and self._driving:
             self.finished = True
 
-        if not self.waste_boost:
+        if not self.waste_boost and car.boost < 70:
             self.controls.boost = 0
 
     def render(self, draw: DrawingTool):
