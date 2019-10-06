@@ -31,16 +31,16 @@ class Ball():
     restitution = 0.6000000238418579
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: Ball) -> None: 
         pass
     @overload
-    def __init__(self, arg0: Ball) -> None: ...
+    def __init__(self) -> None: ...
     def hitbox(self) -> sphere: ...
     @overload
-    def step(self, arg0: float) -> None: 
+    def step(self, arg0: float, arg1: Car) -> None: 
         pass
     @overload
-    def step(self, arg0: float, arg1: Car) -> None: ...
+    def step(self, arg0: float) -> None: ...
 
     angular_velocity: vec3
     position: vec3
@@ -50,10 +50,10 @@ class Ball():
 class Car():
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: Car) -> None: 
         pass
     @overload
-    def __init__(self, arg0: Car) -> None: ...
+    def __init__(self) -> None: ...
     def extrapolate(self, arg0: float) -> None: ...
     def forward(self) -> vec3: ...
     def hitbox(self) -> obb: ...
@@ -95,10 +95,10 @@ class ControlPoint():
 class Curve():
 
     @overload
-    def __init__(self, arg0: List[ControlPoint]) -> None: 
+    def __init__(self, arg0: List[vec3]) -> None: 
         pass
     @overload
-    def __init__(self, arg0: List[vec3]) -> None: ...
+    def __init__(self, arg0: List[ControlPoint]) -> None: ...
     def calculate_distances(self) -> None: ...
     def calculate_max_speeds(self, arg0: float, arg1: float) -> float: ...
     def calculate_tangents(self) -> None: ...
@@ -210,10 +210,10 @@ class ray():
 class sphere():
 
     @overload
-    def __init__(self, arg0: vec3, arg1: float) -> None: 
+    def __init__(self) -> None: 
         pass
     @overload
-    def __init__(self) -> None: ...
+    def __init__(self, arg0: vec3, arg1: float) -> None: ...
 
     center: vec3
     radius: float
@@ -226,8 +226,8 @@ class tri():
 
     pass
 @overload
-def intersect(arg0: sphere, arg1: obb) -> bool:
+def intersect(arg0: obb, arg1: sphere) -> bool:
     pass
 @overload
-def intersect(arg0: obb, arg1: sphere) -> bool:
+def intersect(arg0: sphere, arg1: obb) -> bool:
     pass
