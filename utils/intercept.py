@@ -1,11 +1,11 @@
-from RLUtilities.GameInfo import GameInfo
-from RLUtilities.LinearAlgebra import *
-from RLUtilities.Simulation import Car, Ball
-from RLUtilities.Maneuvers import Aerial, look_at
+from rlutilities.simulation import Car, Ball
+from rlutilities.mechanics import Aerial
+from rlutilities.linear_algebra import look_at
 
 from utils.vector_math import *
 from utils.math import *
 from utils.misc import *
+
 
 class Intercept:
     def __init__(self, car: Car, ball_predictions, predicate: callable = None, backwards=False):
@@ -14,8 +14,10 @@ class Intercept:
 
         #find the first reachable ball slice that also meets the predicate
         speed = 1100 if backwards else estimate_max_car_speed(car)
-        for ball in ball_predictions:
-            if estimate_time(car, ball.pos, speed, -1 if backwards else 1) < ball.t - car.time \
+        # for ball in ball_predictions:
+        for i in range(len(ball_predictions)):
+            ball = ball_predictions[i]
+            if estimate_time(car, ball.position, speed, -1 if backwards else 1) < ball.time - car.time \
             and (predicate is None or predicate(car, ball)):
                 self.ball = ball
                 break
@@ -28,9 +30,9 @@ class Intercept:
                 self.ball = ball_predictions[-1]
             self.is_viable = False
 
-        self.time = self.ball.t
-        self.ground_pos = ground(self.ball.pos)
-        self.pos = self.ball.pos
+        self.time = self.ball.time
+        self.ground_pos = ground(self.ball.position)
+        self.position = self.ball.position
 
 class AerialIntercept:
     def __init__(self, car: Car, ball_predictions, predicate: callable = None):
@@ -39,16 +41,16 @@ class AerialIntercept:
 
         #find the first reachable ball slice that also meets the predicate
         test_car = Car(car)
-        test_aerial = Aerial(car, vec3(0, 0, 0), 0)
+        test_aerial = Aerial(car)
         
         for ball in ball_predictions:
-            test_aerial.target = ball.pos
-            test_aerial.t_arrival = ball.t
+            test_aerial.target = ball.position
+            test_aerial.arrival_time = ball.time
 
             # fake our car state :D
-            dir_to_target = ground_direction(test_car.pos, test_aerial.target)
-            test_car.vel = dir_to_target * max(norm(test_car.vel), 1200)
-            test_car.theta = look_at(dir_to_target)
+            dir_to_target = ground_direction(test_car.position, test_aerial.target)
+            test_car.velocity = dir_to_target * max(norm(test_car.velocity), 1200)
+            test_car.orientation = look_at(dir_to_target, vec3(0,0,1))
 
             if test_aerial.is_viable() and (predicate is None or predicate(car, ball)):
                 self.ball = ball
@@ -59,9 +61,9 @@ class AerialIntercept:
             self.ball = ball_predictions[-1]
             self.is_viable = False
 
-        self.time = self.ball.t
-        self.ground_pos = ground(self.ball.pos)
-        self.pos = self.ball.pos
+        self.time = self.ball.time
+        self.ground_pos = ground(self.ball.position)
+        self.position = self.ball.position
 
 
 class NearestIntercept:
@@ -75,6 +77,6 @@ class NearestIntercept:
                 self.ball = ball
                 best_dist = dist
 
-        self.time = self.ball.t
-        self.ground_pos = ground(self.ball.pos)
-        self.pos = self.ball.pos
+        self.time = self.ball.time
+        self.ground_pos = ground(self.ball.position)
+        self.position = self.ball.position

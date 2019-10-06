@@ -1,8 +1,8 @@
 from rlbot.agents.base_agent import GameTickPacket
 
-from RLUtilities.GameInfo import GameInfo
-from RLUtilities.LinearAlgebra import *
-from RLUtilities.Simulation import Car, Ball
+from utils.game_info import GameInfo
+from rlutilities.linear_algebra import *
+from rlutilities.simulation import Car, Ball
 
 from utils.vector_math import *
 from utils.math import *
@@ -26,6 +26,7 @@ from maneuvers.shadow_defense import ShadowDefense
 
 from strategy.offense import Offense
 
+import time
 
 #This file is a Wintertide-deadline mess and definitely not something you should learn from..
 
@@ -53,7 +54,7 @@ class SoccarStrategy:
         best_car = None
 
         for car in cars:
-            intercept = Intercept(car, self.info.ball_predictions, lambda car, ball: ball.pos[2] < max_height)
+            intercept = Intercept(car, self.info.ball_predictions, lambda car, ball: ball.position[2] < max_height)
             if best_intercept is None or intercept.time <= best_intercept.time:
                 best_intercept = intercept
                 best_car = car
@@ -76,8 +77,8 @@ class SoccarStrategy:
         corners = [my_goal + vec3(Arena.size[0], 0, 0), my_goal - vec3(Arena.size[0], 0, 0)]
         corner = Strike.pick_easiest_target(car, my_hit.ball, corners)
         corner[1] *= 0.8
-        if abs(corner[1]) > abs(car.pos[1]):
-            corner[1] = car.pos[1]
+        if abs(corner[1]) > abs(car.position[1]):
+            corner[1] = car.position[1]
 
         return DodgeShot(car, self.info, corner)
 
@@ -93,8 +94,11 @@ class SoccarStrategy:
         their_goal = ground(info.their_goal.center)
         my_goal = ground(info.my_goal.center)
 
+        start = time.time()
         my_hit = Intercept(car, info.ball_predictions)
         their_best_hit, opponent = self.best_intercept(info.opponents, 500)
+        end = time.time()
+        
 
         if my_score > their_score + 2:
             self.aggresivity = 5
@@ -118,7 +122,7 @@ class SoccarStrategy:
             return self.when_airborne()
 
         # kickoff
-        if should_commit and ball.pos[0] == 0 and ball.pos[1] == 0:
+        if should_commit and ball.position[0] == 0 and ball.position[1] == 0:
             return Kickoff(car, info)
 
         # dont save our own shots
@@ -129,12 +133,12 @@ class SoccarStrategy:
         # save
         if info.about_to_be_scored_on:
 
-            if align(car.pos, my_hit.ball, their_goal) > -0.2:
+            if align(car.position, my_hit.ball, their_goal) > -0.2:
 
                 any_shot = offense.any_shot(car, their_goal, my_hit)
 
                 if (not isinstance(any_shot, Strike) or their_best_hit.time < any_shot.intercept.time + 0.5) \
-                and align(car.pos, my_hit.ball, their_goal) < 0.6:
+                and align(car.position, my_hit.ball, their_goal) < 0.6:
                 
                     return DodgeStrike(car, info, their_goal)
                 return any_shot
@@ -143,8 +147,8 @@ class SoccarStrategy:
 
 
         # fallback
-        if align(car.pos, my_hit.ball, my_goal) > 0.2:
-            if ground_distance(my_hit, my_goal) < 4000 and should_commit and abs(car.pos[1]) < abs(my_hit.pos[1]):
+        if align(car.position, my_hit.ball, my_goal) > 0.2:
+            if ground_distance(my_hit, my_goal) < 4000 and should_commit and abs(car.position[1]) < abs(my_hit.position[1]):
                 return self.clear_into_corner(my_hit)
             return ShadowDefense(car, info, my_hit.ground_pos, 6000)
 
@@ -152,16 +156,16 @@ class SoccarStrategy:
         if (
             should_commit
             and ground_distance(my_hit, my_goal) < 3500
-            and abs(my_hit.pos[0]) < 3000
+            and abs(my_hit.position[0]) < 3000
             and ground_distance(car, my_goal) < 2500
         ):
 
-            if align(car.pos, my_hit.ball, their_goal) > -0.1:
+            if align(car.position, my_hit.ball, their_goal) > -0.1:
 
                 any_shot = offense.any_shot(car, their_goal, my_hit)
 
                 if (not isinstance(any_shot, Strike) or their_best_hit.time < any_shot.intercept.time + 0.5) \
-                and align(car.pos, my_hit.ball, their_goal) < 0.6:
+                and align(car.position, my_hit.ball, their_goal) < 0.6:
                 
                     return DodgeStrike(car, info, their_goal)
                 return any_shot
@@ -169,7 +173,7 @@ class SoccarStrategy:
 
 
         # double tap 
-        if should_commit and car.pos[2] > 1000:
+        if should_commit and car.position[2] > 1000:
             double_tap = offense.double_tap(car, their_goal)
             if double_tap is not None:
                 return double_tap
@@ -177,9 +181,9 @@ class SoccarStrategy:
         # 1v1
         if not info.teammates:
             if distance(their_best_hit.ground_pos, their_goal) < distance(their_best_hit.ground_pos, my_goal):
-                opponents_align = -align(opponent.pos, their_best_hit.ball, their_goal)
+                opponents_align = -align(opponent.position, their_best_hit.ball, their_goal)
             else:
-                opponents_align = align(opponent.pos, their_best_hit.ball, my_goal)
+                opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
 
             # I can get to ball faster than them
             if should_commit and my_hit.time < their_best_hit.time - 0.8:
@@ -200,7 +204,7 @@ class SoccarStrategy:
 
                         return Refuel(car, info, my_hit.ground_pos)
 
-                    if abs(strike.intercept.ball.pos[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
+                    if abs(strike.intercept.ball.position[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
                         return strike
 
             # they are out of position
@@ -217,21 +221,21 @@ class SoccarStrategy:
 
                     if (
                         car.boost < 40
-                        and (distance(my_hit, their_goal) > 5000 or abs(my_hit.pos[0]) > Arena.size[0] - 1500)
+                        and (distance(my_hit, their_goal) > 5000 or abs(my_hit.position[0]) > Arena.size[0] - 1500)
                         and distance(opponent, their_best_hit) > 3000
                     ):
                         return Refuel(car, info, my_hit.ground_pos)
 
-                    if not isinstance(strike, Strike) or abs(strike.intercept.ball.pos[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
+                    if not isinstance(strike, Strike) or abs(strike.intercept.ball.position[1] - their_goal[1]) > 300 or ground_distance(strike.intercept, their_goal) < 900:
                         return strike
 
             if distance(their_best_hit.ball, my_goal) > 7000 and \
-                (distance(their_best_hit, opponent) > 3000 or align(opponent.pos, their_best_hit.ball, my_goal) < 0) and car.boost < 30:
+                (distance(their_best_hit, opponent) > 3000 or align(opponent.position, their_best_hit.ball, my_goal) < 0) and car.boost < 30:
                 return Refuel(car, info, my_hit.ground_pos)
 
             if car.boost < 35 and distance(their_best_hit, opponent) > 3000:
                 refuel = Refuel(car, info, my_hit.ground_pos)
-                if estimate_time(car, refuel.pad.pos, 1400) < 1.5:
+                if estimate_time(car, refuel.pad.position, 1400) < 1.5:
                     return refuel
 
         # teamplay

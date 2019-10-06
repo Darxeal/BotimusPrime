@@ -1,12 +1,12 @@
 import math
-from RLUtilities.LinearAlgebra import vec3, normalize, dot, norm
-from RLUtilities.Simulation import Car, Ball
+from rlutilities.linear_algebra import vec3, normalize, dot, norm
+from rlutilities.simulation import Car, Ball
 
 from utils.vector_math import *
 from utils.math import *
 
 def estimate_max_car_speed(car: Car):
-    return clamp(max(norm(car.vel), 1300) + car.boost * 30, 1400, 2300)
+    return clamp(max(norm(car.velocity), 1300) + car.boost * 30, 1400, 2300)
 
 def estimate_time(car: Car, target, speed, dd=1) -> float:
     dist = distance(car, target)
@@ -16,7 +16,7 @@ def estimate_time(car: Car, target, speed, dd=1) -> float:
     turning = angle_between(car.forward() * dd, direction(car, target)) / math.pi * 2
     if turning < 1:
         turning **= 2
-    acceleration = (speed * dd - dot(car.vel, car.forward())) / 2100 * 0.6 * dd
+    acceleration = (speed * dd - dot(car.velocity, car.forward())) / 2100 * 0.6 * dd
     return travel + acceleration + turning * 0.7
 
 def turn_radius(speed: float) -> float:

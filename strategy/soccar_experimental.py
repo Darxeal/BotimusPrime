@@ -1,8 +1,8 @@
 from rlbot.agents.base_agent import GameTickPacket
 
-from RLUtilities.GameInfo import GameInfo
-from RLUtilities.LinearAlgebra import *
-from RLUtilities.Simulation import Car, Ball
+from utils.game_info import GameInfo
+from rlutilities.linear_algebra import *
+from rlutilities.simulation import Car, Ball
 
 from utils.vector_math import *
 from utils.math import *
@@ -53,7 +53,7 @@ class SoccarStrategy:
         best_car = None
 
         for car in cars:
-            intercept = Intercept(car, self.info.ball_predictions, lambda car, ball: ball.pos[2] < max_height)
+            intercept = Intercept(car, self.info.ball_predictions, lambda car, ball: ball.position[2] < max_height)
             if best_intercept is None or intercept.time <= best_intercept.time:
                 best_intercept = intercept
                 best_car = car
@@ -76,8 +76,8 @@ class SoccarStrategy:
         corners = [my_goal + vec3(Arena.size[0], 0, 0), my_goal - vec3(Arena.size[0], 0, 0)]
         corner = Strike.pick_easiest_target(car, my_hit.ball, corners)
         corner[1] *= 0.8
-        if abs(corner[1]) > abs(car.pos[1]):
-            corner[1] = car.pos[1]
+        if abs(corner[1]) > abs(car.position[1]):
+            corner[1] = car.position[1]
 
         return DodgeShot(car, self.info, corner)
 
@@ -93,21 +93,21 @@ class SoccarStrategy:
         their_goal = ground(info.their_goal.center)
         my_goal = ground(info.my_goal.center)
 
-        my_hit = Intercept(car, info.ball_predictions, lambda car, ball: ball.pos[2] < 300)
+        my_hit = Intercept(car, info.ball_predictions, lambda car, ball: ball.position[2] < 300)
         their_best_hit, opponent = self.best_intercept(info.opponents)
 
-        my_attack_align = align(car.pos, my_hit.ball, their_goal)
+        my_attack_align = align(car.position, my_hit.ball, their_goal)
 
         opponents_align = 0
         my_align = 0
         if distance(their_best_hit.ground_pos, their_goal) < distance(their_best_hit.ground_pos, my_goal):
-            opponents_align = -align(opponent.pos, their_best_hit.ball, their_goal)
+            opponents_align = -align(opponent.position, their_best_hit.ball, their_goal)
         else:
-            opponents_align = align(opponent.pos, their_best_hit.ball, my_goal)
+            opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
         if distance(my_hit.ground_pos, my_goal) < distance(my_hit.ground_pos, their_goal):
-            my_align = -align(car.pos, my_hit.ball, my_goal)
+            my_align = -align(car.position, my_hit.ball, my_goal)
         else:
-            my_align = align(car.pos, my_hit.ball, their_goal)
+            my_align = align(car.position, my_hit.ball, their_goal)
 
         print(my_align, my_attack_align, opponents_align)
 
@@ -130,9 +130,9 @@ class SoccarStrategy:
             return self.when_airborne()
 
         # kickoff
-        if should_commit and ball.pos[0] == 0 and ball.pos[1] == 0:
+        if should_commit and ball.position[0] == 0 and ball.position[1] == 0:
             print("Kickoff")
-            if abs(car.pos[0]) > 1000:
+            if abs(car.position[0]) > 1000:
                 return DiagonalKickoff(car, info)
             return Kickoff(car, info)
 
@@ -163,13 +163,13 @@ class SoccarStrategy:
 
 
         # fallback
-        if align(car.pos, my_hit.ball, my_goal) > 0.2:
+        if align(car.position, my_hit.ball, my_goal) > 0.2:
             if (
                 should_commit
                 and ground_distance(car, my_hit) < 5000
                 and their_best_hit.time < my_hit.time + 4
-                # and abs(car.pos[1]) < abs(my_hit.pos[1])
-                and abs(my_hit.pos[0]) < Arena.size[0] - 2000
+                # and abs(car.position[1]) < abs(my_hit.position[1])
+                and abs(my_hit.position[0]) < Arena.size[0] - 2000
             ):
                 print("fallback, clearing into corner")
                 return self.clear_into_corner(my_hit)
@@ -181,7 +181,7 @@ class SoccarStrategy:
         if (
             should_commit
             and ground_distance(my_hit, my_goal) < 3500
-            and abs(my_hit.pos[0]) < 2500
+            and abs(my_hit.position[0]) < 2500
             and ground_distance(car, my_goal) < 2500
         ):
 
@@ -203,7 +203,7 @@ class SoccarStrategy:
 
 
         # double tap 
-        if should_commit and car.pos[2] > 1000:
+        if should_commit and car.position[2] > 1000:
             double_tap = offense.double_tap(car, their_goal)
             if double_tap is not None:
                 print("weeeee")
@@ -250,8 +250,8 @@ class SoccarStrategy:
 
                     if distance(opponent, their_goal) > 2000: # if opponent is not sitting in their net
                         if (
-                            abs(strike.intercept.ball.pos[1] - their_goal[1]) > 1000     # ball is not near their back wall
-                            or abs(strike.intercept.ball.pos[0]) < 900     # ball is near their goal
+                            abs(strike.intercept.ball.position[1] - their_goal[1]) > 1000     # ball is not near their back wall
+                            or abs(strike.intercept.ball.position[0]) < 900     # ball is near their goal
                         ):
                             print("going for ball!")
                             return strike
@@ -260,7 +260,7 @@ class SoccarStrategy:
                 distance(their_best_hit.ball, my_goal) > 7000 
                 and (
                     their_time_left > 4
-                    or align(opponent.pos, their_best_hit.ball, my_goal) < 0
+                    or align(opponent.position, their_best_hit.ball, my_goal) < 0
                 )
                 and car.boost < 30
             ):
@@ -269,7 +269,7 @@ class SoccarStrategy:
 
             if car.boost < 35 and their_time_left > 4:
                 refuel = Refuel(car, info, my_hit.ground_pos)
-                if estimate_time(car, refuel.pad.pos, 1400) < 1.5:
+                if estimate_time(car, refuel.pad.position, 1400) < 1.5:
                     print("boost, because it's near")
                     return refuel
 

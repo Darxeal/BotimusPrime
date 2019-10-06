@@ -1,9 +1,8 @@
 import math
 from dataclasses import dataclass
 
-from RLUtilities.LinearAlgebra import vec3, cross
-from RLUtilities.Simulation import Car, Input
-from RLUtilities.GameInfo import GameInfo
+from rlutilities.linear_algebra import vec3, cross
+from rlutilities.simulation import Car, Input
 
 from rlbot.utils.rendering.rendering_manager import RenderingManager
 
@@ -162,16 +161,16 @@ class DrawingTool:
             dt = min(dt, end_time - test_car.time)
             test_car.step(Input(), dt)
             test_car.time += dt
-            steps.append(vec3(test_car.pos))
+            steps.append(vec3(test_car.position))
         self.polyline(steps)
 
     def ball_trajectory(self, ball_predictions: list, step=1, time_limit=None):
         for i in range(step, len(ball_predictions), step):
-            if time_limit is not None and ball_predictions[i].t > time_limit:
+            if time_limit is not None and ball_predictions[i].time > time_limit:
                 break
             self.line(ball_predictions[i - step], ball_predictions[i])
 
-    def ball_prediction(self, info: GameInfo, time_limit=None):
+    def ball_prediction(self, info, time_limit=None):
         self.group('prediction')
         self.color(self.yellow)
         self.alpha(0.5)

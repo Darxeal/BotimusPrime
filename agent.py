@@ -1,8 +1,7 @@
 from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
 
-from RLUtilities.GameInfo import GameInfo
-from RLUtilities.Simulation import Input
-from RLUtilities.LinearAlgebra import norm
+from rlutilities.simulation import Input
+from rlutilities.linear_algebra import norm
 
 from tools.drawing import DrawingTool
 from tools.quick_chats import QuickChatTool
@@ -15,8 +14,9 @@ from maneuvers.shadow_defense import ShadowDefense
 from strategy.soccar_strategy import SoccarStrategy
 
 from utils.vector_math import distance
+from utils.game_info import GameInfo
 
-
+import time
 
 class BotimusPrime(BaseAgent):
     
@@ -25,10 +25,15 @@ class BotimusPrime(BaseAgent):
     PREDICTION_RATE = 120
     PREDITION_DURATION = 8
 
+    # def is_hot_reload_enabled(self):
+    #     return False
+
     def initialize_agent(self):
         self.info: GameInfo = GameInfo(self.index, self.team)
         self.controls: SimpleControllerState = SimpleControllerState()
         self.maneuver: Maneuver = None
+
+        self.info.set_mode("soccar")
 
         self.time = 0
         self.prev_time = 0
@@ -58,7 +63,7 @@ class BotimusPrime(BaseAgent):
         self.prev_time = self.time
         if self.ticks < 6:
             self.ticks += 1
-        self.info.read_packet(packet)
+        self.info.read_packet(packet, self.get_field_info())
         self.strategy.packet = packet
         
 
@@ -74,7 +79,7 @@ class BotimusPrime(BaseAgent):
             self.last_touch_time = touch.time_seconds
             if (
                 self.info.my_car.on_ground and not self.controls.jump
-                and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel._driving)
+                and (not isinstance(self.maneuver, ShadowDefense) or self.maneuver.travel.driving)
             ):
                 self.maneuver = None
                 #self.reset_time = self.time
@@ -86,34 +91,35 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.clear()
 
+            start = time.time()
             self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
+            end = time.time()
+            
 
+            start = time.time()
             self.maneuver = self.strategy.choose_maneuver()
+            end = time.time()
+            
             
             name = str(type(self.maneuver).__name__)
+            print(name)
 
-            self.last_ball_vel = norm(self.info.ball.vel)
+            self.last_ball_vel = norm(self.info.ball.velocity)
 
         
         # execute maneuver
         if self.maneuver is not None:
             self.maneuver.step(dt)
-
-            # I have to convert from RLU Input to SimpleControllerState, because Input doesnt have 'use_item'
-            self.controls.steer = self.maneuver.controls.steer
-            self.controls.throttle = self.maneuver.controls.throttle
-            self.controls.jump = self.maneuver.controls.jump
-            self.controls.pitch = self.maneuver.controls.pitch
-            self.controls.yaw = self.maneuver.controls.yaw
-            self.controls.roll = self.maneuver.controls.roll
-            self.controls.handbrake = self.maneuver.controls.handbrake
-            self.controls.boost = self.maneuver.controls.boost
+            self.controls = self.maneuver.controls
 
             if self.RENDERING:
                 self.maneuver.render(self.draw)
 
             if self.maneuver.finished:
                 self.maneuver = None
+
+        for pad in self.info.large_boost_pads:
+            self.draw.string(pad.position, str(pad.is_full_boost))
 
 
         if self.RENDERING:

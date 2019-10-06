@@ -27,9 +27,9 @@ class Arrive(Maneuver):
         car = self.car
 
         if self.target_direction is not None:
-            car_vel = norm(car.vel)
+            car_vel = norm(car.velocity)
             target_direction = normalize(self.target_direction)
-            shift = clamp(distance(car.pos, target) * self.lerp_t, 0, car_vel * 1.5)
+            shift = clamp(distance(car.position, target) * self.lerp_t, 0, car_vel * 1.5)
             if shift - self.additional_shift < turn_radius(clamp(car_vel, 1400, 2000) * 1.1):
                 shift = 0
             else:
@@ -42,7 +42,7 @@ class Arrive(Maneuver):
             translated_time = self.time
         
         self.drive.target_pos = translated_target
-        dist_to_target = distance(car.pos, translated_target)
+        dist_to_target = distance(car.position, translated_target)
         target_speed = clamp(dist_to_target / max(0.001, translated_time - car.time), 0, 2300)
 
         self.drive.target_speed = target_speed
@@ -50,9 +50,9 @@ class Arrive(Maneuver):
         if (
             self.allow_dodges_and_wavedashes
             and car.boost < 5
-            and dist_to_target > clamp(norm(car.vel) + 600, 1400, 2300)
-            and norm(car.vel) < target_speed - 600
-            or not self.travel._driving
+            and dist_to_target > clamp(norm(car.velocity) + 600, 1400, 2300)
+            and norm(car.velocity) < target_speed - 600
+            or not self.travel.driving
         ):
             self.travel.target = target
             self.travel.step(dt)

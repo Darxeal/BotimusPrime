@@ -4,15 +4,17 @@ from maneuvers.strikes.strike import Strike
 from maneuvers.driving.arrive import Arrive
 from maneuvers.air.aerial import Aerial
 
+from rlutilities.mechanics import AerialTurn
+
 class AerialStrike(Strike):
 
     stop_updating = 1.5
     max_additional_time = 2
 
     def __init__(self, car, info, target=None):
-        self.aerial = Aerial(car, vec3(0,0,0), 99999)
-        self.aerial.aerial_turn = AerialTurn(car, car.theta)
-        self.final_turn = AerialTurn(car, car.theta)
+        self.aerial = Aerial(car)
+        self.aerial.aerial_turn = AerialTurn(car)
+        self.final_turn = AerialTurn(car)
 
         self.aerialing = False
         super().__init__(car, info, target)
@@ -29,23 +31,23 @@ class AerialStrike(Strike):
     def configure(self, intercept: AerialIntercept):
         
         self.arrive.target = intercept.ground_pos
-        self.aerial.target = intercept.ball.pos
+        self.aerial.target = intercept.ball.position
 
         self.arrive.time = intercept.time
-        self.aerial.t_arrival = intercept.time
+        self.aerial.arrival_time = intercept.time
 
     def intercept_predicate(self, car: Car, ball: Ball):
-        return ball.pos[2] > 400
+        return ball.position[2] > 400
 
     def step(self, dt):
-        if self.car.time > self.aerial.t_arrival:
+        if self.car.time > self.aerial.arrival_time:
             self.finished = True
             
         if not self.aerialing:
             super().step(dt)
-            if angle_between(ground(self.car.vel), ground_direction(self.car, self.aerial.target)) < 0.1 \
+            if angle_between(ground(self.car.velocity), ground_direction(self.car, self.aerial.target)) < 0.1 \
             and ground_distance(self.car, self.arrive.target) < self.aerial.target[2] * 3 + 500 \
-            and norm(self.car.vel) > self.arrive.drive.target_speed - 300:
+            and norm(self.car.velocity) > self.arrive.drive.target_speed - 300:
                 self.aerialing = True
                 self.aerial.calculate_course()
         
@@ -63,5 +65,5 @@ class AerialStrike(Strike):
         if self.aerialing:
             self.aerial.render(draw)
             draw.color(draw.cyan)
-            draw.point(self.intercept.ball.pos)
-            draw.line(self.aerial.target, self.intercept.ball.pos)
+            draw.point(self.intercept.ball.position)
+            draw.line(self.aerial.target, self.intercept.ball.position)

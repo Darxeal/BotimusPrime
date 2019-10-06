@@ -1,5 +1,7 @@
 from maneuvers.kit import *
+from maneuvers.jumps.air_dodge import AirDodge
 
+from rlutilities.mechanics import AerialTurn
 
 class AirHover(Maneuver):
     '''
@@ -21,10 +23,10 @@ class AirHover(Maneuver):
             self.controls = self.jump.controls
             return
         
-        delta_target = self.target - self.car.pos
+        delta_target = self.target - self.car.position
         target_direction = normalize(vec3(
-            (delta_target[0]) * self.P - self.car.vel[0] * self.D,
-            (delta_target[1]) * self.P - self.car.vel[1] * self.D,
+            (delta_target[0]) * self.P - self.car.velocity[0] * self.D,
+            (delta_target[1]) * self.P - self.car.velocity[1] * self.D,
             1000
         ))
 
@@ -35,7 +37,7 @@ class AirHover(Maneuver):
         self.controls.boost = 0
 
         # tap boost to keep height
-        if (delta_target[2] - self.car.vel[2] * 0.5) > 0:
+        if (delta_target[2] - self.car.velocity[2] * 0.5) > 0:
             self.controls.boost = 1
 
         # boost so we don't fall while relocating

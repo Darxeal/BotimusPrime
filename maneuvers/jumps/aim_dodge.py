@@ -1,4 +1,6 @@
+from rlutilities.mechanics import AerialTurn
 from maneuvers.kit import *
+from maneuvers.jumps.air_dodge import AirDodge
 
 
 class AimDodge(Maneuver):
@@ -7,7 +9,8 @@ class AimDodge(Maneuver):
         super().__init__(car)
 
         self.dodge = AirDodge(car, duration, target)
-        self.turn = AerialTurn(car, look_at(direction(car, target)))
+        self.turn = AerialTurn(car)
+        self.turn.target = look_at(direction(car, target), vec3(0,0,1))
         self.jump = self.dodge.jump
         self.target = target
 

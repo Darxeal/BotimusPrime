@@ -73,7 +73,7 @@ class Strike(Maneuver):
         self.arrive.render(draw)
         draw.color(draw.lime)
         draw.circle(self.intercept.ground_pos, 93)
-        draw.point(self.intercept.ball.pos)
+        draw.point(self.intercept.ball.position)
 
         if self.target is not None:
             draw.color(draw.cyan)

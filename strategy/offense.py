@@ -1,7 +1,7 @@
 
-from RLUtilities.GameInfo import GameInfo
-from RLUtilities.LinearAlgebra import *
-from RLUtilities.Simulation import Car, Ball
+from utils.game_info import GameInfo
+from rlutilities.linear_algebra import *
+from rlutilities.simulation import Car, Ball
 
 from utils.vector_math import *
 from utils.math import *
@@ -47,8 +47,8 @@ class Offense:
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
             or distance(dodge_shot.intercept.ground_pos, target) < 4000
-            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.vel) < -0.2)
-            or norm(ground_shot.intercept.ball.vel) < 500
+            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.velocity) < -0.2)
+            or norm(ground_shot.intercept.ball.velocity) < 500
         ):
             if (
                 distance(dodge_shot.intercept.ground_pos, target) < 4000
@@ -69,10 +69,10 @@ class Offense:
         aerial = AerialShot(car, self.info, target)
         if (
             aerial.intercept.is_viable
-            and car.boost > aerial.intercept.ball.pos[2] / 50 + 5
+            and car.boost > aerial.intercept.ball.position[2] / 50 + 5
             and aerial.intercept.time < direct_shot.intercept.time
             and not self.info.about_to_score
-            and abs(aerial.intercept.ball.pos[1] - target[1]) > 2000
+            and abs(aerial.intercept.ball.position[1] - target[1]) > 2000
         ):
             return aerial
 
@@ -83,24 +83,24 @@ class Offense:
         ball = intercept.ball
 
         if (
-            100 < ball.pos[2] < 2000
-            and abs(ball.vel[2]) < 1500
+            100 < ball.position[2] < 2000
+            and abs(ball.velocity[2]) < 1500
             and ground_distance(car, intercept) < 1000
-            and abs(ball.pos[1] - self.info.my_goal.center[1]) > 1000
+            and abs(ball.position[1] - self.info.my_goal.center[1]) > 1000
         ):
             is_opponent_close = False
             for opponent in self.info.opponents:
-                if ground_distance(opponent, car) < ball.pos[2] + 500:
+                if ground_distance(opponent, car) < ball.position[2] + 500:
                     is_opponent_close = True
                     break
             if not is_opponent_close:
                 return Dribble(car, self.info, target)
 
 
-        if ball.pos[2] > 300 or abs(ball.vel[2]) > 500:
+        if ball.position[2] > 300 or abs(ball.velocity[2]) > 500:
             return self.high_shot(car, target)
 
-        if align(car.pos, ball, target) < 0.1 and abs(ball.pos[1] - target[1]) > 3000:
+        if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
         
         return self.direct_shot(car, target)
@@ -123,12 +123,12 @@ class Offense:
         if car.boost < 5:
             return None
         predicate = lambda car, ball: (
-            abs(ball.pos[0]) < 1000
-            and ball.pos[2] > 400
+            abs(ball.position[0]) < 1000
+            and ball.position[2] > 400
             and distance(ball, target) < 4000
-            and align(car.pos, ball, target) > 0.3
+            and align(car.position, ball, target) > 0.3
         )
         intercept = AerialIntercept(car, self.info.ball_predictions, predicate)
         if intercept.is_viable and car.boost > (intercept.time - car.time) * 5:
-            target_pos = intercept.ball.pos + direction(target, intercept.ball.pos) * 60
+            target_pos = intercept.ball.position + direction(target, intercept.ball.position) * 60
             return Aerial(car, target_pos, intercept.time)

@@ -20,37 +20,37 @@ class Carry(Maneuver):
         car = self.car
 
         # simulate ball until it gets near the floor
-        while (ball.pos[2] > 120 or ball.vel[2] > 0) and ball.t < car.time + 10:
+        while (ball.position[2] > 120 or ball.velocity[2] > 0) and ball.time < car.time + 10:
             ball.step(1/60)
 
-        ball_local = local(car, ground(ball.pos))
+        ball_local = local(car, ground(ball.position))
         target = local(car, self.target)
 
         shift = ground(direction(ball_local, target))
         shift[1] *= 1.8
         shift = normalize(shift)
         
-        max_turn = clamp(norm(car.vel) / 800, 0, 1)
+        max_turn = clamp(norm(car.velocity) / 800, 0, 1)
         max_shift = normalize(vec3(1 - max_turn, max_turn * sign(shift[1]), 0))
 
         if abs(shift[1]) > abs(max_shift[1]) or shift[0] < 0:
             shift = max_shift
         shift *= 30
 
-        shift[1] *= clamp(norm(car.vel)/1000, 1, 2)
+        shift[1] *= clamp(norm(car.velocity)/1000, 1, 2)
 
-        self._shift_direction = normalize(world(car, shift) - car.pos)
+        self._shift_direction = normalize(world(car, shift) - car.position)
 
         target = world(car, ball_local - shift)
-        speed = distance(car.pos, target) / max(0.001, ball.t - car.time)
+        speed = distance(car.position, target) / max(0.001, ball.time - car.time)
 
         self.drive.target_speed = speed
         self.drive.target_pos = target
 
         self.drive.step(dt)
         self.controls = self.drive.controls
-        self.finished = self.ball.pos[2] < 100 or ground_distance(self.ball, self.car) > 1500
+        self.finished = self.ball.position[2] < 100 or ground_distance(self.ball, self.car) > 1500
 
     def render(self, draw: DrawingTool):
         draw.color(draw.pink)
-        draw.triangle(self.car.pos + self._shift_direction * 50, self._shift_direction)
+        draw.triangle(self.car.position + self._shift_direction * 50, self._shift_direction)

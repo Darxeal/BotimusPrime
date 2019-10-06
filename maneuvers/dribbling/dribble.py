@@ -1,6 +1,7 @@
 from maneuvers.kit import *
 
 from maneuvers.dribbling.carry import Carry
+from maneuvers.jumps.air_dodge import AirDodge
 
 class Dribble(Maneuver):
     '''
@@ -14,7 +15,7 @@ class Dribble(Maneuver):
         self.info = info
 
         self.carry = Carry(car, info.ball, target)
-        self.flick = AirDodge(car, 0.15, info.ball.pos)
+        self.flick = AirDodge(car, 0.15, info.ball.position)
         self.flicking = False
 
     def step(self, dt):
@@ -25,22 +26,22 @@ class Dribble(Maneuver):
             car = self.car
             
             # check if it's a good idea to flick
-            dir_to_target = direction(ground(car.pos), ground(self.target))
+            dir_to_target = direction(ground(car.position), ground(self.target))
             if (
-                distance(car.pos, self.info.ball.pos) < 150
-                and distance(ground(car.pos), ground(self.info.ball.pos)) < 80
+                distance(car.position, self.info.ball.position) < 150
+                and distance(ground(car.position), ground(self.info.ball.position)) < 80
                 and dot(car.forward(), dir_to_target) > 0.9
-                and norm(car.vel) > distance(car, self.target) / 4
-                and norm(car.vel) > 1500
-                and dot(dir_to_target, direction(ground(car.pos), ground(self.info.ball.pos))) > 0.95
+                and norm(car.velocity) > distance(car, self.target) / 4
+                and norm(car.velocity) > 1500
+                and dot(dir_to_target, direction(ground(car.position), ground(self.info.ball.position))) > 0.95
             ):
                 self.flicking = True
             
             # flick if opponent is close
             for opponent in self.info.opponents:
                 if (
-                    distance(opponent.pos + opponent.vel, car) < max(800, norm(opponent.vel))
-                    and distance(car.pos, self.info.ball.pos) < 350
+                    distance(opponent.position + opponent.velocity, car) < max(800, norm(opponent.velocity))
+                    and distance(car.position, self.info.ball.position) < 350
                 ):
                     self.flicking = True
         else:

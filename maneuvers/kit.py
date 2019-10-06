@@ -1,15 +1,15 @@
 import math
 
-from RLUtilities.Maneuvers import AirDodge, AerialTurn, Jump, look_at
-from RLUtilities.LinearAlgebra import *
-from RLUtilities.Simulation import *
-from RLUtilities.GameInfo import GameInfo
+# from rlutilities.mechanics import Dodge, AerialTurn
+from rlutilities.linear_algebra import vec2, vec3, norm, normalize, look_at, angle_between, clip, cross, dot, sgn, xy
+from rlutilities.simulation import Game, Ball, Car, Input, Field
 
 from utils.vector_math import *
 from utils.math import *
 from utils.misc import *
 from utils.intercept import Intercept, AerialIntercept
 from utils.arena import Arena
+from utils.game_info import GameInfo
 
 from tools.drawing import DrawingTool
 

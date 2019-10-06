@@ -12,7 +12,6 @@ class ShadowDefense(Maneuver):
         self.info = info
         self.face_target = face_target
 
-        ball = info.ball
         dist = min(distance_from_target, ground_distance(face_target, self.info.my_goal.center) - 50)
         target_pos = ground(face_target) + ground_direction(face_target, self.info.my_goal.center) * dist
 
@@ -35,10 +34,10 @@ class ShadowDefense(Maneuver):
 
         # if (
         #     distance(self.car, ball) < 1000
-        #     and align(self.car.pos, ball, self.info.my_goal.center) > 0.2
+        #     and align(self.car.position, ball, self.info.my_goal.center) > 0.2
         # ):
         #     shift = normalize(cross(direction(ball, self.car), vec3(0, 0, 1))) * 1000
-        #     self.travel.target = nearest_point(self.car.pos, [ball.pos + shift, ball.pos - shift])
+        #     self.travel.target = nearest_point(self.car.position, [ball.position + shift, ball.position - shift])
         # else:
         #     self.travel.target = self.target
 
@@ -58,7 +57,7 @@ class ShadowDefense(Maneuver):
             else:
                 self.wait.step(dt)
                 self.controls = self.wait.controls
-        self.finished = self.travel._driving and self.car.time > self.start_time + 0.5
+        self.finished = self.travel.driving and self.car.time > self.start_time + 0.5
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)

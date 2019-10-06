@@ -1,4 +1,4 @@
-from RLUtilities.LinearAlgebra import vec3
+from rlutilities.linear_algebra import vec3
 from utils.math import signclamp
 
 

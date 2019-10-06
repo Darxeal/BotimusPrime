@@ -18,12 +18,12 @@ class Drive(Maneuver):
         target = Arena.clamp(target, 100)
 
         # smoothly escape goal
-        if abs(self.car.pos[1]) > Arena.size[1] - 50:
+        if abs(self.car.position[1]) > Arena.size[1] - 50:
             target = Arena.clamp(target, 200)
             target[0] = signclamp(target[0], 700)
 
         if not self.drive_on_walls:
-            if self.car.pos[2] > 300:
+            if self.car.position[2] > 300:
                 target = ground(self.car)
 
         local_target = local(self.car, target)
@@ -38,13 +38,13 @@ class Drive(Maneuver):
         self.controls.steer = clamp11(2.5 * phi)
 
         #powersliding
-        if abs(phi) > 1.5 and self.car.pos[2] < 200 and ground_distance(self.car, target) < 2500:
+        if abs(phi) > 1.5 and self.car.position[2] < 200 and ground_distance(self.car, target) < 2500:
             self.controls.handbrake = 1
         else:
             self.controls.handbrake = 0
 
         # forward velocity
-        vf = dot(self.car.vel, self.car.forward())
+        vf = dot(self.car.velocity, self.car.forward())
         if self.backwards:
             vf *= -1
 
@@ -85,6 +85,6 @@ class Drive(Maneuver):
     def render(self, draw: DrawingTool):
         draw.color(draw.cyan)
         draw.square(self.target_pos, 50)
-        target_direction = direction(self.car.pos, self.target_pos)
-        draw.triangle(self.car.pos + target_direction * 150, target_direction, up=self.car.up())
+        target_direction = direction(self.car.position, self.target_pos)
+        draw.triangle(self.car.position + target_direction * 150, target_direction, up=self.car.up())
         

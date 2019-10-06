@@ -1,6 +1,7 @@
 from maneuvers.kit import *
 
-from RLUtilities.Maneuvers import Drive, AirDodge
+from maneuvers.driving.drive import Drive
+from rlutilities.mechanics import Dodge
 
 class DiagonalKickoff(Maneuver):
     '''Dodge forward once to get there faster.'''
@@ -11,7 +12,9 @@ class DiagonalKickoff(Maneuver):
         self.drive = Drive(car)
         self.drive.target_speed = 2300
 
-        self.dodge = AirDodge(car, 0.1, info.ball.pos)
+        self.dodge = Dodge(car)
+        self.dodge.duration = 0.1
+        self.dodge.direction = normalize(info.their_goal)
 
         self.phase = 0
 
@@ -26,11 +29,12 @@ class DiagonalKickoff(Maneuver):
         if self.phase == 1:
             self.dodge.step(dt)
             self.controls = self.dodge.controls
-            self.controls.yaw
             if self.dodge.finished and self.car.on_ground:
                 print("entering phase 2")
                 self.phase = 2
-                self.dodge = AirDodge(self.car, 0.18, self.info.ball.pos)
+                self.dodge = Dodge(self.car)
+                self.dodge.duration = 0.18
+                self.dodge.direction = direction(self.car.position, self.info.ball.position)
         
         if self.phase == 2:
             self.drive.step(dt)
@@ -44,7 +48,7 @@ class DiagonalKickoff(Maneuver):
             self.dodge.step(dt)
             self.controls = self.dodge.controls
 
-        self.finished = self.info.ball.pos[0] != 0 and self.dodge.finished
+        self.finished = self.info.ball.position[0] != 0 and self.dodge.finished
 
     def render(self, draw: DrawingTool):
         pass
