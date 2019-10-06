@@ -33,3 +33,7 @@ def world(car, pos) -> vec3:
 
 def angle_to(car, target, backwards = False) -> float:
     return abs(angle_between(car.forward() * (-1 if backwards else 1), direction(car.position, target)))
+
+def facing(mat: mat3) -> vec3:
+    # return vec3(mat[0, 0], mat[0, 1], mat[0, 2])
+    return vec3(mat[0, 0], mat[1, 0], mat[2, 0])

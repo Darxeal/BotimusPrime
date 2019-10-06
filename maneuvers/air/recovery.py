@@ -15,9 +15,9 @@ class Recovery(Maneuver):
 
         self.turn = AerialTurn(car)
         self.trajectory = []
-        self.find_landing_orientation(200)
 
     def step(self, dt):
+        self.find_landing_orientation(200)
         self.turn.step(dt)
         self.controls = self.turn.controls
         self.controls.throttle = 1 # in case we're turtling
@@ -33,22 +33,26 @@ class Recovery(Maneuver):
         self.trajectory = [vec3(dummy.position)]
         found = False
         for i in range(0, num_points):
-            dummy.step(Input(), 0.0333)
+            dummy.step(Input(), 0.01633)
             self.trajectory.append(vec3(dummy.position))
-            u = Field.collide(dummy.hitbox()).direction
-            if norm(u) > 0.0 and i > 10:
+            u = Field.collide(sphere(dummy.position, 40)).direction
+            if norm(u) > 0.0 and i > 40:
                 f = normalize(dummy.velocity - dot(dummy.velocity, u) * u)
                 l = normalize(cross(u, f))
                 found = True
                 break
 
         if found:
-            self.target = mat3(f[0], l[0], u[0],
-                               f[1], l[1], u[1],
-                               f[2], l[2], u[2])
+            self.turn.target = mat3(f[0], l[0], u[0],
+                                    f[1], l[1], u[1],
+                                    f[2], l[2], u[2])
         else:
-            self.target = look_at(ground(self.car.velocity), vec3(0,0,1))
+            self.turn.target = self.car.orientation
 
     def render(self, draw: DrawingTool):
         draw.color(draw.cyan)
         draw.polyline(self.trajectory)
+        draw.color(draw.green)
+        draw.vector(self.car.position, facing(self.turn.target) * 200)
+        draw.color(draw.red)
+        draw.vector(self.car.position, self.car.forward() * 200)

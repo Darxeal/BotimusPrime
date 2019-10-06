@@ -2,31 +2,41 @@ from maneuvers.kit import *
 
 from maneuvers.air.recovery import Recovery
 from rlutilities.simulation import Field
+from rlutilities.mechanics import AerialTurn
 
-class FastRecovery(Recovery):
+class FastRecovery(Maneuver):
     '''Boost down and try to land on all four wheels'''
 
     def __init__(self, car: Car):
         super().__init__(car)
 
         self.landing = False
-        self.target = look_at(vec3(0, 0, -1), vec3(0, 0, 1))
+        self.turn = AerialTurn(self.car)
+        self.recovery = Recovery(self.car)
 
     def step(self, dt):
-        super().step(dt)
         self.controls.throttle = 1 # in case we're turtling
 
-        if not self.landing:
+        if self.landing:
+            self.recovery.step(dt)
+            self.controls = self.recovery.controls
+        else:
+            landing_pos = self.find_landing_pos()
+            landing_dir = direction(self.car, landing_pos - vec3(0,0,1000))
+
+            self.turn.target = look_at(landing_dir, vec3(0,0,1))
+            self.turn.step(dt)
+            self.controls = self.turn.controls
+
             # boost down
-            if angle_between(self.car.forward(), vec3(0, 0, -1)) < 0.5:
+            if angle_between(self.car.forward(), landing_dir) < 0.8:
                 self.controls.boost = 1
             else:
                 self.controls.boost = 0
 
             # when nearing landing position, start recovery
-            if distance(self.car, self.find_landing_pos()) < clamp(norm(self.car.velocity), 600, 2300):
+            if distance(self.car, landing_pos) < clamp(norm(self.car.velocity), 600, 2300):
                 self.landing = True
-                self.find_landing_orientation(200)
 
         self.finished = self.car.on_ground
 
@@ -36,8 +46,12 @@ class FastRecovery(Recovery):
         for i in range(0, num_points):
             dummy.step(Input(), dt)
             dummy.time += dt
-            n = Field.collide(dummy.hitbox()).direction
+            n = Field.collide(sphere(dummy.position, 40)).direction
             if norm(n) > 0.0 and i > 10:
                 return dummy.position
         return self.car.position
+
+    def render(self, draw):
+        if self.landing:
+            self.recovery.render(draw)
                     
