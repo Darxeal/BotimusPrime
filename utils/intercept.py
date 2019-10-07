@@ -15,8 +15,7 @@ class Intercept:
         #find the first reachable ball slice that also meets the predicate
         speed = 1100 if backwards else estimate_max_car_speed(car)
         # for ball in ball_predictions:
-        for i in range(len(ball_predictions)):
-            ball = ball_predictions[i]
+        for ball in ball_predictions:
             if estimate_time(car, ball.position, speed, -1 if backwards else 1) < ball.time - car.time \
             and (predicate is None or predicate(car, ball)):
                 self.ball = ball
@@ -60,22 +59,6 @@ class AerialIntercept:
         if self.ball is None:
             self.ball = ball_predictions[-1]
             self.is_viable = False
-
-        self.time = self.ball.time
-        self.ground_pos = ground(self.ball.position)
-        self.position = self.ball.position
-
-
-class NearestIntercept:
-    def __init__(self, pos: vec3, ball_predictions, predicate: callable = None):
-        self.ball: Ball = None
-        best_dist = 99999
-
-        for ball in ball_predictions:
-            dist = distance(pos, ball)
-            if dist < best_dist and (predicate is None or predicate(pos, ball)):
-                self.ball = ball
-                best_dist = dist
 
         self.time = self.ball.time
         self.ground_pos = ground(self.ball.position)

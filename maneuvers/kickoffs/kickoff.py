@@ -2,7 +2,7 @@ from maneuvers.kit import *
 
 from maneuvers.driving.arrive import Arrive
 
-from rlutilities.mechanics import Dodge
+from maneuvers.jumps.air_dodge import AirDodge
 
 class Kickoff(Maneuver):
     '''The simplest boost and dodge at the end kickoff.'''
@@ -17,9 +17,9 @@ class Kickoff(Maneuver):
         self.action.allow_dodges_and_wavedashes = False
 
         self.dodging = False
-        self.dodge = Dodge(car)
-        self.dodge.duration = 0.05
-        self.dodge.direction = normalize(vec2(info.their_goal.center))
+        self.dodge = AirDodge(car, 0.05, info.ball.position)
+        # self.dodge.duration = 0.05
+        # self.dodge.direction = normalize(vec2(info.their_goal.center))
 
     def step(self, dt):
         if not self.dodging and distance(self.car, self.info.ball) < 800:

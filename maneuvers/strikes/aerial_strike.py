@@ -13,8 +13,6 @@ class AerialStrike(Strike):
 
     def __init__(self, car, info, target=None):
         self.aerial = Aerial(car)
-        self.aerial.aerial_turn = AerialTurn(car)
-        self.final_turn = AerialTurn(car)
 
         self.aerialing = False
         super().__init__(car, info, target)
@@ -52,13 +50,8 @@ class AerialStrike(Strike):
                 self.aerial.calculate_course()
         
         if self.aerialing:
-            if norm(self.aerial.A) > 100 or self.car.on_ground:
-                self.aerial.step(dt)
-                self.controls = self.aerial.controls
-            else:
-                self.final_turn.target = look_at(direction(self.aerial.target, self.intercept.ball))
-                self.final_turn.step(dt)
-                self.controls = self.final_turn.controls
+            self.aerial.step(dt)
+            self.controls = self.aerial.controls
 
     def render(self, draw: DrawingTool):
         super().render(draw)

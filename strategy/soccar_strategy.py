@@ -94,10 +94,10 @@ class SoccarStrategy:
         their_goal = ground(info.their_goal.center)
         my_goal = ground(info.my_goal.center)
 
-        start = time.time()
+        
         my_hit = Intercept(car, info.ball_predictions)
         their_best_hit, opponent = self.best_intercept(info.opponents, 500)
-        end = time.time()
+        
         
 
         if my_score > their_score + 2:

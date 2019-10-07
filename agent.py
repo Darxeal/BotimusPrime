@@ -5,6 +5,8 @@ from rlutilities.linear_algebra import norm
 
 from tools.drawing import DrawingTool
 from tools.quick_chats import QuickChatTool
+from rlbot.matchcomms.common_uses.set_attributes_message import handle_set_attributes_message
+from rlbot.matchcomms.common_uses.reply import reply_to
 
 from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
@@ -12,6 +14,7 @@ from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.shadow_defense import ShadowDefense
 
 from strategy.soccar_strategy import SoccarStrategy
+from strategy.training import get_maneuver_by_name
 
 from utils.vector_math import distance
 from utils.game_info import GameInfo
@@ -53,6 +56,17 @@ class BotimusPrime(BaseAgent):
         self.num_of_our_goals_reacted_to = 0
         self.num_of_their_goals_reacted_to = 0
 
+        self.matchcomms_message = ""
+
+    def handle_training_matchcomms(self) -> bool:
+        try:
+            msg = self.matchcomms.incoming_broadcast.get_nowait()
+            if handle_set_attributes_message(msg, self, allowed_keys=['matchcomms_message']):
+                reply_to(self.matchcomms, msg)
+                return True
+        except:
+            return False
+        return False
 
     def get_output(self, packet: GameTickPacket):
         self.time = packet.game_info.seconds_elapsed
@@ -65,7 +79,6 @@ class BotimusPrime(BaseAgent):
             self.ticks += 1
         self.info.read_packet(packet, self.get_field_info())
         self.strategy.packet = packet
-        
 
         #reset maneuver when another car hits the ball
         touch = packet.game_ball.latest_touch
@@ -84,22 +97,21 @@ class BotimusPrime(BaseAgent):
                 self.maneuver = None
                 #self.reset_time = self.time
 
+        if self.handle_training_matchcomms():
+            self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
+            self.maneuver = get_maneuver_by_name(self.matchcomms_message, self.info)
+            print("Training: Setting " + self.matchcomms_message)
+
 
         # choose maneuver
         if self.maneuver is None and self.time > self.reset_time + 0.01 and self.ticks > 5:
 
             if self.RENDERING:
                 self.draw.clear()
-
-            start = time.time()
+            
             self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
-            end = time.time()
             
-
-            start = time.time()
             self.maneuver = self.strategy.choose_maneuver()
-            end = time.time()
-            
             
             name = str(type(self.maneuver).__name__)
             print(name)

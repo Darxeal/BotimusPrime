@@ -36,7 +36,7 @@ class Arrive(Maneuver):
                 shift += self.additional_shift
             translated_target = target - target_direction * shift
 
-            translated_time = self.time - distance(translated_target, target) / max(1, clamp(car_vel, 500, 2300))
+            translated_time = self.time - distance(translated_target, target) * 0.7 / max(1, clamp(car_vel, 500, 2300))
         else:
             translated_target = target
             translated_time = self.time
