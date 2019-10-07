@@ -10,6 +10,7 @@ from utils.misc import *
 from utils.intercept import Intercept
 from utils.arena import Arena
 
+from tools.drawing import DrawingTool
 
 from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
@@ -31,7 +32,8 @@ import time
 #This file is a Wintertide-deadline mess and definitely not something you should learn from..
 
 class SoccarStrategy:
-    def __init__(self, info: GameInfo):
+    def __init__(self, info: GameInfo, drawing_tool: DrawingTool):
+        self.draw = drawing_tool
         self.info = info
         self.offense = Offense(info)
         self.aggresivity = 0
@@ -98,6 +100,11 @@ class SoccarStrategy:
         my_hit = Intercept(car, info.ball_predictions)
         their_best_hit, opponent = self.best_intercept(info.opponents, 500)
         
+        self.draw.group("intersects")
+        self.draw.color(self.draw.cyan)
+        self.draw.crosshair(my_hit.position)
+        self.draw.color(self.draw.red)
+        self.draw.crosshair(their_best_hit.position)
         
 
         if my_score > their_score + 2:

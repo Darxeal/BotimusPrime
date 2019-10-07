@@ -51,17 +51,17 @@ class GameInfo(Game):
                 self.pads[30]]
 
     def get_teammates(self) -> List[Car]:
-        cars: List[Car] = list()
-        for car in self.cars:
-            if car.team == self.team and car.id != self.id:
-                cars.append(car)
+        cars: List[Car] = []
+        for i in range(self.num_cars):
+            if self.cars[i].team == self.team and self.cars[i].id != self.id:
+                cars.append(self.cars[i])
         return cars
 
     def get_opponents(self) -> List[Car]:
-        cars: List[Car] = list()
-        for car in self.cars:
-            if car.team != self.team:
-                cars.append(car)
+        cars: List[Car] = []
+        for i in range(self.num_cars):
+            if self.cars[i].team != self.team:
+                cars.append(self.cars[i])
         return cars
 
     def predict_ball(self, num_steps, dt):

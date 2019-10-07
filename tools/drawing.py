@@ -124,6 +124,11 @@ class DrawingTool:
     def vector(self, pos: vec3, vector: vec3):
         self.line(pos, pos + vector)
 
+    def crosshair(self, pos: vec3, size: int = 50):
+        self.line(pos + vec3(size, 0, 0), pos - vec3(size, 0, 0))
+        self.line(pos + vec3(0, size, 0), pos - vec3(0, size, 0))
+        self.line(pos + vec3(0, 0, size), pos - vec3(0, 0, size))
+
     def triangle(self, pos: vec3, pointing_dir: vec3, width=50, length=50, up=vec3(0,0,1)):
         left = pos + cross(pointing_dir, up) * width / 2
         right = pos - cross(pointing_dir, up) * width / 2

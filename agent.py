@@ -46,7 +46,7 @@ class BotimusPrime(BaseAgent):
 
         self.draw: DrawingTool = DrawingTool(self.renderer)
 
-        self.strategy = SoccarStrategy(self.info)
+        self.strategy = SoccarStrategy(self.info, self.draw)
 
         # variables related to quick chats
         self.chat = QuickChatTool(self)
@@ -125,6 +125,7 @@ class BotimusPrime(BaseAgent):
             self.controls = self.maneuver.controls
 
             if self.RENDERING:
+                self.draw.group("maneuver")
                 self.maneuver.render(self.draw)
 
             if self.maneuver.finished:
