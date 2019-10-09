@@ -3,6 +3,10 @@ from maneuvers.kit import *
 from maneuvers.driving.drive import Drive
 from maneuvers.driving.travel import Travel
 
+from utils.travel_plan import TravelPlan
+from math import pi, asin, atan2, sin, cos
+
+
 class Arrive(Maneuver):
     '''
     Arrive at a target position at a certain time (game seconds).
@@ -18,9 +22,11 @@ class Arrive(Maneuver):
         self.time: float = 0
         self.drive = Drive(car)
         self.travel = Travel(car)
-        self.lerp_t = 0.6
+        self.lerp_t = 0.5
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
+
+
 
     def step(self, dt):
         target = self.target
@@ -36,7 +42,7 @@ class Arrive(Maneuver):
                 shift += self.additional_shift
             translated_target = target - target_direction * shift
 
-            translated_time = self.time - distance(translated_target, target) * 0.7 / max(1, clamp(car_vel, 500, 2300))
+            translated_time = self.time - distance(translated_target, target) / max(1, clamp(car_vel, 500, 2300))
         else:
             translated_target = target
             translated_time = self.time
@@ -48,13 +54,14 @@ class Arrive(Maneuver):
         self.drive.target_speed = target_speed
 
         if (
+            True or
             self.allow_dodges_and_wavedashes
             and car.boost < 5
             and dist_to_target > clamp(norm(car.velocity) + 600, 1400, 2300)
             and norm(car.velocity) < target_speed - 600
             or not self.travel.driving
         ):
-            self.travel.target = target
+            self.travel.target = translated_target
             self.travel.step(dt)
             self.controls = self.travel.controls
         else:
@@ -66,7 +73,7 @@ class Arrive(Maneuver):
         return self.finished
 
     def render(self, draw: DrawingTool):
-        self.drive.render(draw)
+        self.travel.render(draw)
 
         if self.target_direction is not None:
             draw.color(draw.lime)

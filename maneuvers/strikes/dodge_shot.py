@@ -26,3 +26,5 @@ class DodgeShot(DodgeStrike):
         
         self.arrive.target = intercept.ground_pos - hit_dir * 100
         self.arrive.target_direction = hit_dir
+
+        self.dodge.direction = vec2(ground_direction(self.arrive.target, intercept))

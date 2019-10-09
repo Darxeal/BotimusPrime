@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 from typing import List
 from bisect import bisect_left
 from dataclasses import dataclass
@@ -14,7 +15,8 @@ class LookupTable:
         :param name: Name of the column
         :return: List of float values in the column
         """
-        file = open(self.file_name)
+        data_folder = Path(__file__).absolute().parent
+        file = open(data_folder / self.file_name)
         reader = csv.DictReader(file)
         return [float(row[name]) for row in reader]
 
@@ -93,5 +95,5 @@ class KinematicsLookupTable(LookupTable):
 
         
 
-BOOST_LUT = KinematicsLookupTable('data/boost.csv')
-THROTTLE_LUT = KinematicsLookupTable('data/throttle.csv')
+BOOST_LUT = KinematicsLookupTable('boost.csv')
+THROTTLE_LUT = KinematicsLookupTable('throttle.csv')

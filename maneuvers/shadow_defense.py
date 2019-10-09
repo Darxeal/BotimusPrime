@@ -22,7 +22,8 @@ class ShadowDefense(Maneuver):
 
         self.target = Arena.clamp(target_pos, 500)
 
-        self.travel = Travel(car, self.target)
+        self.travel = Travel(car)
+        self.travel.target = self.target
         self.travel.finish_distance = 800 if near_goal else 1500
         self.drive = Drive(car)
 

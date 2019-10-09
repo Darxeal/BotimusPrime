@@ -1,6 +1,7 @@
 from maneuvers.dribbling.dribble import Dribble
 from maneuvers.air.aerial import Aerial
 from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.ground_shot import GroundShot
 from maneuvers.strikes.mirror_shot import MirrorShot
@@ -15,3 +16,5 @@ from utils.game_info import GameInfo
 def get_maneuver_by_name(name: str, info: GameInfo):
     if name == "DodgeShot":
         return DodgeShot(info.my_car, info, info.their_goal.center)
+    if name == "DodgeStrike":
+        return DodgeStrike(info.my_car, info, info.their_goal.center)

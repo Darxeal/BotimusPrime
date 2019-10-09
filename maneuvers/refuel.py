@@ -10,7 +10,9 @@ class Refuel(Maneuver):
 
         pos = (target + car.position * 2 + info.my_goal.center * 2) / 5
         self.pad = self.nearest_boostpad(car, info, pos)
-        self.travel = Travel(car, self.pad.position, waste_boost=True)
+        self.travel = Travel(car)
+        self.travel.target = self.pad.position
+        self.travel.waste_boost = True
 
     @staticmethod
     def nearest_boostpad(car: Car, info: GameInfo, pos: vec3):
@@ -25,9 +27,9 @@ class Refuel(Maneuver):
         return best_pad
 
     def step(self, dt):
-        if norm(self.car.velocity) > 1400:
-            if distance(self.car, self.pad) < norm(self.car.velocity) * 0.3:
-                self.travel.action.target_speed = 1300
+        # if norm(self.car.velocity) > 1400:
+        #     if distance(self.car, self.pad) < norm(self.car.velocity) * 0.3:
+        #         self.travel.action.target_speed = 1300
         self.travel.step(dt)
         self.controls = self.travel.controls
         self.finished = (not self.pad.is_active \

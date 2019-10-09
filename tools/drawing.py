@@ -7,7 +7,7 @@ from rlutilities.simulation import Car, Input, Ball
 
 from rlbot.utils.rendering.rendering_manager import RenderingManager
 
-from utils.vector_math import loc
+from utils.vector_math import loc, world, flip, ground
 from utils.math import clamp
 
 
@@ -109,10 +109,12 @@ class DrawingTool:
         self._check_limit()
         self._renderer.draw_string_2d(x, y, int(scale), int(scale), str(text), self.__getcolor())
 
-    def polyline(self, iterable):
-        if len(iterable) > 1:
+    def polyline(self, points: List[vec3]):
+        if len(points) > 1:
             self._check_limit()
-            self._renderer.draw_polyline_3d(iterable, self.__getcolor())
+            for p in points:
+                p[2] = max(p[2], 10)
+            self._renderer.draw_polyline_3d(points, self.__getcolor())
 
 
     # advanced
@@ -152,6 +154,16 @@ class DrawingTool:
 
     def square(self, pos: vec3, size: float):
         self.arc(pos, size / 2, 0, math.pi * 2, 4)
+
+    def car_shadow(self, car: Car):
+        hitbox = car.hitbox()
+        points = [
+            world(car, ground(hitbox.half_width)),
+            world(car, ground(flip(hitbox.half_width, 0))),
+            world(car, ground(hitbox.half_width * -1)),
+            world(car, ground(flip(hitbox.half_width, 1)))
+        ]
+        self.cyclic_polyline(points)
 
 
     def car_trajectory(self, car: Car, end_time: float, dt: float = 1 / 10):

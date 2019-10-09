@@ -37,3 +37,10 @@ def angle_to(car, target, backwards = False) -> float:
 def facing(mat: mat3) -> vec3:
     # return vec3(mat[0, 0], mat[0, 1], mat[0, 2])
     return vec3(mat[0, 0], mat[1, 0], mat[2, 0])
+
+def flip(vec: vec3, dimension: int) -> vec3:
+    new = vec3(vec)
+    new[dimension] *= -1
+    return new
+
+    

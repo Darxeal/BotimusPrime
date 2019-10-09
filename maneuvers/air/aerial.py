@@ -5,6 +5,10 @@ from rlutilities.mechanics import Aerial as RLUAerial
 class Aerial(RLUAerial):
     '''Wrapper for the RLU Aerial class'''
     
+    def __init__(self, car: Car):
+        super().__init__(car)
+        self.car = car
+
     def step(self, dt):
         super().step(dt)
 

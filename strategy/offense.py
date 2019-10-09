@@ -62,9 +62,9 @@ class Offense:
     def high_shot(self, car: Car, target: vec3) -> Maneuver:
         direct_shot = self.direct_shot(car, target)
 
-        wall_shot = self.wall_shot(car, target)
-        if wall_shot.intercept.is_viable and wall_shot.intercept.time < direct_shot.intercept.time:
-            return wall_shot
+        # wall_shot = self.wall_shot(car, target)
+        # if wall_shot.intercept.is_viable and wall_shot.intercept.time < direct_shot.intercept.time:
+        #     return wall_shot
 
         aerial = AerialShot(car, self.info, target)
         if (

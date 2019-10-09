@@ -5,7 +5,7 @@ from rlutilities.linear_algebra import look_at
 from utils.vector_math import *
 from utils.math import *
 from utils.misc import *
-
+from utils.travel_plan import TravelPlan
 
 class Intercept:
     def __init__(self, car: Car, ball_predictions, predicate: callable = None, backwards=False):
@@ -13,20 +13,20 @@ class Intercept:
         self.is_viable = True
 
         #find the first reachable ball slice that also meets the predicate
-        speed = 1100 if backwards else estimate_max_car_speed(car)
-        # for ball in ball_predictions:
         for ball in ball_predictions:
-            if estimate_time(car, ball.position, speed, -1 if backwards else 1) < ball.time - car.time \
-            and (predicate is None or predicate(car, ball)):
+            time_left = ball.time - car.time
+            plan = TravelPlan(car, max_time=time_left)
+            plan.simulate()
+            if (
+                plan.distance_traveled > ground_distance(car, ball)
+                and (predicate is None or predicate(car, ball))
+            ):
                 self.ball = ball
                 break
 
         #if no slice is found, use the last one
         if self.ball is None:
-            if not ball_predictions:
-                self.ball = Ball()
-            else:
-                self.ball = ball_predictions[-1]
+            self.ball = ball_predictions[-1]
             self.is_viable = False
 
         self.time = self.ball.time

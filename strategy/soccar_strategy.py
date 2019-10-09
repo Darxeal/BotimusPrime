@@ -63,7 +63,7 @@ class SoccarStrategy:
 
         if best_intercept is None:
             best_car = Car()
-            best_intercept = Intercept(best_car, [])
+            best_intercept = Intercept(best_car, [self.info.ball_predictions[-1]])
 
         return best_intercept, best_car
 
@@ -193,13 +193,13 @@ class SoccarStrategy:
                 opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
 
             # I can get to ball faster than them
-            if should_commit and my_hit.time < their_best_hit.time - 0.8:
+            if True or should_commit and my_hit.time < their_best_hit.time - 0.8:
                 strike = offense.any_shot(car, their_goal, my_hit)
 
                 if not isinstance(strike, Strike):
                     return strike
 
-                if strike.intercept.time < their_best_hit.time - 0.8 \
+                if True or strike.intercept.time < their_best_hit.time - 0.8 \
                 and (not info.about_to_score or strike.intercept.time < info.time_of_goal - 1):
 
                     if strike.intercept.time - car.time > 4 and car.boost < 30 \

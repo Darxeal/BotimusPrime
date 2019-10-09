@@ -3,12 +3,12 @@ from maneuvers.kit import *
 
 class Drive(Maneuver):
 
-    def __init__(self, car, target_pos: vec3 = vec3(0, 0, 0), target_speed: float = 0, backwards: bool = False):
+    def __init__(self, car):
         super().__init__(car)
 
-        self.target_pos = target_pos
-        self.target_speed = target_speed
-        self.backwards = backwards
+        self.target_pos: vec3 = None
+        self.target_speed: float = 2300
+        self.backwards: bool = False
         self.drive_on_walls = False
 
     def step(self, dt):
@@ -106,7 +106,7 @@ class Drive(Maneuver):
         draw.cyclic_polyline(speed_bar)
 
         # target speed
-        mapped_speed = rangemap(self.target_speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
+        mapped_speed = interpolate(self.target_speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
         draw.color(draw.pink)
         draw.line(
             world(self.car, vec3(mapped_speed, -HALF_WIDTH, 0) + OFFSET),
@@ -116,7 +116,7 @@ class Drive(Maneuver):
 
         # current speed
         speed = norm(self.car.velocity)
-        mapped_speed = rangemap(speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
+        mapped_speed = interpolate(speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
         draw.color(draw.lime)
         draw.line(
             world(self.car, vec3(mapped_speed, -HALF_WIDTH, 0) + OFFSET),
