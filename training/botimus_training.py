@@ -27,6 +27,8 @@ def mat3_to_Rotator(mat: mat3) -> Rotator:
 
 class BotimusExercise(TrainingExercise):
     
+    bot_cfg_filename = 'botimus.cfg'
+
     def __init__(self, grader: Grader):
 
         excercise_name = str(self.__class__.__name__)
@@ -36,7 +38,7 @@ class BotimusExercise(TrainingExercise):
 
         self.match_config.player_configs = [
             PlayerConfig.bot_config(
-                Path(__file__).absolute().parent.parent / 'botimus.cfg', Team.BLUE
+                Path(__file__).absolute().parent.parent / self.bot_cfg_filename, Team.BLUE
             )
         ]
 
@@ -114,6 +116,15 @@ class DontCareGrader(CompoundGrader):
 
 class SpecificManeuverTest(SpecificManeuverExcercise):
     
+    timeout: float = 10
+
+    def __init__(self):
+        super().__init__(DontCareGrader(self.timeout))
+
+
+class CollectorExcercise(BotimusExercise):
+    
+    bot_cfg_filename = 'collector.cfg'
     timeout: float = 10
 
     def __init__(self):
