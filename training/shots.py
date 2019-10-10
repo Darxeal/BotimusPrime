@@ -1,18 +1,12 @@
-from training.botimus_training import BotimusStrikerExcercise, Car, Ball
+from training.botimus_training import BotimusStrikerExcercise, Car, Ball, SpecificManeuverStrikerExcercise
 from rlutilities.linear_algebra import look_at, vec3
-from rlbot.matchcomms.common_uses.set_attributes_message import make_set_attributes_message
-from rlbot.matchcomms.common_uses.reply import send_and_wait_for_replies
 from utils.vector_math import ground_direction
 
 
-class EasyShot(BotimusStrikerExcercise):
+class EasyShot(SpecificManeuverStrikerExcercise):
 
+    maneuver_name = "DodgeShot"
     timeout = 7
-
-    def on_briefing(self):
-        send_and_wait_for_replies(self.get_matchcomms(), [
-            make_set_attributes_message(0, {'matchcomms_message' : 'DodgeShot'})
-        ])
 
     def set_car_ball_state(self, car: Car, ball: Ball):
         ball.position[0] = self.rng.n11() * 500

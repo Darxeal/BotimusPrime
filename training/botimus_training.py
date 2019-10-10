@@ -2,9 +2,13 @@ from pathlib import Path
 
 from rlbot.matchconfig.match_config import Team, PlayerConfig
 from rlbot.utils.game_state_util import GameState, BallState, CarState, Physics, Vector3, Rotator
+from rlbot.matchcomms.common_uses.set_attributes_message import make_set_attributes_message
+from rlbot.matchcomms.common_uses.reply import send_and_wait_for_replies
 
 from rlbottraining.training_exercise import TrainingExercise
-from rlbottraining.common_graders.goal_grader import StrikerGrader, Grader, GoalieGrader
+from rlbottraining.common_graders.goal_grader import StrikerGrader, Grader, GoalieGrader, PassOnGoalForAllyTeam
+from rlbottraining.common_graders.timeout import PassOnTimeout
+from rlbottraining.common_graders.compound_grader import CompoundGrader
 from rlbottraining.rng import SeededRandomNumberGenerator
 
 from rlutilities.simulation import Car, Ball
@@ -65,6 +69,16 @@ class BotimusExercise(TrainingExercise):
     def set_car_ball_state(self, car: Car, ball: Ball):
         pass
 
+class SpecificManeuverExcercise(BotimusExercise):
+
+    maneuver_name: str = None
+
+    def on_briefing(self):
+        assert self.maneuver_name
+        send_and_wait_for_replies(self.get_matchcomms(), [
+            make_set_attributes_message(0, {'matchcomms_message' : self.maneuver_name})
+        ])
+
 
 class BotimusGoalieExcercise(BotimusExercise):
 
@@ -73,9 +87,35 @@ class BotimusGoalieExcercise(BotimusExercise):
     def __init__(self):
         super().__init__(GoalieGrader(self.timeout))
 
+
 class BotimusStrikerExcercise(BotimusExercise):
 
     timeout: float = 10
 
     def __init__(self):
         super().__init__(StrikerGrader(self.timeout))
+
+
+class SpecificManeuverStrikerExcercise(SpecificManeuverExcercise):
+    
+    timeout: float = 10
+
+    def __init__(self):
+        super().__init__(StrikerGrader(self.timeout))
+
+
+class DontCareGrader(CompoundGrader):
+    def __init__(self, timeout, ally=0):
+        super().__init__([
+            PassOnTimeout(timeout),
+            PassOnGoalForAllyTeam(ally)
+        ])
+
+
+class SpecificManeuverTest(SpecificManeuverExcercise):
+    
+    timeout: float = 10
+
+    def __init__(self):
+        super().__init__(DontCareGrader(self.timeout))
+
