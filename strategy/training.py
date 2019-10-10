@@ -10,11 +10,19 @@ from maneuvers.strikes.aerial_shot import AerialShot
 from maneuvers.strikes.wall_shot import WallShot
 from maneuvers.strikes.wall_dodge_shot import WallDodgeShot
 from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.driving.travel import Travel
+from maneuvers.chainable.turn import Turn
+from maneuvers.chain_maneuver import ChainManeuver
 from utils.game_info import GameInfo
-
+from maneuvers.kit import *
 
 def get_maneuver_by_name(name: str, info: GameInfo):
+    car = info.my_car
     if name == "DodgeShot":
-        return DodgeShot(info.my_car, info, info.their_goal.center)
+        return DodgeShot(car, info, info.their_goal.center)
     if name == "DodgeStrike":
-        return DodgeStrike(info.my_car, info, info.their_goal.center)
+        return DodgeStrike(car, info, info.their_goal.center)
+    if name == "TurnAndTravel":
+        travel = Travel(car)
+        travel.target = info.ball.position
+        return ChainManeuver(car, [Turn(car, travel.target)], travel)

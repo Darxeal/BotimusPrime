@@ -70,9 +70,7 @@ class BotimusPrime(BaseAgent):
 
     def get_output(self, packet: GameTickPacket):
         self.info.read_packet(packet, self.get_field_info())
-
-        if self.ticks < 6:
-            self.ticks += 1
+        self.ticks += 1
         self.strategy.packet = packet
 
         # check if we should go for kickoff
@@ -98,7 +96,7 @@ class BotimusPrime(BaseAgent):
 
 
         # choose maneuver
-        if self.maneuver is None and self.ticks > 5:
+        if self.maneuver is None and self.ticks > 10:
 
             if self.RENDERING:
                 self.draw.clear()
@@ -134,4 +132,3 @@ class BotimusPrime(BaseAgent):
         self.chat.step(packet)
 
         return self.controls
-

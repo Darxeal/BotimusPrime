@@ -1,4 +1,6 @@
-from rlutilities.linear_algebra import vec3, norm, normalize, dot, cross, mat3, angle_between, inv
+from rlutilities.linear_algebra import vec3, norm, normalize, dot, cross, mat3, angle_between, inv, vec2
+from rlutilities.simulation import Car
+from math import asin, atan2, sin, cos
 
 def loc(obj) -> vec3:
     if hasattr(obj, "position"):
@@ -7,6 +9,8 @@ def loc(obj) -> vec3:
         return vec3(obj.x, obj.y, obj.z)
     elif hasattr(obj, "X"):
         return vec3(obj.X, obj.Y, obj.Z)
+    elif isinstance(obj, vec2):
+        return vec3(obj)
     return obj
 
 def ground(pos) -> vec3:
@@ -25,17 +29,16 @@ def direction(source, target) -> vec3:
 def ground_direction(source, target) -> vec3:
     return normalize(ground(target) - ground(source))
 
-def local(car, pos) -> vec3:
+def local(car: Car, pos) -> vec3:
     return dot(loc(pos) - car.position, car.orientation)
 
-def world(car, pos) -> vec3:
+def world(car: Car, pos) -> vec3:
     return car.position + dot(car.orientation, loc(pos))
 
-def angle_to(car, target, backwards = False) -> float:
+def angle_to(car: Car, target, backwards = False) -> float:
     return abs(angle_between(car.forward() * (-1 if backwards else 1), direction(car.position, target)))
 
 def facing(mat: mat3) -> vec3:
-    # return vec3(mat[0, 0], mat[0, 1], mat[0, 2])
     return vec3(mat[0, 0], mat[1, 0], mat[2, 0])
 
 def flip(vec: vec3, dimension: int) -> vec3:
@@ -43,4 +46,18 @@ def flip(vec: vec3, dimension: int) -> vec3:
     new[dimension] *= -1
     return new
 
+def circle_tangent(center: vec2, radius: float, point: vec2, sign: int) -> vec2:
+    # http://jsfiddle.net/zxqCw/1/
+    center = vec2(center)
+    point = vec2(point)
+
+    d = center - point
+    dd = norm(d)
     
+    assert radius < dd
+
+    a = asin(radius / dd)
+    b = atan2(d[1], d[0])
+
+    t = b - a * sign
+    return vec2(radius * sin(t) * sign, radius * -cos(t) * sign) + center
