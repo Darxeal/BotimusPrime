@@ -138,19 +138,27 @@ class DrawingTool:
         self.cyclic_polyline([left, right, top])
 
 
-    def arc(self, pos: vec3, radius: float, start: float, end: float, segments: int = 50):
-        step = (end - start) / segments
+    def arc(self, pos: vec3, radius: float, start_angle: float, end_angle: float):
+        segments = int(clamp(radius * abs(start_angle - end_angle) / 20, 10, 50))
+        step = (end_angle - start_angle) / segments
         points = []
 
-        for i in range(segments):
-            angle = start + step * i
+        for i in range(segments + 1):
+            angle = start_angle + step * i
             points.append(pos + vec3(math.cos(angle) * radius, math.sin(angle) * radius, 0))
         
-        self.cyclic_polyline(points)
+        self.polyline(points)
 
     def circle(self, pos: vec3, radius: float):
         segments = int(clamp(radius / 20, 10, 50))
-        self.arc(pos, radius, 0, math.pi * 2, segments)
+        step = 2 * math.pi / segments
+        points = []
+
+        for i in range(segments):
+            angle = step * i
+            points.append(pos + vec3(math.cos(angle) * radius, math.sin(angle) * radius, 0))
+        
+        self.cyclic_polyline(points)
 
     def square(self, pos: vec3, size: float):
         self.arc(pos, size / 2, 0, math.pi * 2, 4)

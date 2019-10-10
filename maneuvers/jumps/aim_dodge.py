@@ -30,9 +30,22 @@ from maneuvers.jumps.air_dodge import AirDodge
 
 class AimDodge(Dodge):
 
+    def __init__(self, car: Car):
+        super().__init__(car)
+        self.car = car
+        self.preorientation_dir: vec3 = None
+
     def step(self, dt):
         target_dir = vec3(self.direction)
         target_dir[2] = 1
         target_dir = normalize(target_dir)
         self.preorientation = look_at(target_dir, vec3(0,0,1))
         super().step(dt)
+
+    def render(self, draw: DrawingTool):
+        draw.color(draw.orange)
+        draw.vector(self.car, self.car.forward() * 100)
+        # draw.vector(self.car, self.car.up() * 100)
+        draw.color(draw.lime)
+        draw.vector(self.car, self.preorientation_dir * 100)
+        # draw.vector(self.car, self.preorientation_up * 100)
