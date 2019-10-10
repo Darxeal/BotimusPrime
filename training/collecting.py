@@ -7,6 +7,6 @@ class PowerslideCollection(CollectorExcercise):
 
     def set_car_ball_state(self, car: Car, ball: Ball):
         car.position[2] = 18
-        car.velocity = vec3(1000, 0, 0)
+        car.velocity = vec3(1500, 0, 0)
 
         ball.position = vec3(2000,2000,2000)

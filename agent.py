@@ -115,7 +115,7 @@ class BotimusPrime(BaseAgent):
 
         
         # execute maneuver
-        if self.maneuver is not None:
+        if self.maneuver is not None and self.ticks > 10:
             self.maneuver.step(self.info.time_delta)
             self.controls = self.maneuver.controls
 

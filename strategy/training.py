@@ -11,8 +11,9 @@ from maneuvers.strikes.wall_shot import WallShot
 from maneuvers.strikes.wall_dodge_shot import WallDodgeShot
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.driving.travel import Travel
-from maneuvers.chainable.turn import Turn
 from maneuvers.chain_maneuver import ChainManeuver
+from maneuvers.chainable.turn import Turn
+from maneuvers.chainable.powerslide import Powerslide
 from utils.game_info import GameInfo
 from maneuvers.kit import *
 
@@ -26,3 +27,7 @@ def get_maneuver_by_name(name: str, info: GameInfo):
         travel = Travel(car)
         travel.target = info.ball.position
         return ChainManeuver(car, [Turn(car, travel.target)], travel)
+    if name == "SlideAndTravel":
+        travel = Travel(car)
+        travel.target = info.ball.position
+        return ChainManeuver(car, [Powerslide(car, travel.target)], travel)

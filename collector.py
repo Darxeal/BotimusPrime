@@ -9,7 +9,7 @@ from maneuvers.driving.drive import Drive
 
 class Collector(BaseAgent):
     
-    filename = "data/powerslide_1000.csv"
+    filename = "data/powerslide_1500.csv"
 
     def initialize_agent(self):
         self.info = GameInfo(self.index, self.team)
@@ -96,7 +96,7 @@ class Collector(BaseAgent):
                 "car_rot_roll": str(pyr[2]),
             })
 
-        self.drive.target_pos = vec3(0,0,0)
+        self.drive.target_pos = vec3(0,1000,0)
         self.drive.step(self.info.time_delta)
         self.controls = self.drive.controls
 
