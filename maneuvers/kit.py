@@ -13,9 +13,10 @@ from utils.game_info import GameInfo
 
 from tools.drawing import DrawingTool
 
+
 class Maneuver:
 
-    def __init__(self, car):
+    def __init__(self, car: Car):
         self.car: Car = car
         self.controls: Input = Input()
         self.finished: bool = False
@@ -24,4 +25,14 @@ class Maneuver:
         pass
 
     def render(self, draw: DrawingTool):
+        pass
+
+
+class ChainableManeuver(Maneuver):
+
+    def __init__(self, car: Car, target: vec3):
+        super().__init__(car)
+        self.target = target
+
+    def simulate(self) -> Car:
         pass
