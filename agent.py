@@ -66,10 +66,8 @@ class BotimusPrime(BaseAgent):
             if handle_set_attributes_message(msg, self, allowed_keys=['matchcomms_message']):
                 reply_to(self.matchcomms, msg)
                 self.training = True
-                return True
-        except:
-            return False
-        return False
+        except Exception as e:
+            pass
 
     def get_output(self, packet: GameTickPacket):
         self.info.read_packet(packet, self.get_field_info())
@@ -92,14 +90,10 @@ class BotimusPrime(BaseAgent):
             self.maneuver = None
 
         # check if an excercise wants us to set a certain maneuver
-        if self.handle_training_matchcomms():
-            self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
-            self.maneuver = get_maneuver_by_name(self.matchcomms_message, self.info)
-            print("Training: Setting " + self.matchcomms_message)
-
+        self.handle_training_matchcomms()
 
         # choose maneuver
-        if self.maneuver is None and self.ticks > 10:
+        if self.maneuver is None and self.ticks > 20:
 
             if self.RENDERING:
                 self.draw.clear()
@@ -116,7 +110,7 @@ class BotimusPrime(BaseAgent):
 
         
         # execute maneuver
-        if self.maneuver is not None and self.ticks > 10:
+        if self.maneuver is not None:
             self.maneuver.step(self.info.time_delta)
             self.controls = self.maneuver.controls
 

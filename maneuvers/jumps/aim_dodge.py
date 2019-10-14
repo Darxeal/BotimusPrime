@@ -37,7 +37,7 @@ class AimDodge(Dodge):
 
     def step(self, dt):
         target_dir = vec3(self.direction)
-        target_dir[2] = 10
+        target_dir[2] = 0.7
         target_dir = normalize(target_dir)
         up = target_dir * -1
         up[2] = abs(up[2])

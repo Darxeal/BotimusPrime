@@ -44,7 +44,7 @@ class Arrive(Maneuver):
 
     def get_total_distance(self):
         translated_target = self.get_shifted_target()
-        return ground_distance(self.car, translated_target) + ground_distance(translated_target, self.target) * 0.1
+        return ground_distance(self.car, translated_target) + ground_distance(translated_target, self.target)
 
     def step(self, dt):
         car = self.car
@@ -54,6 +54,9 @@ class Arrive(Maneuver):
             translated_time = self.time - distance(translated_target, self.target) / max(1, clamp(norm(self.car.velocity), 500, 2300))            
             dist_to_target = distance(car.position, translated_target)
             target_speed = clamp(dist_to_target / max(0.001, translated_time - car.time), 0, 2300)
+
+            if target_speed < 300:
+                target_speed = 0
 
             self.drive.target_pos = translated_target
             self.drive.target_speed = target_speed

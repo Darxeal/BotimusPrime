@@ -7,6 +7,6 @@ from training.collecting import *
 def make_default_playlist() -> Playlist:
     return [
         NearGoalShot(),
-        # ChipShot(),
-        # RampShot()
+        ChipShot(),
+        RampShot()
     ]

@@ -4,7 +4,7 @@ from maneuvers.driving.arrive import Arrive
 
 class Strike(Maneuver):
 
-    max_additional_time = 0.5
+    max_additional_time = 0.1
     update_interval = 0.5
 
     def __init__(self, car: Car, ball: Ball, target: vec3):
@@ -62,7 +62,7 @@ class Strike(Maneuver):
 
     def get_hit_direction(self) -> vec3:
         target_direction = ground_direction(self.intercept, self.target)
-        return ground_direction(self.intercept.velocity, target_direction * 5000)
+        return ground_direction(self.intercept.velocity, target_direction * 4000)
 
     def configure(self, intercept: Ball):
         self.intercept = intercept
@@ -87,12 +87,18 @@ class Strike(Maneuver):
     def get_time_left(self) -> float:
         return self.intercept.time - self.car.time
 
+    def get_steer_penalty(self) -> float:
+        # stolen from reliefbot
+        to_target = direction(self.car.position, self.get_facing_target())
+        correction_err = max(0.0, 0.3 - dot(to_target, self.car.forward()))
+        return correction_err * .1 + correction_err * norm(self.car.velocity) * .02
+
     def get_no_dodge_time(self) -> float:
         return 1.0
 
     def is_intercept_reachable(self) -> bool:
         distance_to_target = self.get_distance_to_target()
-        plan = TravelPlan(self.car, max_time=self.get_time_left())
+        plan = TravelPlan(self.car, max_time=self.get_time_left() - self.get_steer_penalty())
         plan.no_dodge_time = self.get_no_dodge_time()
         plan.simulate()
         return plan.distance_traveled >= distance_to_target

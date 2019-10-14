@@ -6,8 +6,8 @@ from maneuvers.jumps.aim_dodge import AimDodge
 
 class GroundStrike(Strike):
 
-    max_intercept_height = 120
-    max_intercept_velocity = 100
+    max_intercept_height = 150
+    max_intercept_velocity = 200
 
     def is_intercept_desirable(self):
         return (

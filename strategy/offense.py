@@ -14,16 +14,18 @@ class Offense:
 
     @staticmethod
     def get_best_strike(car: Car, ball: Ball, target: vec3) -> ChainManeuver:
+        print("Offense - choosing best Strike")
         copy = Ball(ball)
 
         stabilizers: List[ChainableManeuver] = [
-            Turn(car), Powerslide(car)
+            Turn(car),
+            # Powerslide(car)
         ]
 
         strikes: List[Strike] = [
-            DodgeStrike(car, ball, target),
-            GroundStrike(car, ball, target),
             WallStrike(car, ball, target),
+            GroundStrike(car, ball, target),
+            DodgeStrike(car, ball, target),
         ]
 
         while copy.time < car.time + 20.0:
@@ -40,8 +42,8 @@ class Offense:
                     #         better_car = stabilizer.simulate()
                     #         strike.car = better_car
                     #         strike.configure_mechanics()
-                            # if strike.is_intercept_reachable():
-                            #     return ChainManeuver(car, [stabilizer], strike)
+                    #         if strike.is_intercept_reachable():
+                    #             return ChainManeuver(car, [stabilizer], strike)
                     if strike.is_intercept_reachable():
                         return strike
 

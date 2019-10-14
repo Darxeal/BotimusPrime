@@ -1,4 +1,4 @@
-from rlutilities.linear_algebra import vec3, norm, normalize, dot, cross, mat3, angle_between, inv, vec2
+from rlutilities.linear_algebra import vec3, norm, normalize, dot, cross, mat3, angle_between, inv, vec2, xy
 from rlutilities.simulation import Car
 from math import asin, atan2, sin, cos
 
@@ -36,7 +36,7 @@ def world(car: Car, pos) -> vec3:
     return car.position + dot(car.orientation, loc(pos))
 
 def angle_to(car: Car, target, backwards = False) -> float:
-    return abs(angle_between(car.forward() * (-1 if backwards else 1), direction(car.position, target)))
+    return abs(angle_between(xy(car.forward()) * (-1 if backwards else 1), ground_direction(car.position, target)))
 
 def facing(mat: mat3) -> vec3:
     return vec3(mat[0, 0], mat[1, 0], mat[2, 0])

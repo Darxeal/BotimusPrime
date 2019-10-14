@@ -63,6 +63,9 @@ class Travel(Maneuver):
                 self.dodge.duration = 0.1
                 self.dodge.direction = vec2(ground_direction(self.car.position, self.target))
 
+            if angle_to(self.car, self.target) > 0.5:
+                self.controls.boost = False
+
             if distance(self.car.position, self.target) < self.finish_distance and self.driving:
                 self.finished = True
 

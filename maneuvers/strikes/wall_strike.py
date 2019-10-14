@@ -4,7 +4,7 @@ from maneuvers.strikes.strike import Strike
 
 class WallStrike(Strike):
 
-    max_dist_from_wall = 200
+    max_dist_from_wall = 150
 
     def __init__(self, car, ball, target):
         super().__init__(car, ball, target)
@@ -35,13 +35,19 @@ class WallStrike(Strike):
         return self.get_plane_intersect_position()
 
     def is_intercept_desirable(self):
-        if self.intercept.position[2] < 100 or abs(self.intercept.position[0]) < 2000:
+        if self.intercept.position[2] < 200 or abs(self.intercept.position[0]) < 3000:
             return False
 
         return norm(self.collision.start) > 0
 
+    def get_no_dodge_time(self):
+        return math.inf
+
+    def get_steer_penalty(self):
+        return 0
+
     def get_offset_target(self):
-        if self.car.position[2] > 200:
+        if self.car.position[2] > 100:
             return self.collision.start
         else:
             return self.get_plane_intersect_position()

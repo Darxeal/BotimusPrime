@@ -5,14 +5,20 @@ from maneuvers.jumps.aim_dodge import AimDodge
 
 class DodgeStrike(Strike):
 
+    predodge_time = 0.2
+
     def __init__(self, car, ball, target):
         super().__init__(car, ball, target)
         self.dodge = AimDodge(car)
         self.dodging = False
 
     def is_intercept_desirable(self):
-        # return self.intercept.position[2] < 320
-        return self.intercept.position[2] < 280
+        if self.intercept.position[2] > 250:
+            return False
+
+        time_left = self.intercept.time - self.car.time
+        return time_left > self.get_jump_time() + self.predodge_time
+
 
     def get_offset_target(self):
         return ground(self.intercept.position) - self.get_hit_direction() * 100
@@ -38,7 +44,7 @@ class DodgeStrike(Strike):
         target_height = clamp(self.intercept.position[2] - Ball.radius, 0, 220)
 
         time = self.get_time_to_z(target_height)
-        return clamp(time, 0.05, 0.9)
+        return clamp(time, 0.05, 0.9) + 0.05
 
     def configure_mechanics(self):
         super().configure_mechanics()
@@ -46,7 +52,8 @@ class DodgeStrike(Strike):
         self.dodge.car = self.car
         additional_jump = self.get_jump_time()
         self.dodge.duration = additional_jump
-        self.arrive.additional_shift = additional_jump * norm(self.car.velocity)
+        self.arrive.additional_shift = additional_jump * norm(self.car.velocity) * 0.5
+        self.arrive.lerp_t = 0.58
 
 
     def step(self, dt):
@@ -56,7 +63,16 @@ class DodgeStrike(Strike):
             self.controls = self.dodge.controls
         else:
             super().step(dt)
-            if self.arrive.time - self.car.time < self.dodge.duration + 0.2:
-                self.dodging = True
-                self.dodge.direction = vec2(self.get_hit_direction())
+            if self.arrive.time - self.car.time < self.dodge.duration + self.predodge_time:
+                if angle_to(self.car, self.get_offset_target()) < 0.1:
+                    self.dodging = True
+                    self.dodge.direction = vec2(self.get_hit_direction())
+                else:
+                    self.controls.throttle = -1
+                    self.finished = True
         self.finished = self.finished or self.dodge.finished
+
+    def render(self, draw: DrawingTool):
+        draw.color(draw.cyan)
+        draw.triangle(self.intercept.position, self.get_hit_direction())
+        super().render(draw)

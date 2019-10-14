@@ -51,7 +51,7 @@ class Drive(Maneuver):
         #speed controller
         if vf < self.target_speed:
             self.controls.throttle = 1.0
-            if self.target_speed > 1400 and vf < 2250:
+            if self.target_speed > 1400 and vf < 2250 and self.target_speed - vf > 50:
                 self.controls.boost = 1
             else:
                 self.controls.boost = 0

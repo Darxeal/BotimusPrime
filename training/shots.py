@@ -6,7 +6,7 @@ from utils.vector_math import ground_direction
 class ChipShot(SpecificManeuverStrikerExcercise):
 
     maneuver_name = "Offense"
-    timeout = 7
+    timeout = 10
 
     def set_car_ball_state(self, car: Car, ball: Ball):
         ball.position[0] = self.rng.n11() * 500
@@ -28,14 +28,14 @@ class ChipShot(SpecificManeuverStrikerExcercise):
 class RampShot(SpecificManeuverStrikerExcercise):
 
     maneuver_name = "Offense"
-    timeout = 4
+    timeout = 10
 
     def set_car_ball_state(self, car: Car, ball: Ball):
         ball.position[0] = 2000
         ball.position[1] = -2000
-        ball.position[2] = 100
+        ball.position[2] = 200
 
-        ball.velocity[0] = self.rng.uniform(1500, 2000)
+        ball.velocity[0] = self.rng.uniform(1000, 3000)
         ball.velocity[1] = self.rng.n11() * 500
         ball.velocity[2] = 0
 
@@ -50,11 +50,11 @@ class RampShot(SpecificManeuverStrikerExcercise):
 class NearGoalShot(SpecificManeuverStrikerExcercise):
 
     maneuver_name = "Offense"
-    timeout = 7
+    timeout = 10
 
     def set_car_ball_state(self, car: Car, ball: Ball):
         ball.position[0] = self.rng.n11() * 500
-        ball.position[1] = 3000
+        ball.position[1] = 2000
         ball.position[2] = 1000
 
         ball.velocity[0] = self.rng.n11() * 1000
