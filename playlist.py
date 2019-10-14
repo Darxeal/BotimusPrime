@@ -6,5 +6,7 @@ from training.collecting import *
 
 def make_default_playlist() -> Playlist:
     return [
-        SlideAndTravelTest()
+        NearGoalShot(),
+        # ChipShot(),
+        # RampShot()
     ]

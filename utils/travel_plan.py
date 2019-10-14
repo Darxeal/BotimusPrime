@@ -30,13 +30,23 @@ class TravelPlan:
         self.max_distance = max_distance
         self.max_time = max_time
 
+        self.no_dodge_time = 0
+
     def get_time_to_finish(self, additional_speed: float = 0.0):
-        time_limit = self.max_time - self.time_passed
+        time_left = self.max_time - self.time_passed
         distance_left = self.max_distance - self.distance_traveled
         speed = max(self.forward_speed + additional_speed, 1)
-        distance_time_limit = distance_left / speed
+        distance_time_left = distance_left / speed
 
-        return min(time_limit, distance_time_limit)
+        return min(time_left, distance_time_left)
+
+    def get_distance_to_finish(self, additional_speed: float = 0.0):
+        time_left = self.max_time - self.time_passed
+        distance_left = self.max_distance - self.distance_traveled
+        speed = max(self.forward_speed + additional_speed, 1)
+        distance_time_left = time_left * speed
+
+        return min(distance_left, distance_time_left)
 
     def is_finished(self):
         return self.get_time_to_finish() < 0.01
@@ -74,6 +84,11 @@ class TravelPlan:
         self.time_passed += time_left
         self.distance_traveled += time_left * self.forward_speed
 
+    def should_dodge(self):
+        time_left = self.get_time_to_finish(self.DODGE_FORWARD_IMPULSE)
+        # distance_left = self.get_distance_to_finish(self.DODGE_FORWARD_IMPULSE)
+        return time_left > self.DODGE_DURATION + self.no_dodge_time
+
     def advance(self) -> TravelMethod:
         # if we are close to max speed, boosting or dodging
         # no longer makes sense, so just throttle to keep speed
@@ -90,8 +105,7 @@ class TravelPlan:
                 return TravelMethod.Boost
 
             # if we have enough time left for a dodge, do it
-            time_left = self.get_time_to_finish(self.DODGE_FORWARD_IMPULSE)
-            if time_left > self.DODGE_DURATION:
+            if self.should_dodge():
                 self.dodge()
                 return TravelMethod.Dodge
             
@@ -107,8 +121,7 @@ class TravelPlan:
 
 
         # if we have enough time left for a dodge, do it
-        time_left = self.get_time_to_finish(self.DODGE_FORWARD_IMPULSE)
-        if time_left > self.DODGE_DURATION:
+        if self.should_dodge():
             self.dodge()
             return TravelMethod.Dodge
         

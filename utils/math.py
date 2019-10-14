@@ -1,3 +1,4 @@
+import math
 
 def sign(x) -> int:
     return 1 if x >= 0 else -1
@@ -19,3 +20,12 @@ def nonzero(value) -> float:
 
 def interpolate(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+def quadratic(a, b, c):
+    D = b**2 - 4.0 * a * c
+    if D < 0:
+        return None
+    return (
+        -b - math.sqrt(D) / (2.0 * a),
+        -b + math.sqrt(D) / (2.0 * a)
+    )

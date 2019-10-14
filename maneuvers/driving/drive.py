@@ -9,7 +9,7 @@ class Drive(Maneuver):
         self.target_pos: vec3 = None
         self.target_speed: float = 2300
         self.backwards: bool = False
-        self.drive_on_walls = False
+        self.drive_on_walls = True
 
     def step(self, dt):
         target = self.target_pos
@@ -83,14 +83,15 @@ class Drive(Maneuver):
 
 
     def render(self, draw: DrawingTool):
-        draw.color(draw.cyan)
-        draw.square(self.target_pos + vec3(0,0,10), 50)
-        target_direction = direction(self.car.position, self.target_pos)
-        draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())
+        if self.target_pos:
+            draw.color(draw.cyan)
+            draw.crosshair(self.target_pos, 50)
+            target_direction = direction(self.car.position, self.target_pos)
+            draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())
         
-        if self.car.on_ground:
-            self.render_speedometer(draw, vec3(60, 50, 0))
-            self.render_speedometer(draw, vec3(60, -50, 0))
+        # if self.car.on_ground:
+        #     self.render_speedometer(draw, vec3(60, 50, 0))
+        #     self.render_speedometer(draw, vec3(60, -50, 0))
 
     def render_speedometer(self, draw: DrawingTool, OFFSET: vec3):
         HALF_WIDTH = 8

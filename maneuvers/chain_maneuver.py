@@ -47,4 +47,8 @@ class ChainManeuver(Maneuver):
             draw.color(draw.cyan)
             draw.car_shadow(transition_car)
             
-        self.final_maneuver.render(draw)
+        if self.current_maneuver == self.final_maneuver:
+            self.final_maneuver.render(draw)
+
+    def __str__(self):
+        return " > ".join(str(maneuver) for maneuver in self.queue + [self.final_maneuver])

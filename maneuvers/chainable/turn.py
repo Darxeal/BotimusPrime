@@ -13,6 +13,13 @@ class Turn(ChainableManeuver):
         arc_angle = angle_between(center_local * (-1), tangent_local - center_local) * turn_sign
         return radius, center_local, tangent_local, arc_angle
 
+    def viable(self):
+        radius = turn_radius(norm(self.car.velocity))
+        target_local = vec2(local(self.car, self.target))
+        turn_sign = sgn(target_local[1])
+        center_local = vec2(0, radius * turn_sign)
+        return norm(target_local - center_local) > radius + 100
+
     def simulate(self) -> Car:
         radius, _, tangent_local, angle = self.get_tangent_info()
         tangent_point = world(self.car, tangent_local)
@@ -26,6 +33,10 @@ class Turn(ChainableManeuver):
         return copy
 
     def step(self, dt):
+        if not self.viable():
+            self.finished = True
+            return
+
         self.controls.throttle = 1
         target_local = vec2(local(self.car, self.target))
         phi = math.atan2(target_local[1], target_local[0])

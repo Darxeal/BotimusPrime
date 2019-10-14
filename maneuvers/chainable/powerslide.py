@@ -4,12 +4,16 @@ from maneuvers.driving.drive import Drive
 
 class Powerslide(ChainableManeuver):
 
-    def __init__(self, car, target):
-        super().__init__(car, target)
+    def __init__(self, car):
+        super().__init__(car)
         self.drive = Drive(car)
-        self.drive.target_pos = target
+        self.drive.target_pos = self.target
         self.first_step = True
         self.first_simulation: Car = None
+
+    def viable(self):
+        angle = angle_to(self.car, self.target)
+        return angle > 1.8 and norm(self.car.velocity) > 500
 
     def simulate(self) -> Car:
         copy = Car(self.car)
@@ -26,6 +30,7 @@ class Powerslide(ChainableManeuver):
         return copy
 
     def step(self, dt):
+        self.drive.target_pos = self.target
         self.drive.step(dt)
         self.controls = self.drive.controls
         self.controls.boost = 0

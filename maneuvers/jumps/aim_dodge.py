@@ -37,9 +37,11 @@ class AimDodge(Dodge):
 
     def step(self, dt):
         target_dir = vec3(self.direction)
-        target_dir[2] = 1
+        target_dir[2] = 10
         target_dir = normalize(target_dir)
-        self.preorientation = look_at(target_dir, vec3(0,0,1))
+        up = target_dir * -1
+        up[2] = abs(up[2])
+        self.preorientation = look_at(target_dir, up)
         super().step(dt)
 
     def render(self, draw: DrawingTool):

@@ -1,110 +1,120 @@
 from maneuvers.kit import *
-
 from maneuvers.driving.arrive import Arrive
+
 
 class Strike(Maneuver):
 
-    allow_backwards = False
-    update_interval = 0.3
-    stop_updating = 0.5
-    max_additional_time = 1
+    max_additional_time = 0.5
+    update_interval = 0.5
 
-    def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
+    def __init__(self, car: Car, ball: Ball, target: vec3):
         super().__init__(car)
         
-        self.info = info
-        self.target = target
+        self.ball: Ball = ball
+        self.target: vec3 = target
 
-        self.arrive = Arrive(car)
-        self.intercept: Intercept = None
-
-        self._has_drawn_prediction = False
-        self._last_update_time = car.time
-        self._should_strike_backwards = False
-        self._initial_time = 999999
-        self.update()
-        self._initial_time = self.intercept.time
-
-    def intercept_predicate(self, car: Car, ball: Ball):
-        return True
-
-    def configure(self, intercept: Intercept):
-        self.arrive.target = intercept.ground_pos
-        self.arrive.time = intercept.time
-        self.arrive.drive.backwards = self._should_strike_backwards
-
-    def update(self):
-        self.intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate)
-        if self.allow_backwards:
-            backwards_intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate, backwards=True)
-            if backwards_intercept.time + 0.1 < self.intercept.time:
-                self.intercept = backwards_intercept
-                self._should_strike_backwards = True
-            else:
-                self._should_strike_backwards = False
-
-        self.configure(self.intercept)
-        self._last_update_time = self.car.time
-        if not self.intercept.is_viable or self.intercept.time > self._initial_time + self.max_additional_time:
-            print("Strike expired because intercept got changed too much.")
-            self.finished = True
-            
-
-    def update_requirement(self):
-        return self.intercept.time > self.car.time + self.stop_updating and self.car.on_ground
+        self.arrive: Arrive = Arrive(car)
+        self.intercept: Ball = None
+        self.__ball_positions: List[vec3] = []
+        self.__last_update_time: float = -math.inf
+        self.__previous_intercept_time: float = self.car.time + 10.0
+        self.__rendered_prediction = True
 
     def step(self, dt):
+        if self.should_recalculate_intercept():
+            self.recalculate_intercept()
+
+        self.configure(self.intercept)
         self.arrive.step(dt)
         self.controls = self.arrive.controls
-        self.finished = self.arrive.finished
+        if self.arrive.finished:
+            self.finished = True
+        
+    def should_recalculate_intercept(self) -> bool:
+        return self.car.time > self.__last_update_time + self.update_interval and self.car.on_ground
+    
+    def recalculate_intercept(self):
+        copy = Ball(self.ball)
+        dt = 1.0 / 120.0
+        self.__rendered_prediction = False
+        self.__ball_positions.clear()
+        self.__last_update_time = self.car.time
+        last_pos_time = 0.0
+        previous_intercept_reachable = False
 
-        if self.arrive.drive.target_speed < 300:
-            self.controls.throttle = 0
+        while copy.time < self.__previous_intercept_time + self.max_additional_time:
+            copy.step(dt)
+            if copy.time > last_pos_time + 0.2:
+                self.__ball_positions.append(vec3(copy.position))
+                last_pos_time = copy.time
+            self.configure(copy)
 
-        if self.car.time > self._last_update_time + self.update_interval:
+            if self.is_intercept_reachable():
+                if self.is_intercept_desirable():
+                    self.__previous_intercept_time = self.intercept.time
+                    if previous_intercept_reachable:
+                        self.arrive.speed_control = True
+                    return
+                previous_intercept_reachable = True
 
-            if self.update_requirement():
+        print("Didn't find a valid intercept in time.")
+        self.finished = True
 
-                prediction_steps = int((self.intercept.time - self.car.time + 1) * 60)
-                self.info.predict_ball(prediction_steps, 1/60)
-                self._has_drawn_prediction = False
-                self.update()
+    def get_hit_direction(self) -> vec3:
+        target_direction = ground_direction(self.intercept, self.target)
+        return ground_direction(self.intercept.velocity, target_direction * 5000)
+
+    def configure(self, intercept: Ball):
+        self.intercept = intercept
+        self.configure_mechanics()
+
+    def configure_mechanics(self):
+        self.arrive.car = self.car
+        self.arrive.target = self.get_offset_target()
+        self.arrive.target_direction = self.get_hit_direction()
+        self.arrive.time = self.intercept.time
+        self.arrive.travel.no_dodge_time = self.get_no_dodge_time()
+
+    def get_offset_target(self) -> vec3:
+        raise NotImplementedError
+
+    def get_facing_target(self) -> vec3:
+        return self.arrive.get_shifted_target()
+
+    def get_distance_to_target(self) -> float:
+        return self.arrive.get_total_distance()
+
+    def get_time_left(self) -> float:
+        return self.intercept.time - self.car.time
+
+    def get_no_dodge_time(self) -> float:
+        return 1.0
+
+    def is_intercept_reachable(self) -> bool:
+        distance_to_target = self.get_distance_to_target()
+        plan = TravelPlan(self.car, max_time=self.get_time_left())
+        plan.no_dodge_time = self.get_no_dodge_time()
+        plan.simulate()
+        return plan.distance_traveled >= distance_to_target
+
+    def is_intercept_desirable(self) -> bool:
+        raise NotImplementedError
 
     def render(self, draw: DrawingTool):
         self.arrive.render(draw)
+
         draw.color(draw.lime)
-        draw.circle(self.intercept.ground_pos + vec3(0,0,10), 93)
-        draw.point(self.intercept.ball.position)
+        draw.circle(ground(self.intercept.position), 93)
+        draw.point(self.intercept.position)
 
         if self.target is not None:
             draw.color(draw.cyan)
-            pos = self.intercept.ground_pos
+            pos = ground(self.intercept.position)
             tdir = ground_direction(pos, self.target)
             draw.triangle(pos + tdir * 150, tdir, length=100)
 
-        if not self._has_drawn_prediction:
-            self._has_drawn_prediction = True
-            draw.ball_prediction(self.info, self.intercept.time)
-
-
-    @staticmethod
-    def pick_easiest_target(car: Car, ball: Ball, targets) -> vec3:
-        best_dot = -99
-        best_target = None
-        for target in targets:
-            this_dot = dot(ground_direction(car, ball), ground_direction(ball, target))
-            if this_dot > best_dot:
-                best_dot = this_dot
-                best_target = target
-        return best_target
-
-    @staticmethod
-    def pick_easiest_direction(car: Car, ball: Ball, directions) -> vec3:
-        best_dot = -99
-        best_direction = None
-        for d in directions:
-            this_dot = dot(ground_direction(car, ball), d)
-            if this_dot > best_dot:
-                best_dot = this_dot
-                best_direction = d
-        return best_direction
+        if not self.__rendered_prediction:
+            draw.group("prediction")
+            self.__rendered_prediction = True
+            draw.color(draw.yellow)
+            draw.polyline(self.__ball_positions)

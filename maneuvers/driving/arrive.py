@@ -20,63 +20,62 @@ class Arrive(Maneuver):
         self.target_direction: vec3 = None
         self.target: vec3 = None
         self.time: float = 0
-        self.drive = Drive(car)
-        self.travel = Travel(car)
-        self.lerp_t = 0.5
-        self.allow_dodges_and_wavedashes: bool = True
+        self.speed_control: bool = False
         self.additional_shift = 0
 
+        self.lerp_t = 0.58
 
+        self.drive = Drive(car)
+        self.travel = Travel(car)
+
+    def get_shifted_target(self):
+        if self.target_direction is None:
+            return vec3(self.target)
+
+        car_vel = norm(self.car.velocity)
+        target_direction = normalize(self.target_direction)
+        shift = clamp(distance(self.car.position, self.target) * self.lerp_t, 0, car_vel * 1.5)
+        if shift - self.additional_shift < turn_radius(clamp(car_vel, 1400, 2300) * 1.1):
+            shift = 0
+        else:
+            shift += self.additional_shift
+        shifted_target = self.target - target_direction * shift
+        return Arena.clamp(shifted_target)
+
+    def get_total_distance(self):
+        translated_target = self.get_shifted_target()
+        return ground_distance(self.car, translated_target) + ground_distance(translated_target, self.target) * 0.1
 
     def step(self, dt):
-        target = self.target
         car = self.car
+        translated_target = self.get_shifted_target()    
 
-        if self.target_direction is not None:
-            car_vel = norm(car.velocity)
-            target_direction = normalize(self.target_direction)
-            shift = clamp(distance(car.position, target) * self.lerp_t, 0, car_vel * 1.5)
-            if shift - self.additional_shift < turn_radius(clamp(car_vel, 1400, 2000) * 1.1):
-                shift = 0
-            else:
-                shift += self.additional_shift
-            translated_target = target - target_direction * shift
+        if self.speed_control:
+            translated_time = self.time - distance(translated_target, self.target) / max(1, clamp(norm(self.car.velocity), 500, 2300))            
+            dist_to_target = distance(car.position, translated_target)
+            target_speed = clamp(dist_to_target / max(0.001, translated_time - car.time), 0, 2300)
 
-            translated_time = self.time - distance(translated_target, target) / max(1, clamp(car_vel, 500, 2300))
+            self.drive.target_pos = translated_target
+            self.drive.target_speed = target_speed
+            self.drive.step(dt)
+            self.controls = self.drive.controls
         else:
-            translated_target = target
-            translated_time = self.time
-        
-        self.drive.target_pos = translated_target
-        dist_to_target = distance(car.position, translated_target)
-        target_speed = clamp(dist_to_target / max(0.001, translated_time - car.time), 0, 2300)
-
-        self.drive.target_speed = target_speed
-
-        if (
-            True or
-            self.allow_dodges_and_wavedashes
-            and car.boost < 5
-            and dist_to_target > clamp(norm(car.velocity) + 600, 1400, 2300)
-            and norm(car.velocity) < target_speed - 600
-            or not self.travel.driving
-        ):
             self.travel.target = translated_target
             self.travel.step(dt)
             self.controls = self.travel.controls
-        else:
-            self.drive.step(dt)
-            self.controls = self.drive.controls
-
 
         self.finished = self.car.time >= self.time
-        return self.finished
 
     def render(self, draw: DrawingTool):
-        self.travel.render(draw)
+        if self.speed_control:
+            self.drive.render(draw)
+        else:
+            self.travel.render(draw)
 
         if self.target_direction is not None:
             draw.color(draw.lime)
             draw.triangle(self.target - self.target_direction * 250, self.target_direction)
+            draw.color(draw.white)
+            draw.line(self.target, self.get_shifted_target())
 
         

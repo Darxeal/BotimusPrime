@@ -13,13 +13,16 @@ from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.shadow_defense import ShadowDefense
 
-from strategy.soccar_strategy import SoccarStrategy
 from strategy.training import get_maneuver_by_name
+from strategy.soccar import SoccarStrategy
 
 from utils.vector_math import distance
 from utils.game_info import GameInfo
 
 import time
+
+
+
 
 class BotimusPrime(BaseAgent):
     
@@ -101,16 +104,14 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.clear()
 
-            self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
+            # self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
             
             if self.training and self.info.my_car.on_ground:
                 self.maneuver = get_maneuver_by_name(self.matchcomms_message, self.info)            
             else:
                 self.maneuver = self.strategy.choose_maneuver()
             
-            name = str(type(self.maneuver).__name__)
-            print(name)
-
+            print("chosen", self.maneuver)
             self.last_ball_vel = norm(self.info.ball.velocity)
 
         
@@ -124,6 +125,7 @@ class BotimusPrime(BaseAgent):
                 self.maneuver.render(self.draw)
 
             if self.maneuver.finished:
+                print(self.maneuver, "finished")
                 self.maneuver = None
 
         if self.RENDERING:

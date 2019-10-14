@@ -9,20 +9,23 @@ class Travel(Maneuver):
 
     def __init__(self, car: Car):
         super().__init__(car)
-        self.target: vec3 = None
-        self.drive = Drive(car)
-        self.dodge: Dodge = None
+        self.target: vec3 = vec3(0,0,0)
+        self.finish_distance = 500
+        self.no_dodge_time = 0
 
         self.driving = True
         self.dodging = False
 
-        self.finish_distance = 500
+        self.drive = Drive(car)
+        self.dodge: Dodge = None
 
         self.__time_spend_on_ground = 0
 
     def get_plan(self):
         distance_to_target = ground_distance(self.car.position, self.target)
-        return TravelPlan(self.car, max_distance=distance_to_target)
+        plan = TravelPlan(self.car, max_distance=distance_to_target)
+        plan.no_dodge_time = self.no_dodge_time
+        return plan
 
     def step(self, dt):
         if self.dodging:
@@ -68,7 +71,9 @@ class Travel(Maneuver):
             draw.string(self.car.position, "dodging")
             return
 
-        draw.group("TravelPlan")
+        self.drive.render(draw)
+
+        # draw.group("TravelPlan")
         plan = self.get_plan()
         last_pos = self.car.position
         target_dir = ground_direction(last_pos, self.target)

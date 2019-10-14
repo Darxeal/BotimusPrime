@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass
 from typing import List
 
-from rlutilities.linear_algebra import vec3, cross
+from rlutilities.linear_algebra import vec3, cross, axis_to_rotation, dot
 from rlutilities.simulation import Car, Input, Ball
 
 from rlbot.utils.rendering.rendering_manager import RenderingManager
@@ -149,14 +149,17 @@ class DrawingTool:
         
         self.polyline(points)
 
-    def circle(self, pos: vec3, radius: float):
+    def circle(self, pos: vec3, radius: float, up: vec3=None):
         segments = int(clamp(radius / 20, 10, 50))
         step = 2 * math.pi / segments
         points = []
 
         for i in range(segments):
             angle = step * i
-            points.append(pos + vec3(math.cos(angle) * radius, math.sin(angle) * radius, 0))
+            p = cross(up) if up else vec3(0,1,0)
+            u = up if up else vec3(0,0,1)
+            p = dot(axis_to_rotation(angle * u), p) * radius
+            points.append(p + pos)
         
         self.cyclic_polyline(points)
 
