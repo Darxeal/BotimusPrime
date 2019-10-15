@@ -9,11 +9,11 @@ class DodgeStrike(Strike):
 
     def __init__(self, car, ball):
         Strike.__init__(self, car, ball)
-        self.dodge = AimDodge(car)
+        self.dodge = AimDodge(car, 0.1, ball.position)
         self.dodging = False
 
     def is_intercept_desirable(self):
-        if self.intercept.position[2] > 250:
+        if self.intercept.position[2] > 280:
             return False
 
         time_left = self.intercept.time - self.car.time
@@ -51,25 +51,25 @@ class DodgeStrike(Strike):
 
         self.dodge.car = self.car
         additional_jump = self.get_jump_time()
-        self.dodge.duration = additional_jump
+        self.dodge.jump.duration = additional_jump
         self.arrive.additional_shift = additional_jump * norm(self.car.velocity) * 0.5
         self.arrive.lerp_t = 0.58
 
 
     def step(self, dt):
         if self.dodging:
-            self.dodge.direction = vec2(ground_direction(self.car, self.intercept))
             self.dodge.step(dt)
             self.controls = self.dodge.controls
         else:
             super().step(dt)
-            if self.arrive.time - self.car.time < self.dodge.duration + self.predodge_time:
+            if self.arrive.time - self.car.time < self.dodge.jump.duration + self.predodge_time:
 
                 car_speed = norm(self.car.velocity)
 
                 if angle_to(self.car, self.get_offset_target()) < 0.1 or car_speed < 500:
                     self.dodging = True
-                    self.dodge.direction = vec2(self.get_hit_direction())
+                    self.dodge.target = self.intercept.position
+
                 elif car_speed > 800:
                     self.controls.throttle = -1
                     # self.finished = True
