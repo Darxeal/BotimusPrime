@@ -7,8 +7,8 @@ class DodgeStrike(Strike):
 
     predodge_time = 0.2
 
-    def __init__(self, car, ball, target):
-        super().__init__(car, ball, target)
+    def __init__(self, car, ball):
+        Strike.__init__(self, car, ball)
         self.dodge = AimDodge(car)
         self.dodging = False
 
@@ -64,15 +64,18 @@ class DodgeStrike(Strike):
         else:
             super().step(dt)
             if self.arrive.time - self.car.time < self.dodge.duration + self.predodge_time:
-                if angle_to(self.car, self.get_offset_target()) < 0.1:
+
+                car_speed = norm(self.car.velocity)
+
+                if angle_to(self.car, self.get_offset_target()) < 0.1 or car_speed < 500:
                     self.dodging = True
                     self.dodge.direction = vec2(self.get_hit_direction())
-                else:
+                elif car_speed > 800:
                     self.controls.throttle = -1
-                    self.finished = True
+                    # self.finished = True
         self.finished = self.finished or self.dodge.finished
 
     def render(self, draw: DrawingTool):
         draw.color(draw.cyan)
         draw.triangle(self.intercept.position, self.get_hit_direction())
-        super().render(draw)
+        Strike.render(self, draw)

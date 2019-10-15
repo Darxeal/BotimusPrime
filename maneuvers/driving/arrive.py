@@ -55,7 +55,7 @@ class Arrive(Maneuver):
             dist_to_target = distance(car.position, translated_target)
             target_speed = clamp(dist_to_target / max(0.001, translated_time - car.time), 0, 2300)
 
-            if target_speed < 300:
+            if target_speed < 500:
                 target_speed = 0
 
             self.drive.target_pos = translated_target

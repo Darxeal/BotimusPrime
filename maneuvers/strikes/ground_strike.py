@@ -17,7 +17,7 @@ class GroundStrike(Strike):
 
     def configure_mechanics(self):
         super().configure_mechanics()
-        self.arrive.lerp_t = 0.5
+        self.arrive.lerp_t = 0.57
 
     def get_offset_target(self):
         return ground(self.intercept) - self.get_hit_direction() * 90

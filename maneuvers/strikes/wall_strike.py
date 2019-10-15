@@ -6,8 +6,8 @@ class WallStrike(Strike):
 
     max_dist_from_wall = 150
 
-    def __init__(self, car, ball, target):
-        super().__init__(car, ball, target)
+    def __init__(self, car, ball):
+        super().__init__(car, ball)
         self.collision: ray = None
 
     def get_hit_direction(self):
@@ -61,4 +61,4 @@ class WallStrike(Strike):
         draw.line(ground(self.car.position), plane_intersect_pos)
         draw.line(plane_intersect_pos, self.collision.start)
 
-        super().render(draw)
+        self.render_ball_prediction(draw)

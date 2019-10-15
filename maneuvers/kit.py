@@ -10,7 +10,7 @@ from utils.math import *
 from utils.misc import *
 from utils.intercept import Intercept, AerialIntercept
 from utils.arena import Arena
-from utils.game_info import GameInfo
+from utils.game_info import GameInfo, Goal
 from utils.travel_plan import TravelPlan
 
 from tools.drawing import DrawingTool

@@ -105,6 +105,13 @@ class SpecificManeuverStrikerExcercise(SpecificManeuverExcercise):
     def __init__(self):
         super().__init__(StrikerGrader(self.timeout))
 
+class SpecificManeuverGoalieExcercise(SpecificManeuverExcercise):
+    
+    timeout: float = 10
+
+    def __init__(self):
+        super().__init__(GoalieGrader(self.timeout))
+
 
 class DontCareGrader(CompoundGrader):
     def __init__(self, timeout, ally=0):

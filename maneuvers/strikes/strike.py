@@ -5,13 +5,14 @@ from maneuvers.driving.arrive import Arrive
 class Strike(Maneuver):
 
     max_additional_time = 0.1
-    update_interval = 0.5
+    update_interval = 0.3
 
-    def __init__(self, car: Car, ball: Ball, target: vec3):
-        super().__init__(car)
+    def __init__(self, car: Car, ball: Ball):
+        Maneuver.__init__(self, car)
         
         self.ball: Ball = ball
-        self.target: vec3 = target
+        self.target_direction: vec3 = None
+        self.earliest_intercept_time: float = 0.0
 
         self.arrive: Arrive = Arrive(car)
         self.intercept: Ball = None
@@ -47,10 +48,10 @@ class Strike(Maneuver):
             if copy.time > last_pos_time + 0.2:
                 self.__ball_positions.append(vec3(copy.position))
                 last_pos_time = copy.time
+            
             self.configure(copy)
-
             if self.is_intercept_reachable():
-                if self.is_intercept_desirable():
+                if self.is_intercept_desirable() and copy.time > self.earliest_intercept_time:
                     self.__previous_intercept_time = self.intercept.time
                     if previous_intercept_reachable:
                         self.arrive.speed_control = True
@@ -60,9 +61,12 @@ class Strike(Maneuver):
         print("Didn't find a valid intercept in time.")
         self.finished = True
 
+    def get_target_direction(self) -> vec3:
+        return self.target_direction
+
     def get_hit_direction(self) -> vec3:
-        target_direction = ground_direction(self.intercept, self.target)
-        return ground_direction(self.intercept.velocity, target_direction * 4000)
+        target_direction = self.get_target_direction()
+        return ground_direction(self.intercept.velocity, target_direction * 5000)
 
     def configure(self, intercept: Ball):
         self.intercept = intercept
@@ -88,10 +92,13 @@ class Strike(Maneuver):
         return self.intercept.time - self.car.time
 
     def get_steer_penalty(self) -> float:
+        # return 0
+        if norm(self.car.velocity) < 1000:
+            return 0
         # stolen from reliefbot
         to_target = direction(self.car.position, self.get_facing_target())
         correction_err = max(0.0, 0.3 - dot(to_target, self.car.forward()))
-        return correction_err * .1 + correction_err * norm(self.car.velocity) * .02
+        return correction_err * norm(self.car.velocity) * .02
 
     def get_no_dodge_time(self) -> float:
         return 1.0
@@ -101,26 +108,33 @@ class Strike(Maneuver):
         plan = TravelPlan(self.car, max_time=self.get_time_left() - self.get_steer_penalty())
         plan.no_dodge_time = self.get_no_dodge_time()
         plan.simulate()
-        return plan.distance_traveled >= distance_to_target
+        return plan.distance_traveled > distance_to_target - 30
 
     def is_intercept_desirable(self) -> bool:
         raise NotImplementedError
 
-    def render(self, draw: DrawingTool):
-        self.arrive.render(draw)
-
-        draw.color(draw.lime)
-        draw.circle(ground(self.intercept.position), 93)
-        draw.point(self.intercept.position)
-
-        if self.target is not None:
-            draw.color(draw.cyan)
-            pos = ground(self.intercept.position)
-            tdir = ground_direction(pos, self.target)
-            draw.triangle(pos + tdir * 150, tdir, length=100)
-
+    def render_ball_prediction(self, draw: DrawingTool):
         if not self.__rendered_prediction:
             draw.group("prediction")
             self.__rendered_prediction = True
             draw.color(draw.yellow)
             draw.polyline(self.__ball_positions)
+
+    def render_intercept_circle(self, draw: DrawingTool):
+        draw.color(draw.lime)
+        draw.circle(ground(self.intercept.position), 93)
+        draw.point(self.intercept.position)
+
+    def render_direction_triangle(self, draw: DrawingTool):
+        draw.color(draw.cyan)
+        tdir = self.get_target_direction()
+        draw.triangle(ground(self.intercept.position) + tdir * 150, tdir, length=100)
+
+    def render(self, draw: DrawingTool):
+        self.arrive.render(draw)
+        self.render_direction_triangle(draw)
+        self.render_intercept_circle(draw)
+        self.render_ball_prediction(draw)
+
+
+

@@ -38,7 +38,7 @@ class Drive(Maneuver):
         self.controls.steer = clamp11(2.5 * phi)
 
         #powersliding
-        if abs(phi) > 1.5 and self.car.position[2] < 200:
+        if abs(phi) > 1.4 and self.car.position[2] < 200 and norm(ground(local_target)) < 3000:
             self.controls.handbrake = 1
         else:
             self.controls.handbrake = 0
