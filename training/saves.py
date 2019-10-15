@@ -1,8 +1,8 @@
-from training.botimus_training import BotimusGoalieExcercise, Car, Ball, SpecificManeuverGoalieExcercise
+from training.botimus_training import BotimusGoalieExercise, Car, Ball, SpecificManeuverGoalieExercise
 from rlutilities.linear_algebra import look_at, vec3, axis_to_rotation
 
 
-class EasySave(SpecificManeuverGoalieExcercise):
+class EasySave(SpecificManeuverGoalieExercise):
     timeout = 5
     maneuver_name = "Offense"
 
@@ -15,7 +15,7 @@ class EasySave(SpecificManeuverGoalieExcercise):
         ball.velocity = vec3(0, -2000, 0)
 
 
-class FullTurnSave(SpecificManeuverGoalieExcercise):
+class FullTurnSave(SpecificManeuverGoalieExercise):
     timeout = 5
     maneuver_name = "Offense"
 

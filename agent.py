@@ -89,7 +89,7 @@ class BotimusPrime(BaseAgent):
             self.last_touch_time = touch.time_seconds
             self.maneuver = None
 
-        # check if an excercise wants us to set a certain maneuver
+        # check if an exercise wants us to set a certain maneuver
         self.handle_training_matchcomms()
 
         # choose maneuver

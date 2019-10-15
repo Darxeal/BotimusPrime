@@ -1,9 +1,9 @@
-from training.botimus_training import BotimusStrikerExcercise, Car, Ball, SpecificManeuverStrikerExcercise
+from training.botimus_training import BotimusStrikerExercise, Car, Ball, SpecificManeuverStrikerExercise
 from rlutilities.linear_algebra import look_at, vec3, axis_to_rotation
 from utils.vector_math import ground_direction
 
 
-class ChipShot(SpecificManeuverStrikerExcercise):
+class ChipShot(SpecificManeuverStrikerExercise):
 
     maneuver_name = "Offense"
     timeout = 10
@@ -25,7 +25,7 @@ class ChipShot(SpecificManeuverStrikerExcercise):
         car.velocity = tdir * 0
         car.boost = 100
 
-class RampShot(SpecificManeuverStrikerExcercise):
+class RampShot(SpecificManeuverStrikerExercise):
 
     maneuver_name = "Offense"
     timeout = 10
@@ -47,7 +47,7 @@ class RampShot(SpecificManeuverStrikerExcercise):
         car.velocity = tdir * 0
         car.boost = 100
 
-class BouncyShot(SpecificManeuverStrikerExcercise):
+class BouncyShot(SpecificManeuverStrikerExercise):
 
     maneuver_name = "Offense"
     timeout = 10
@@ -69,7 +69,7 @@ class BouncyShot(SpecificManeuverStrikerExcercise):
         car.velocity = tdir * 0
         car.boost = 100
 
-class WaitForBallToRollInfrontOfGoal(SpecificManeuverStrikerExcercise):
+class WaitForBallToRollInfrontOfGoal(SpecificManeuverStrikerExercise):
 
     maneuver_name = "Offense"
     timeout = 5
@@ -91,7 +91,7 @@ class WaitForBallToRollInfrontOfGoal(SpecificManeuverStrikerExcercise):
         car.velocity = tdir * 1000
         car.boost = 100
 
-class WaitForBallToBounceInfrontOfGoal(SpecificManeuverStrikerExcercise):
+class WaitForBallToBounceInfrontOfGoal(SpecificManeuverStrikerExercise):
 
     maneuver_name = "Offense"
     timeout = 5

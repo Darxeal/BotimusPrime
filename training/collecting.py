@@ -1,7 +1,7 @@
-from training.botimus_training import CollectorExcercise, Car, Ball
+from training.botimus_training import CollectorExercise, Car, Ball
 from rlutilities.linear_algebra import vec2, vec3, rotation, dot, look_at
 
-class PowerslideCollection(CollectorExcercise):
+class PowerslideCollection(CollectorExercise):
 
     timeout = 1.2
 

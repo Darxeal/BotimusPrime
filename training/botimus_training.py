@@ -31,8 +31,8 @@ class BotimusExercise(TrainingExercise):
 
     def __init__(self, grader: Grader):
 
-        excercise_name = str(self.__class__.__name__)
-        super().__init__(excercise_name, grader)
+        exercise_name = str(self.__class__.__name__)
+        super().__init__(exercise_name, grader)
 
         self.rng: SeededRandomNumberGenerator = None
 
@@ -71,7 +71,7 @@ class BotimusExercise(TrainingExercise):
     def set_car_ball_state(self, car: Car, ball: Ball):
         pass
 
-class SpecificManeuverExcercise(BotimusExercise):
+class SpecificManeuverExercise(BotimusExercise):
 
     maneuver_name: str = None
 
@@ -82,7 +82,7 @@ class SpecificManeuverExcercise(BotimusExercise):
         ])
 
 
-class BotimusGoalieExcercise(BotimusExercise):
+class BotimusGoalieExercise(BotimusExercise):
 
     timeout: float = 10
 
@@ -90,7 +90,7 @@ class BotimusGoalieExcercise(BotimusExercise):
         super().__init__(GoalieGrader(self.timeout))
 
 
-class BotimusStrikerExcercise(BotimusExercise):
+class BotimusStrikerExercise(BotimusExercise):
 
     timeout: float = 10
 
@@ -98,14 +98,14 @@ class BotimusStrikerExcercise(BotimusExercise):
         super().__init__(StrikerGrader(self.timeout))
 
 
-class SpecificManeuverStrikerExcercise(SpecificManeuverExcercise):
+class SpecificManeuverStrikerExercise(SpecificManeuverExercise):
     
     timeout: float = 10
 
     def __init__(self):
         super().__init__(StrikerGrader(self.timeout))
 
-class SpecificManeuverGoalieExcercise(SpecificManeuverExcercise):
+class SpecificManeuverGoalieExercise(SpecificManeuverExercise):
     
     timeout: float = 10
 
@@ -121,7 +121,7 @@ class DontCareGrader(CompoundGrader):
         ])
 
 
-class SpecificManeuverTest(SpecificManeuverExcercise):
+class SpecificManeuverTest(SpecificManeuverExercise):
     
     timeout: float = 10
 
@@ -129,7 +129,7 @@ class SpecificManeuverTest(SpecificManeuverExcercise):
         super().__init__(DontCareGrader(self.timeout))
 
 
-class CollectorExcercise(BotimusExercise):
+class CollectorExercise(BotimusExercise):
     
     bot_cfg_filename = 'collector.cfg'
     timeout: float = 10
