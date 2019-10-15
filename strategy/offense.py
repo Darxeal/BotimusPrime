@@ -19,6 +19,8 @@ class Offense:
         #     abs(ball.position[1]) < abs(target_goal.center[1]) - 1500
         #     or abs(ball.position[0]) < target_goal.WIDTH / 2 + abs(ball.position[1] - target_goal.center[1]) - 300
         # )
+        if ground_distance(ball, target_goal.center) > 3000:
+            return True
         return dot(ground_direction(car, ball), ground_direction(ball, target_goal.center)) > 0
 
 
