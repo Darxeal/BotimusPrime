@@ -25,7 +25,7 @@ class Offense:
 
 
     @staticmethod
-    def get_best_strike(car: Car, ball: Ball, target_goal: Goal) -> ChainManeuver:
+    def get_best_strike(car: Car, ball: Ball, target_goal: Goal) -> Strike:
         print("Offense - choosing best Strike")
         copy = Ball(ball)
 
@@ -42,14 +42,14 @@ class Offense:
 
         earliest_time = 0
 
-        while copy.time < car.time + 20.0:
+        while copy.time < car.time + 10.0:
             for _ in range(5):
                 dt = 1.0 / 120.0
                 copy.step(dt)
 
-            if not Offense.makes_sense(car, copy, target_goal):
-                earliest_time = copy.time
-                continue
+            # if not Offense.makes_sense(car, copy, target_goal):
+            #     earliest_time = copy.time
+            #     continue
 
             for strike in strikes:
                 strike.configure(copy)

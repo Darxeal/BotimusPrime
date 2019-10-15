@@ -9,7 +9,7 @@ class Drive(Maneuver):
         self.target_pos: vec3 = None
         self.target_speed: float = 2300
         self.backwards: bool = False
-        self.drive_on_walls = True
+        self.drive_on_walls = False
 
     def step(self, dt):
         target = self.target_pos

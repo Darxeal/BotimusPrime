@@ -9,6 +9,7 @@ class WallStrike(Strike):
     def __init__(self, car, ball):
         super().__init__(car, ball)
         self.collision: ray = None
+        self.arrive.travel.drive.drive_on_walls = True # lmao
 
     def get_hit_direction(self):
         return None
@@ -35,7 +36,7 @@ class WallStrike(Strike):
         return self.get_plane_intersect_position()
 
     def is_intercept_desirable(self):
-        if self.intercept.position[2] < 200 or abs(self.intercept.position[0]) < 3000:
+        if self.intercept.position[2] < 200 or abs(self.intercept.position[0]) < 3500:
             return False
 
         return norm(self.collision.start) > 0

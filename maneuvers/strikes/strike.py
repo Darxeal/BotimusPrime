@@ -49,6 +49,9 @@ class Strike(Maneuver):
                 self.__ball_positions.append(vec3(copy.position))
                 last_pos_time = copy.time
             
+            if copy.time > self.car.time + 10.0:
+                break
+
             self.configure(copy)
             if self.is_intercept_reachable():
                 if self.is_intercept_desirable() and copy.time > self.earliest_intercept_time:

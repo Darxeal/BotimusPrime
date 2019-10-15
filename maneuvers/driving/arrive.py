@@ -22,6 +22,7 @@ class Arrive(Maneuver):
         self.time: float = 0
         self.speed_control: bool = False
         self.additional_shift = 0
+        self.arena_clamp = 0
 
         self.lerp_t = 0.58
 
@@ -40,7 +41,7 @@ class Arrive(Maneuver):
         else:
             shift += self.additional_shift
         shifted_target = self.target - target_direction * shift
-        return Arena.clamp(shifted_target)
+        return Arena.clamp(shifted_target, self.arena_clamp)
 
     def get_total_distance(self):
         translated_target = self.get_shifted_target()

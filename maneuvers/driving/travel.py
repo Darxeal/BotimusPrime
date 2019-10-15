@@ -10,7 +10,6 @@ class Travel(Maneuver):
     def __init__(self, car: Car):
         super().__init__(car)
         self.target: vec3 = vec3(0,0,0)
-        self.finish_distance = 500
         self.no_dodge_time = 0
 
         self.driving = True
@@ -26,6 +25,13 @@ class Travel(Maneuver):
         plan = TravelPlan(self.car, max_distance=distance_to_target)
         plan.no_dodge_time = self.no_dodge_time
         return plan
+
+    def estimate_time_to(self, target: vec3) -> float:
+        distance_to_target = ground_distance(self.car.position, target)
+        plan = TravelPlan(self.car, max_distance=distance_to_target)
+        plan.no_dodge_time = self.no_dodge_time
+        plan.simulate()
+        return plan.time_passed
 
     def step(self, dt):
         if self.dodging:
@@ -56,7 +62,11 @@ class Travel(Maneuver):
                 self.controls.boost = False
                 self.controls.throttle = 1
 
-            elif method == TravelMethod.Dodge and angle_to(self.car, self.target) < 0.1:
+            elif (
+                method == TravelMethod.Dodge
+                and angle_to(self.car, self.target) < 0.1
+                and self.car.position[2] < 100
+            ):
                 self.dodging = True
                 self.driving = False
                 self.dodge = Dodge(self.car)
@@ -66,8 +76,6 @@ class Travel(Maneuver):
             if angle_to(self.car, self.target) > 0.5:
                 self.controls.boost = False
 
-            if distance(self.car.position, self.target) < self.finish_distance and self.driving:
-                self.finished = True
 
     def render(self, draw: DrawingTool):
         if self.dodging:
