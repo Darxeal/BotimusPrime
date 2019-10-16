@@ -41,7 +41,7 @@ class Offense:
 
         earliest_time = 0
 
-        while copy.time < car.time + 10.0:
+        while copy.time < car.time + 15.0:
             for _ in range(5):
                 dt = 1.0 / 120.0
                 copy.step(dt)
