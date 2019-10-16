@@ -23,7 +23,7 @@ class Drive(Maneuver):
             target[0] = signclamp(target[0], 700)
 
         if not self.drive_on_walls:
-            if self.car.position[2] > 300:
+            if self.car.position[2] > 100:
                 target = ground(self.car)
 
         local_target = local(self.car, target)
@@ -38,7 +38,7 @@ class Drive(Maneuver):
         self.controls.steer = clamp11(2.5 * phi)
 
         #powersliding
-        if abs(phi) > 1.4 and self.car.position[2] < 200 and norm(ground(local_target)) < 3000:
+        if abs(phi) > 1.5 and self.car.position[2] < 200 and norm(ground(local_target)) < 3000:
             self.controls.handbrake = 1
         else:
             self.controls.handbrake = 0

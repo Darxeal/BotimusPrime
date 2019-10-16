@@ -24,6 +24,8 @@ class WallStrike(Strike):
         s = sphere(intercept.position, self.max_dist_from_wall)
         self.collision = Field.collide(s)
         super().configure(intercept)
+        if self.arrive.speed_control and self.arrive.travel.drive.target_speed < 1000:
+            self.finished = True
 
     def get_plane_intersect_position(self):
         target = self.collision.start

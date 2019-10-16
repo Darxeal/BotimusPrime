@@ -44,7 +44,7 @@ class DodgeStrike(Strike):
         target_height = clamp(self.intercept.position[2] - Ball.radius, 0, 220)
 
         time = self.get_time_to_z(target_height)
-        return clamp(time, 0.05, 0.9) + 0.05
+        return clamp(time, 0, 0.9) + 0.05
 
     def configure_mechanics(self):
         super().configure_mechanics()

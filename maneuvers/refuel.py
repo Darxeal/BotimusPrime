@@ -15,7 +15,7 @@ class Refuel(Maneuver):
         self.arrive.target = self.pad.position
         self.arrive.target_direction = ground_direction(self.pad.position, target)
         self.arrive.lerp_t = 0.4
-        self.arrive.arena_clamp = 400
+        self.arrive.arena_clamp = Arena.size[0] - abs(self.pad.position[0])
 
     def nearest_boostpad(self, pos: vec3) -> Pad:
         best_pad = None
@@ -36,7 +36,7 @@ class Refuel(Maneuver):
         self.arrive.step(dt)
         self.controls = self.arrive.controls
 
-        if distance(self.car, self.pad) < norm(self.car.velocity) * 0.3:
+        if distance(self.car, self.pad) < norm(self.car.velocity) * 0.2:
             if angle_to(self.car, self.target) > 1.0:
                 if norm(self.car.velocity) > 1000:
                     self.controls.throttle = -1

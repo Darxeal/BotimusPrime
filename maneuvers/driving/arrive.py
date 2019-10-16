@@ -29,23 +29,36 @@ class Arrive(Maneuver):
         self.drive = Drive(car)
         self.travel = Travel(car)
 
-    def get_shifted_target(self):
+    def get_shifted_target(self) -> vec3:
         if self.target_direction is None:
             return vec3(self.target)
 
         car_vel = norm(self.car.velocity)
         target_direction = normalize(self.target_direction)
-        shift = clamp(distance(self.car.position, self.target) * self.lerp_t, 0, car_vel * 1.5)
+        shift = clamp(distance(self.car, self.target) * self.lerp_t, 0, car_vel * 1.5)
+        car_to_target = ground_direction(self.car, self.target)
+
+        if dot(target_direction, car_to_target) < 0:
+            perpendicular_direction = cross(car_to_target)
+            if dot(target_direction, perpendicular_direction) < 0:
+                perpendicular_direction *= -1
+            target_direction = perpendicular_direction
+
         if shift - self.additional_shift < turn_radius(clamp(car_vel, 1400, 2300) * 1.1):
             shift = 0
         else:
             shift += self.additional_shift
+
         shifted_target = self.target - target_direction * shift
         return Arena.clamp(shifted_target, self.arena_clamp)
 
-    def get_total_distance(self):
+    def get_total_distance(self) -> float:
         translated_target = self.get_shifted_target()
         return ground_distance(self.car, translated_target) + ground_distance(translated_target, self.target)
+
+    def estimate_time(self) -> float:
+        dist = self.get_total_distance()
+        return self.travel.time_for_distance(dist)
 
     def step(self, dt):
         car = self.car

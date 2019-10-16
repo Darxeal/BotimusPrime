@@ -26,12 +26,15 @@ class Travel(Maneuver):
         plan.no_dodge_time = self.no_dodge_time
         return plan
 
-    def estimate_time_to(self, target: vec3) -> float:
-        distance_to_target = ground_distance(self.car.position, target)
-        plan = TravelPlan(self.car, max_distance=distance_to_target)
+    def time_for_distance(self, dist: float) -> float:
+        plan = TravelPlan(self.car, max_distance=dist)
         plan.no_dodge_time = self.no_dodge_time
         plan.simulate()
         return plan.time_passed
+
+    def estimate_time_to(self, target: vec3) -> float:
+        distance_to_target = ground_distance(self.car.position, target)
+        return self.time_for_distance(distance_to_target)
 
     def step(self, dt):
         if self.dodging:

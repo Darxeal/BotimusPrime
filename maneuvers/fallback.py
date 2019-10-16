@@ -13,7 +13,7 @@ class Fallback(Maneuver):
         self.travel.target = vec3(sgn(self.info.ball.position[0]) * 2000, self.info.my_goal.center[1] * 0.9, 0)
         self.travel.step(dt)
         self.controls = self.travel.controls
-        if ground_distance(self.travel.target, self.car.position) < 2000:
+        if ground_distance(self.travel.target, self.car.position) < 3000:
             self.finished = True
 
     def render(self, draw):

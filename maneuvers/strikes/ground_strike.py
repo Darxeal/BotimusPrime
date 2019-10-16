@@ -13,6 +13,7 @@ class GroundStrike(Strike):
         return (
             self.intercept.position[2] < self.max_intercept_height
             and abs(self.intercept.velocity[2]) < self.max_intercept_velocity
+            and distance(self.intercept.velocity, self.get_hit_direction() * self.car_speed_at_intercept) > 1000
         )
 
     def configure_mechanics(self):

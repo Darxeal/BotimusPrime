@@ -16,6 +16,7 @@ class Strike(Maneuver):
 
         self.arrive: Arrive = Arrive(car)
         self.intercept: Ball = None
+        self.car_speed_at_intercept: float = 0
         self.__ball_positions: List[vec3] = []
         self.__last_update_time: float = -math.inf
         self.__previous_intercept_time: float = self.car.time + 10.0
@@ -111,6 +112,7 @@ class Strike(Maneuver):
         plan = TravelPlan(self.car, max_time=self.get_time_left() - self.get_steer_penalty())
         plan.no_dodge_time = self.get_no_dodge_time()
         plan.simulate()
+        self.car_speed_at_intercept = plan.forward_speed
         return plan.distance_traveled > distance_to_target - 30
 
     def is_intercept_desirable(self) -> bool:

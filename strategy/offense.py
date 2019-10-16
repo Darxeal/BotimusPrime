@@ -26,7 +26,6 @@ class Offense:
 
     @staticmethod
     def get_best_strike(car: Car, ball: Ball, target_goal: Goal) -> Strike:
-        print("Offense - choosing best Strike")
         copy = Ball(ball)
 
         # stabilizers: List[ChainableManeuver] = [
@@ -66,6 +65,5 @@ class Offense:
                         strike.earliest_intercept_time = earliest_time
                         return strike
 
-        print("Didn't find any possible Strike.")
         return None
             
