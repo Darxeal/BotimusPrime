@@ -31,6 +31,7 @@ class TravelPlan:
         self.max_time = max_time
 
         self.no_dodge_time = 0
+        self.no_accelerate_time = 0
 
     def get_time_to_finish(self, additional_speed: float = 0.0):
         time_left = self.max_time - self.time_passed
@@ -53,7 +54,7 @@ class TravelPlan:
 
     def accelerate_until_speed(self, target_speed: float, with_boost: bool):
         lut = BOOST_LUT if with_boost else THROTTLE_LUT
-        time_limit = self.max_time - self.time_passed
+        time_limit = self.get_time_to_finish() - self.no_accelerate_time
 
         # make sure we don't simulate longer than we can boost
         if with_boost:
@@ -93,6 +94,10 @@ class TravelPlan:
         # if we are close to max speed, boosting or dodging
         # no longer makes sense, so just throttle to keep speed
         if self.forward_speed > self.MAX_SPEED - 50:
+            self.maintain_speed_till_finish()
+            return TravelMethod.Throttle
+
+        if self.get_time_to_finish() <= self.no_accelerate_time:
             self.maintain_speed_till_finish()
             return TravelMethod.Throttle
 

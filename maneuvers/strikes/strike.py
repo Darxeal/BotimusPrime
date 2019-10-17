@@ -4,7 +4,7 @@ from maneuvers.driving.arrive import Arrive
 
 class Strike(Maneuver):
 
-    max_additional_time = 0.1
+    max_additional_time = 0.5
     update_interval = 0.3
 
     def __init__(self, car: Car, ball: Ball):
@@ -17,9 +17,9 @@ class Strike(Maneuver):
         self.arrive: Arrive = Arrive(car)
         self.intercept: Ball = None
         self.car_speed_at_intercept: float = 0
+        self.previous_intercept_time: float = math.inf
         self.__ball_positions: List[vec3] = []
         self.__last_update_time: float = -math.inf
-        self.__previous_intercept_time: float = self.car.time + 10.0
         self.__rendered_prediction = True
 
     def step(self, dt):
@@ -44,7 +44,7 @@ class Strike(Maneuver):
         last_pos_time = 0.0
         previous_intercept_reachable = False
 
-        while copy.time < self.__previous_intercept_time + self.max_additional_time:
+        while copy.time < self.previous_intercept_time + self.max_additional_time:
             copy.step(dt)
             if copy.time > last_pos_time + 0.2:
                 self.__ball_positions.append(vec3(copy.position))
@@ -56,7 +56,7 @@ class Strike(Maneuver):
             self.configure(copy)
             if self.is_intercept_reachable():
                 if self.is_intercept_desirable() and copy.time > self.earliest_intercept_time:
-                    self.__previous_intercept_time = self.intercept.time
+                    self.previous_intercept_time = self.intercept.time
                     if previous_intercept_reachable:
                         self.arrive.speed_control = True
                     return
@@ -107,10 +107,14 @@ class Strike(Maneuver):
     def get_no_dodge_time(self) -> float:
         return 1.0
 
+    def get_no_accelerate_time(self) -> float:
+        return 0.0
+
     def is_intercept_reachable(self) -> bool:
         distance_to_target = self.get_distance_to_target()
         plan = TravelPlan(self.car, max_time=self.get_time_left() - self.get_steer_penalty())
         plan.no_dodge_time = self.get_no_dodge_time()
+        plan.no_accelerate_time = self.get_no_accelerate_time()
         plan.simulate()
         self.car_speed_at_intercept = plan.forward_speed
         return plan.distance_traveled > distance_to_target - 30

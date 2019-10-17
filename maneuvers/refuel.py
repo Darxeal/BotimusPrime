@@ -38,7 +38,7 @@ class Refuel(Maneuver):
 
         if distance(self.car, self.pad) < norm(self.car.velocity) * 0.2:
             if angle_to(self.car, self.target) > 1.0:
-                if norm(self.car.velocity) > 1000:
+                if norm(self.car.velocity) > 1400:
                     self.controls.throttle = -1
         
         self.finished = (

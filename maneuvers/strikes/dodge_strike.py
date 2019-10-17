@@ -23,6 +23,9 @@ class DodgeStrike(Strike):
     def get_offset_target(self):
         return ground(self.intercept.position) - self.get_hit_direction() * 100
 
+    def get_no_accelerate_time(self):
+        return self.get_jump_time() + self.predodge_time
+
     @staticmethod
     def get_time_to_z(z, press=0.2) -> float:
         # this function has been stolen from Wildfire

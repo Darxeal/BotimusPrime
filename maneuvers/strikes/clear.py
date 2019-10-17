@@ -10,4 +10,7 @@ class Clear(DodgeStrike):
         if sgn(facing_direction[1]) == team_sign:
             facing_direction = vec3(sgn(facing_direction[0]), 0, 0)
         return facing_direction
+
+    def get_hit_direction(self):
+        return self.get_target_direction()
         

@@ -41,7 +41,7 @@ class Offense:
 
         earliest_time = 0
 
-        while copy.time < car.time + 15.0:
+        while copy.time < car.time + 10.0:
             for _ in range(5):
                 dt = 1.0 / 120.0
                 copy.step(dt)
@@ -62,7 +62,8 @@ class Offense:
                     #         if strike.is_intercept_reachable():
                     #             return ChainManeuver(car, [stabilizer], strike)
                     if strike.is_intercept_reachable():
-                        strike.earliest_intercept_time = earliest_time
+                        strike.previous_intercept_time = copy.time
+                        # strike.earliest_intercept_time = earliest_time
                         return strike
 
         return None

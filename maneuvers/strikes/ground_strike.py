@@ -7,13 +7,13 @@ from maneuvers.jumps.aim_dodge import AimDodge
 class GroundStrike(Strike):
 
     max_intercept_height = 120
-    max_intercept_velocity = 100
+    max_intercept_velocity = 500
 
     def is_intercept_desirable(self):
         return (
             self.intercept.position[2] < self.max_intercept_height
             and abs(self.intercept.velocity[2]) < self.max_intercept_velocity
-            and distance(self.intercept.velocity, self.get_hit_direction() * self.car_speed_at_intercept) > 500
+            and distance(self.intercept.velocity, self.get_hit_direction() * self.car_speed_at_intercept) > 300
         )
 
     def configure_mechanics(self):

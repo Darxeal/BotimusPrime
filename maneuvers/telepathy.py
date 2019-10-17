@@ -11,13 +11,16 @@ class Telepathy(Maneuver):
         self.info: GameInfo = info
         self.arrive = Arrive(car)
         self.arrive.target_direction = normalize(info.their_goal.center)
-        self.arrive.arena_clamp = 200
+        self.arrive.arena_clamp = 500
 
     def step(self, dt):
         self.opponent_strike.step(dt)
 
-        ball_speed = norm(self.opponent_strike.intercept.velocity) + self.opponent_strike.car_speed_at_intercept + 500
-        ball_direction = ground_direction(self.opponent_strike.intercept, self.info.my_goal.center)
+        opponent = self.opponent_strike.car
+        ball_speed = norm(self.opponent_strike.intercept.velocity) + self.opponent_strike.car_speed_at_intercept + 1500
+        intercept_to_my_goal = ground_direction(self.opponent_strike.intercept, self.info.my_goal.center)
+        opponent_to_ball = ground_direction(opponent, self.opponent_strike.intercept)
+        ball_direction = normalize(intercept_to_my_goal * 5 + opponent_to_ball)
         ball_pos = ground(self.opponent_strike.intercept)
         ball_time = self.opponent_strike.intercept.time
 

@@ -16,7 +16,7 @@ class ShadowDefense(Maneuver):
         target_pos = ground(face_target) + ground_direction(face_target, self.info.my_goal.center) * dist
 
         near_goal = ground_distance(car, info.my_goal.center) < 3000
-        side_shift = 400 if near_goal else 1500
+        side_shift = 400 if near_goal else 2000
         points = [target_pos + vec3(side_shift, 0, 0), target_pos - vec3(side_shift, 0, 0)]
         target_pos = nearest_point(face_target, points) if near_goal else furthest_point(face_target, points)
 
