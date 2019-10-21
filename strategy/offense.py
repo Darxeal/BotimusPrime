@@ -47,8 +47,7 @@ class Offense:
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
             or distance(dodge_shot.intercept.ground_pos, target) < 4000
-            or (dot(direction(ground_shot.intercept.ground_pos, car), ground_shot.intercept.ball.velocity) < -0.2)
-            or norm(ground_shot.intercept.ball.velocity) < 500
+            or distance(ground_shot.intercept.ball.velocity, car.velocity) < 500
         ):
             if (
                 distance(dodge_shot.intercept.ground_pos, target) < 4000
@@ -83,22 +82,22 @@ class Offense:
         ball = intercept.ball
 
         if (
-            100 < ball.position[2] < 2000
+            (100 < ball.position[2] or ball.velocity[2] > 300)
             and abs(ball.velocity[2]) < 1500
-            and ground_distance(car, intercept) < 1000
-            and abs(ball.position[1] - self.info.my_goal.center[1]) > 1000
+            and ground_distance(car, intercept) < 1500
+            and ground_distance(ball, self.info.my_goal.center) > 1000
         ):
             is_opponent_close = False
             for opponent in self.info.opponents:
-                if ground_distance(opponent, car) < ball.position[2] + 500:
+                if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
                     is_opponent_close = True
                     break
             if not is_opponent_close:
                 return Dribble(car, self.info, target)
 
 
-        if ball.position[2] > 300 or abs(ball.velocity[2]) > 500:
-            return self.high_shot(car, target)
+        # if ball.position[2] > 300 or abs(ball.velocity[2]) > 500:
+        #     return self.high_shot(car, target)
 
         if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)

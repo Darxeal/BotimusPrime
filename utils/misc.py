@@ -6,7 +6,7 @@ from utils.vector_math import *
 from utils.math import *
 
 def estimate_max_car_speed(car: Car):
-    return clamp(max(norm(car.velocity), 1300) + car.boost * 30, 1400, 2300)
+    return clamp(max(norm(car.velocity), 1300) + car.boost * 100, 1600, 2300)
 
 def estimate_time(car: Car, target, speed, dd=1) -> float:
     dist = distance(car, target)
@@ -16,7 +16,7 @@ def estimate_time(car: Car, target, speed, dd=1) -> float:
     turning = angle_between(car.forward() * dd, direction(car, target)) / math.pi * 2
     if turning < 1:
         turning **= 2
-    acceleration = (speed * dd - dot(car.velocity, car.forward())) / 2100 * 0.6 * dd
+    acceleration = (speed * dd - dot(car.velocity, car.forward())) / 2100 * 0.2 * dd / max(car.boost / 20, 1)
     return travel + acceleration + turning * 0.7
 
 def turn_radius(speed: float) -> float:

@@ -12,7 +12,7 @@ class GroundShot(Strike):
         if ball.position[2] > 200 or abs(ball.position[1]) > Arena.size[1] - 400:
             return False
         contact_ray = Field.collide(sphere(ball.position, self.max_distance_from_wall))
-        return norm(contact_ray.start) > 0 and abs(dot(ball.velocity, contact_ray.direction)) < 250          
+        return norm(contact_ray.start) > 0 and abs(dot(ball.velocity, contact_ray.direction)) < 150          
         # return dot(ball.velocity, vec3(0,0,1)) < 250
 
     def configure(self, intercept: Intercept):

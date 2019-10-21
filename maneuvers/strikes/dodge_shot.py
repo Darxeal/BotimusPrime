@@ -8,7 +8,8 @@ class DodgeShot(DodgeStrike):
     max_base_height = 250
 
     def intercept_predicate(self, car: Car, ball: Ball):
-        max_height = align(car, ball, self.target) * 60 + self.max_base_height
+        # max_height = align(car, ball, self.target) * 60 + self.max_base_height
+        max_height = 300
         contact_ray = Field.collide(sphere(ball.position, max_height))
         return (
             norm(contact_ray.direction) > 0

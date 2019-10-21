@@ -1,15 +1,12 @@
-from rlutilities.simulation import Car, Input
-from rlutilities.linear_algebra import dot, normalize, sgn, vec3
+from maneuvers.kit import *
 from maneuvers.jumps.jump import Jump
 
 
-class AirDodge:
+class AirDodge(Maneuver):
 
     def __init__(self, car, duration=0.0, target=None):
-
-        self.car: Car = car
+        super().__init__(car)
         self.target: vec3 = target
-        self.controls = Input()
 
         self.jump = Jump(duration)
 
@@ -20,7 +17,6 @@ class AirDodge:
         self.state_timer = 0.0
         self.total_timer = 0.0
 
-        self.finished = False
 
     def step(self, dt):
 
@@ -46,11 +42,11 @@ class AirDodge:
                     target_local = dot(self.target - self.car.position, self.car.orientation)
                     target_local[2] = 0
 
-                    direction = normalize(target_local)
+                    target_direction = normalize(target_local)
 
                     self.controls.roll = 0
-                    self.controls.pitch = -direction[0]
-                    self.controls.yaw = sgn(self.car.orientation[2, 2]) * direction[1]
+                    self.controls.pitch = -target_direction[0]
+                    self.controls.yaw = sgn(self.car.orientation[2, 2]) * target_direction[1]
 
             elif self.counter == 2:
 

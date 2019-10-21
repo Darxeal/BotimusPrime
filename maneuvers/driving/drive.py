@@ -23,7 +23,7 @@ class Drive(Maneuver):
             target[0] = signclamp(target[0], 700)
 
         if not self.drive_on_walls:
-            if self.car.position[2] > 300:
+            if self.car.position[2] > 100:
                 target = ground(self.car)
 
         local_target = local(self.car, target)
@@ -51,12 +51,12 @@ class Drive(Maneuver):
         #speed controller
         if vf < self.target_speed:
             self.controls.throttle = 1.0
-            if self.target_speed > 1400 and vf < 2250:
+            if self.target_speed > 1400 and vf < 2250 and self.target_speed - vf > 50:
                 self.controls.boost = 1
             else:
                 self.controls.boost = 0
         else:
-            if (vf - self.target_speed) > 200:  # 75
+            if (vf - self.target_speed) > 400:  # 75
                 self.controls.throttle = -1.0
             else:
                 if self.car.up()[2] > 0.85:

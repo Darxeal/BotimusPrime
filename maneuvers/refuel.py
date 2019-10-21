@@ -26,7 +26,7 @@ class Refuel(Maneuver):
 
     def step(self, dt):
         if norm(self.car.velocity) > 1400:
-            if distance(self.car, self.pad) < norm(self.car.velocity) * 0.3:
+            if distance(self.car, self.pad) < norm(self.car.velocity) * 0.2:
                 self.travel.action.target_speed = 1300
         self.travel.step(dt)
         self.controls = self.travel.controls

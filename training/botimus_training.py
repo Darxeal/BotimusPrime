@@ -21,20 +21,21 @@ def mat3_to_Rotator(mat: mat3) -> Rotator:
     return Rotator(pyr[0], pyr[1], pyr[2])
 
 
+def inject_botimus_into_exercise(exercise: TrainingExercise):
+    exercise.match_config.player_configs = [
+        PlayerConfig.bot_config(
+            Path(__file__).absolute().parent.parent / 'botimus.cfg', Team.BLUE
+        )
+    ]
+
 class BotimusExercise(TrainingExercise):
     
     def __init__(self, grader: Grader):
 
         excercise_name = str(self.__class__.__name__)
         super().__init__(excercise_name, grader)
-
+        inject_botimus_into_exercise(self)
         self.rng: SeededRandomNumberGenerator = None
-
-        self.match_config.player_configs = [
-            PlayerConfig.bot_config(
-                Path(__file__).absolute().parent.parent / 'botimus.cfg', Team.BLUE
-            )
-        ]
 
     def make_game_state(self, rng: SeededRandomNumberGenerator):
         self.rng = rng

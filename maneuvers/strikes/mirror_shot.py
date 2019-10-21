@@ -8,8 +8,8 @@ class MirrorShot(DodgeShot):
         self.actual_target = target
 
         mirrors = [self.mirrored_pos(target, 1), self.mirrored_pos(target, -1)]
-        mirrors[0][0] *= 1.2
-        mirrors[1][0] *= 1.2
+        # mirrors[0][0] *= 1.2
+        # mirrors[1][0] *= 1.2
         target = Strike.pick_easiest_target(car, info.ball, mirrors)
 
         super().__init__(car, info, target)

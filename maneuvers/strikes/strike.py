@@ -5,8 +5,8 @@ from maneuvers.driving.arrive import Arrive
 class Strike(Maneuver):
 
     allow_backwards = False
-    update_interval = 0.3
-    stop_updating = 0.5
+    update_interval = 0.2
+    stop_updating = 0.3
     max_additional_time = 1
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
@@ -50,7 +50,7 @@ class Strike(Maneuver):
             
 
     def update_requirement(self):
-        return self.intercept.time > self.car.time + self.stop_updating
+        return self.intercept.time > self.car.time + self.stop_updating and self.car.on_ground and not self.controls.jump
 
     def step(self, dt):
         self.arrive.step(dt)

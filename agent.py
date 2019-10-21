@@ -75,10 +75,11 @@ class BotimusPrime(BaseAgent):
             self.maneuver = None
 
         self.prev_time = self.time
-        if self.ticks < 6:
-            self.ticks += 1
+        self.ticks += 1
         self.info.read_packet(packet, self.get_field_info())
         self.strategy.packet = packet
+        if self.ticks < 10:
+            return Input()
 
         #reset maneuver when another car hits the ball
         touch = packet.game_ball.latest_touch
@@ -104,7 +105,7 @@ class BotimusPrime(BaseAgent):
 
 
         # choose maneuver
-        if self.maneuver is None and self.time > self.reset_time + 0.01 and self.ticks > 5:
+        if self.maneuver is None:
 
             if self.RENDERING:
                 self.draw.clear()

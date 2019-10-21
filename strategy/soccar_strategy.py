@@ -68,9 +68,9 @@ class SoccarStrategy:
         return best_intercept, best_car
 
     def when_airborne(self) -> Maneuver:
-        double_tap = self.offense.double_tap(self.info.my_car, self.info.their_goal.center)
-        if double_tap is not None:
-            return double_tap
+        # double_tap = self.offense.double_tap(self.info.my_car, self.info.their_goal.center)
+        # if double_tap is not None:
+        #     return double_tap
         return FastRecovery(self.info.my_car)
 
     def clear_into_corner(self, my_hit: Intercept) -> DodgeShot:
@@ -107,16 +107,16 @@ class SoccarStrategy:
         self.draw.crosshair(their_best_hit.position)
         
 
-        if my_score > their_score + 2:
-            self.aggresivity = 5
-        else:
-            self.aggresivity = 0
+        # if my_score > their_score + 2:
+        #     self.aggresivity = 5
+        # else:
+        #     self.aggresivity = 0
 
-        if their_score > my_score:
-            if self.packet.game_info.game_time_remaining < 60:
-                self.aggresivity = 5
-            if self.packet.game_info.game_time_remaining < 30:
-                self.aggresivity = 30
+        # if their_score > my_score:
+        #     if self.packet.game_info.game_time_remaining < 60:
+        #         self.aggresivity = 5
+        #     if self.packet.game_info.game_time_remaining < 30:
+        #         self.aggresivity = 30
 
         should_commit = True
         if info.teammates:
@@ -252,6 +252,9 @@ class SoccarStrategy:
 
             if car.boost < 50:
                 return Refuel(car, info, my_goal)
+
+        if opponents_align < 0:
+            return offense.any_shot(car, their_goal, my_hit)
 
         shadow_distance = 5500
         shadow_distance -= self.aggresivity * 500
