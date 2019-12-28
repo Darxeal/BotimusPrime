@@ -1,7 +1,5 @@
 from typing import *
-from typing import Iterable as iterable
-from typing import Iterator as iterator
-from numpy import float64
+
 _Shape = Tuple[int, ...]
 import rlutilities.simulation
 from rlutilities.linear_algebra import vec2, vec3, mat3

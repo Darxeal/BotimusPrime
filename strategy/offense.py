@@ -1,28 +1,19 @@
 
-from utils.game_info import GameInfo
-from rlutilities.linear_algebra import *
-from rlutilities.simulation import Car, Ball
-
-from utils.vector_math import *
-from utils.math import *
-from utils.misc import *
-from utils.intercept import Intercept, AerialIntercept
-
-
-from maneuvers.kit import Maneuver
-from maneuvers.dribbling.dribble import Dribble
 from maneuvers.air.aerial import Aerial
+from maneuvers.dribbling.dribble import Dribble
+from maneuvers.kit import Maneuver
+from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.strikes.aerial_shot import AerialShot
+from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_shot import DodgeShot
-from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.ground_shot import GroundShot
 from maneuvers.strikes.mirror_shot import MirrorShot
-from maneuvers.strikes.close_shot import CloseShot
-from maneuvers.strikes.aerial_shot import AerialShot
-from maneuvers.strikes.wall_shot import WallShot
+from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.wall_dodge_shot import WallDodgeShot
-from maneuvers.shadow_defense import ShadowDefense
-
-
+from maneuvers.strikes.wall_shot import WallShot
+from utils.game_info import GameInfo
+from utils.intercept import Intercept, AerialIntercept
+from utils.misc import *
 
 
 class Offense:
@@ -57,7 +48,7 @@ class Offense:
             return dodge_shot
         return ground_shot
 
- 
+
     def high_shot(self, car: Car, target: vec3) -> Maneuver:
         direct_shot = self.direct_shot(car, target)
 
@@ -76,7 +67,7 @@ class Offense:
             return aerial
 
         return direct_shot
-        
+
 
     def any_shot(self, car: Car, target: vec3, intercept: Intercept) -> Maneuver:
         ball = intercept.ball
@@ -101,7 +92,7 @@ class Offense:
 
         if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
-        
+
         return self.direct_shot(car, target)
 
 
@@ -109,16 +100,16 @@ class Offense:
         strike = self.any_shot(car, target, intercept)
         if not isinstance(strike, Strike):
             return strike
-        
+
         distance_to_target = distance(strike.intercept.ground_pos, target)
         shift = clamp(distance_to_target / 6, 100, 800)
 
         if not strike.intercept.is_viable or distance(strike.intercept.ground_pos, car) < shift:
-            
+
             return ShadowDefense(car, self.info, strike.intercept.ground_pos, shift)
         return strike
 
-    def double_tap(self, car: Car, target: vec3) -> Maneuver:
+    def double_tap(self, car: Car, target: vec3) -> Aerial:
         if car.boost < 5:
             return None
         predicate = lambda car, ball: (
@@ -130,4 +121,7 @@ class Offense:
         intercept = AerialIntercept(car, self.info.ball_predictions, predicate)
         if intercept.is_viable and car.boost > (intercept.time - car.time) * 5:
             target_pos = intercept.ball.position + direction(target, intercept.ball.position) * 60
-            return Aerial(car, target_pos, intercept.time)
+            aerial = Aerial(car)
+            aerial.target = target_pos
+            aerial.arrival_time = intercept.time
+            return aerial

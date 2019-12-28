@@ -1,9 +1,10 @@
 import math
-from rlutilities.linear_algebra import vec3, normalize, dot, norm
-from rlutilities.simulation import Car, Ball
 
-from utils.vector_math import *
+from rlutilities.simulation import Ball
+
 from utils.math import *
+from utils.vector_math import *
+
 
 def estimate_max_car_speed(car: Car):
     return clamp(max(norm(car.velocity), 1300) + car.boost * 100, 1600, 2300)

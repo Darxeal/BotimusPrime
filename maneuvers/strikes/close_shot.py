@@ -1,7 +1,8 @@
 from maneuvers.kit import *
 
 from maneuvers.strikes.dodge_shot import DodgeShot
-from maneuvers.strikes.strike import Strike
+from utils.intercept import Intercept
+
 
 class CloseShot(DodgeShot):
 

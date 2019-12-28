@@ -1,6 +1,8 @@
-from rlutilities.linear_algebra import vec3, norm, normalize, dot, cross, mat3, angle_between, inv, vec2, xy
-from rlutilities.simulation import Car
 from math import asin, atan2, sin, cos
+
+from rlutilities.linear_algebra import vec3, norm, normalize, dot, mat3, angle_between, vec2, xy
+from rlutilities.simulation import Car
+
 
 def loc(obj) -> vec3:
     if hasattr(obj, "position"):

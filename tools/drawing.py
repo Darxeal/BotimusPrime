@@ -1,14 +1,12 @@
 import math
-from dataclasses import dataclass
 from typing import List
 
+from rlbot.utils.rendering.rendering_manager import RenderingManager
 from rlutilities.linear_algebra import vec3, cross, axis_to_rotation, dot
 from rlutilities.simulation import Car, Input, Ball
 
-from rlbot.utils.rendering.rendering_manager import RenderingManager
-
-from utils.vector_math import loc, world, flip, ground
 from utils.math import clamp
+from utils.vector_math import loc, world, flip, ground
 
 
 class DrawingTool:
@@ -38,7 +36,6 @@ class DrawingTool:
         self._items_drawn = 0
         self._group_id = 'default'
         self._log_text = ""
-
 
     def begin(self):
         self._renderer.begin_rendering(self._group_id)
@@ -116,7 +113,6 @@ class DrawingTool:
                 p[2] = max(p[2], 10)
             self._renderer.draw_polyline_3d(points, self.__getcolor())
 
-
     # advanced
     def cyclic_polyline(self, points: List[vec3]):
         points.append(points[0])
@@ -162,9 +158,6 @@ class DrawingTool:
             points.append(p + pos)
         
         self.cyclic_polyline(points)
-
-    def square(self, pos: vec3, size: float):
-        self.arc(pos, size / 2, 0, math.pi * 2, 4)
 
     def car_shadow(self, car: Car):
         hitbox = car.hitbox()

@@ -20,7 +20,8 @@ class LookupTable:
         reader = csv.DictReader(file)
         return [float(row[name]) for row in reader]
 
-    def find_index(self, column: List[float], value: float) -> int:
+    @staticmethod
+    def find_index(column: List[float], value: float) -> int:
         return bisect_left(column, value, hi=len(column) - 1)
 
 

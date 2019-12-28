@@ -13,6 +13,7 @@ from utils.game_info import GameInfo
 
 from tools.drawing import DrawingTool
 
+
 class Maneuver:
 
     def __init__(self, car):

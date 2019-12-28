@@ -1,9 +1,6 @@
-from rlutilities.simulation import Car, Ball
-from rlutilities.mechanics import Aerial
 from rlutilities.linear_algebra import look_at
+from rlutilities.mechanics import Aerial
 
-from utils.vector_math import *
-from utils.math import *
 from utils.misc import *
 from utils.travel_plan import TravelPlan
 

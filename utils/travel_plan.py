@@ -1,8 +1,10 @@
-from data.lookup_tables import BOOST_LUT, THROTTLE_LUT, KinematicsLookupTable
 import math
 from enum import Enum
-from rlutilities.simulation import Car
+
 from rlutilities.linear_algebra import dot
+from rlutilities.simulation import Car
+
+from data.lookup_tables import BOOST_LUT, THROTTLE_LUT
 
 
 class TravelMethod(Enum):

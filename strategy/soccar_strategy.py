@@ -1,33 +1,21 @@
 from rlbot.agents.base_agent import GameTickPacket
 
-from utils.game_info import GameInfo
-from rlutilities.linear_algebra import *
-from rlutilities.simulation import Car, Ball
-
-from utils.vector_math import *
-from utils.math import *
-from utils.misc import *
-from utils.intercept import Intercept
-from utils.arena import Arena
-
-from tools.drawing import DrawingTool
-
-from maneuvers.kit import Maneuver
-from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.kickoffs.diagonal import DiagonalKickoff
-from maneuvers.driving.stop import Stop
 from maneuvers.air.fast_recovery import FastRecovery
-from maneuvers.strikes.dodge_shot import DodgeShot
-from maneuvers.strikes.strike import Strike
-from maneuvers.strikes.dodge_strike import DodgeStrike
-from maneuvers.strikes.ground_shot import GroundShot
-from maneuvers.strikes.aerial_strike import AerialStrike
+from maneuvers.driving.stop import Stop
+from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.kit import Maneuver
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
-
+from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
+from maneuvers.strikes.strike import Strike
 from strategy.offense import Offense
+from tools.drawing import DrawingTool
+from utils.arena import Arena
+from utils.game_info import GameInfo
+from utils.intercept import Intercept
+from utils.misc import *
 
-import time
 
 #This file is a Wintertide-deadline mess and definitely not something you should learn from..
 

@@ -1,10 +1,8 @@
-from maneuvers.kit import *
-
-from maneuvers.strikes.strike import Strike
-from maneuvers.driving.arrive import Arrive
 from maneuvers.air.aerial import Aerial
+from maneuvers.kit import *
+from maneuvers.strikes.strike import Strike
+from utils.intercept import AerialIntercept
 
-from rlutilities.mechanics import AerialTurn
 
 class AerialStrike(Strike):
 

@@ -1,4 +1,4 @@
-from botimus_training import BotimusStrikerExcercise, Car, Ball
+from training.botimus_training import BotimusStrikerExcercise, Car, Ball
 from rlbottraining.training_exercise import Playlist
 from rlutilities.linear_algebra import look_at, vec3
 from rlbot.matchcomms.common_uses.set_attributes_message import make_set_attributes_message

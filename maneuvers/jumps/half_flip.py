@@ -1,9 +1,7 @@
-import math
-from math import sqrt
-
-from rlutilities.linear_algebra import vec2, vec3, mat3, norm, normalize, look_at, angle_between, clip, cross, dot, sgn, xy, axis_to_rotation, rotation_to_axis, transpose
-from rlutilities.simulation import Car, Input
+from rlutilities.linear_algebra import vec2, dot, sgn
 from rlutilities.mechanics import Dodge
+from rlutilities.simulation import Car, Input
+
 
 class HalfFlip:
 

@@ -1,10 +1,10 @@
-from maneuvers.kit import *
+from rlutilities.mechanics import AerialTurn
 
 from maneuvers.driving.drive import Drive
-
-from rlutilities.mechanics import AerialTurn
 from maneuvers.jumps.air_dodge import AirDodge
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.kit import *
+from rlutilities.linear_algebra import sgn, look_at
+from utils.game_info import GameInfo
 
 
 class Kickoff(Maneuver):
@@ -58,8 +58,6 @@ class Kickoff(Maneuver):
             self.action.controls.throttle = 1
             if car.on_ground:
                 self.finished = True
-                # self.phase = 6
-                # self.action = DodgeShot(car, self.info, self.info.their_goal.center)
 
         if self.phase == 6:
             self.finished = self.action.finished
@@ -71,21 +69,6 @@ class Kickoff(Maneuver):
         self.action.step(dt)
         self.controls = self.action.controls
 
-
-        # if not self.dodging and :
-
-        
-
-        #     if is_opponent_going_for_kickoff:
-        #         self.action = self.dodge
-        #         self.dodging = True
-        #     else:
-        #         # if not, don't dodge and steer a bit to the side to aim for a top-corner
-        #         self.action.target = self.info.ball.position + vec3(100, 0, 0)
-
-        # self.action.step(dt)
-        # self.controls = self.action.controls
-        # self.finished = self.info.ball.position[0] != 0
 
     def render(self, draw: DrawingTool):
         if hasattr(self.action, "render"):

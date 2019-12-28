@@ -1,7 +1,7 @@
 from typing import *
-from typing import Iterable as iterable
-from typing import Iterator as iterator
-from numpy import float64
+
+from rlutilities.linear_algebra import vec3, mat2, mat3, vec4
+
 _Shape = Tuple[int, ...]
 __all__  = [
 "Ball",

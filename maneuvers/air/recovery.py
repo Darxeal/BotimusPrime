@@ -1,8 +1,8 @@
-from maneuvers.kit import *
-
-from maneuvers.driving.arrive import Arrive
 from rlutilities.mechanics import AerialTurn
-from rlutilities.simulation import Field
+from rlutilities.simulation import Field, sphere
+
+from maneuvers.kit import *
+from rlutilities.linear_algebra import cross
 
 
 class Recovery(Maneuver):

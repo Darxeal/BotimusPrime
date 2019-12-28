@@ -1,27 +1,16 @@
 from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
-
-from rlutilities.simulation import Input
+from rlbot.matchcomms.common_uses.reply import reply_to
+from rlbot.matchcomms.common_uses.set_attributes_message import handle_set_attributes_message
 from rlutilities.linear_algebra import norm
+from rlutilities.simulation import Input
 
+from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.kit import Maneuver
+from strategy.soccar_strategy import SoccarStrategy
+from strategy.training import get_maneuver_by_name
 from tools.drawing import DrawingTool
 from tools.quick_chats import QuickChatTool
-from rlbot.matchcomms.common_uses.set_attributes_message import handle_set_attributes_message
-from rlbot.matchcomms.common_uses.reply import reply_to
-
-from maneuvers.kit import Maneuver
-from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.kickoffs.diagonal import DiagonalKickoff
-from maneuvers.shadow_defense import ShadowDefense
-
-from strategy.training import get_maneuver_by_name
-from strategy.soccar_strategy import SoccarStrategy
-
-from utils.vector_math import distance
 from utils.game_info import GameInfo
-
-import time
-
-
 
 
 class BotimusPrime(BaseAgent):
