@@ -245,6 +245,9 @@ class SoccarStrategy:
                 if estimate_time(car, refuel.pad.position, 1400) < 1.5:
                     return refuel
 
+            if opponents_align < 0:
+                return offense.any_shot(car, their_goal, my_hit)
+
         # teamplay
         else:
             if should_commit:
@@ -252,9 +255,6 @@ class SoccarStrategy:
 
             if car.boost < 50:
                 return Refuel(car, info, my_goal)
-
-        if opponents_align < 0:
-            return offense.any_shot(car, their_goal, my_hit)
 
         shadow_distance = 5500
         shadow_distance -= self.aggresivity * 500
