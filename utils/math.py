@@ -17,5 +17,7 @@ def signclamp(x, limit) -> float:
 def nonzero(value) -> float:
     return max(value, 0.000001)
 
-def rangemap(x, in_min, in_max, out_min, out_max):
+def interpolate(x, in_min, in_max, out_min, out_max):
+    if in_min == in_max:
+        return x
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min

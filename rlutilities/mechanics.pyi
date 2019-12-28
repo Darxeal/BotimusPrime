@@ -4,6 +4,7 @@ from typing import Iterator as iterator
 from numpy import float64
 _Shape = Tuple[int, ...]
 import rlutilities.simulation
+from rlutilities.linear_algebra import vec2, vec3, mat3
 __all__  = [
 "Aerial",
 "AerialTurn",
@@ -73,12 +74,12 @@ class Dodge():
     def step(self, arg0: float) -> None: ...
 
     controls: rlutilities.simulation.Input
-    delay: Optional[float]
-    direction: Optional[vec2]
-    duration: Optional[float]
+    delay: float
+    direction: vec2
+    duration: float
     finished: bool
-    preorientation: Optional[mat3]
-    target: Optional[vec3]
+    preorientation: mat3
+    target: vec3
     timer: float
     pass
 class Drive():

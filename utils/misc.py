@@ -20,7 +20,7 @@ def estimate_time(car: Car, target, speed, dd=1) -> float:
     return travel + acceleration + turning * 0.7
 
 def turn_radius(speed: float) -> float:
-    spd = clamp(speed, 0, 2300)
+    spd = clamp(speed, 500, 2300)
     return 156 + 0.1*spd + 0.000069*spd**2 + 0.000000164*spd**3 + -5.62E-11*spd**4
 
 def turning_speed(radius: float) -> float:

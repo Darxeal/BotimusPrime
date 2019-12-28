@@ -35,13 +35,13 @@ class Strike(Maneuver):
 
     def update(self):
         self.intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate)
-        if self.allow_backwards:
-            backwards_intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate, backwards=True)
-            if backwards_intercept.time + 0.1 < self.intercept.time:
-                self.intercept = backwards_intercept
-                self._should_strike_backwards = True
-            else:
-                self._should_strike_backwards = False
+        # if self.allow_backwards:
+        #     backwards_intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate, backwards=True)
+        #     if backwards_intercept.time + 0.1 < self.intercept.time:
+        #         self.intercept = backwards_intercept
+        #         self._should_strike_backwards = True
+        #     else:
+        #         self._should_strike_backwards = False
 
         self.configure(self.intercept)
         self._last_update_time = self.car.time

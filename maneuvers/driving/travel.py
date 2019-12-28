@@ -85,5 +85,3 @@ class Travel(Maneuver):
     def render(self, draw: DrawingTool):
         if self.driving:
             self.action.render(draw)
-        draw.color(draw.orange)
-        draw.square(self.target, clamp(distance(self.car, self.target) / 10, 100, 1000))
