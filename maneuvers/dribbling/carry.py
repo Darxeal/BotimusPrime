@@ -35,7 +35,7 @@ class Carry(Maneuver):
 
         if abs(shift[1]) > abs(max_shift[1]) or shift[0] < 0:
             shift = max_shift
-        shift *= 30
+        shift *= clamp(car.boost, 30, 50)
 
         shift[1] *= clamp(norm(car.velocity)/1000, 1, 2)
 

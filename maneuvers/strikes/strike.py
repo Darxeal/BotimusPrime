@@ -55,7 +55,8 @@ class Strike(Maneuver):
     def step(self, dt):
         self.arrive.step(dt)
         self.controls = self.arrive.controls
-        self.finished = self.arrive.finished
+        if self.arrive.finished:
+            self.finished = True
 
         if self.arrive.drive.target_speed < 300:
             self.controls.throttle = 0
