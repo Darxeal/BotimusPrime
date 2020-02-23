@@ -16,7 +16,7 @@ from maneuvers.kit import Maneuver
 from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.driving.stop import Stop
-from maneuvers.air.fast_recovery import FastRecovery
+from maneuvers.air.recovery import Recovery
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.dodge_strike import DodgeStrike
@@ -71,7 +71,7 @@ class SoccarStrategy:
         # double_tap = self.offense.double_tap(self.info.my_car, self.info.their_goal.center)
         # if double_tap is not None:
         #     return double_tap
-        return FastRecovery(self.info.my_car)
+        return Recovery(self.info.my_car)
 
     def clear_into_corner(self, my_hit: Intercept) -> DodgeShot:
         car = self.info.my_car
