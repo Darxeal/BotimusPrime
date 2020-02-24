@@ -7,7 +7,7 @@ from rlutilities.simulation import Game, Ball, Car, Input, Field, sphere, obb, r
 from utils.vector_math import *
 from utils.math import *
 from utils.misc import *
-from utils.intercept import Intercept, AerialIntercept
+from utils.intercept import Intercept
 from utils.arena import Arena
 from utils.game_info import GameInfo
 

@@ -6,12 +6,11 @@ from rlutilities.simulation import Car, Ball
 from utils.vector_math import *
 from utils.math import *
 from utils.misc import *
-from utils.intercept import Intercept, AerialIntercept
+from utils.intercept import Intercept
 
 
 from maneuvers.kit import Maneuver
 from maneuvers.dribbling.dribble import Dribble
-from maneuvers.air.aerial import Aerial
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.ground_shot import GroundShot
