@@ -14,7 +14,6 @@ from maneuvers.kickoffs.diagonal import DiagonalKickoff
 from maneuvers.shadow_defense import ShadowDefense
 
 from strategy.soccar_strategy import SoccarStrategy
-from strategy.training import get_maneuver_by_name
 
 from utils.vector_math import distance
 from utils.game_info import GameInfo
@@ -56,18 +55,6 @@ class BotimusPrime(BaseAgent):
         self.num_of_our_goals_reacted_to = 0
         self.num_of_their_goals_reacted_to = 0
 
-        self.matchcomms_message = ""
-
-    def handle_training_matchcomms(self) -> bool:
-        try:
-            msg = self.matchcomms.incoming_broadcast.get_nowait()
-            if handle_set_attributes_message(msg, self, allowed_keys=['matchcomms_message']):
-                reply_to(self.matchcomms, msg)
-                return True
-        except:
-            return False
-        return False
-
     def get_output(self, packet: GameTickPacket):
         self.time = packet.game_info.seconds_elapsed
         dt = self.time - self.prev_time
@@ -97,12 +84,6 @@ class BotimusPrime(BaseAgent):
             ):
                 self.maneuver = None
                 #self.reset_time = self.time
-
-        if self.handle_training_matchcomms():
-            self.info.predict_ball(self.PREDICTION_RATE * self.PREDITION_DURATION, 1 / self.PREDICTION_RATE)
-            self.maneuver = get_maneuver_by_name(self.matchcomms_message, self.info)
-            print("Training: Setting " + self.matchcomms_message)
-
 
         # choose maneuver
         if self.maneuver is None:
