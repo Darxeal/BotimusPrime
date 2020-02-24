@@ -21,7 +21,6 @@ from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.strike import Strike
 from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_shot import GroundShot
-from maneuvers.strikes.aerial_strike import AerialStrike
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 
@@ -66,12 +65,6 @@ class SoccarStrategy:
             best_intercept = Intercept(best_car, [])
 
         return best_intercept, best_car
-
-    def when_airborne(self) -> Maneuver:
-        # double_tap = self.offense.double_tap(self.info.my_car, self.info.their_goal.center)
-        # if double_tap is not None:
-        #     return double_tap
-        return Recovery(self.info.my_car)
 
     def clear_into_corner(self, my_hit: Intercept) -> DodgeShot:
         car = self.info.my_car
@@ -126,7 +119,7 @@ class SoccarStrategy:
 
 
         if not car.on_ground:
-            return self.when_airborne()
+            return Recovery(car)
 
         # kickoff
         if should_commit and ball.position[0] == 0 and ball.position[1] == 0:
@@ -177,13 +170,6 @@ class SoccarStrategy:
                     return DodgeStrike(car, info, their_goal)
                 return any_shot
             return self.clear_into_corner(my_hit)
-
-
-        # double tap 
-        if should_commit and car.position[2] > 1000:
-            double_tap = offense.double_tap(car, their_goal)
-            if double_tap is not None:
-                return double_tap
 
         # 1v1
         if not info.teammates:
