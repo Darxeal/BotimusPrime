@@ -20,7 +20,7 @@ class Drive(Maneuver):
         # smoothly escape goal
         if abs(self.car.position[1]) > Arena.size[1] - 50:
             target = Arena.clamp(target, 200)
-            target[0] = signclamp(target[0], 700)
+            target[0] = abs_clamp(target[0], 700)
 
         if not self.drive_on_walls:
             if self.car.position[2] > 100:
@@ -103,10 +103,10 @@ class Drive(Maneuver):
             world(self.car, vec3( HALF_LENGTH,  HALF_WIDTH, 0) + OFFSET),
             world(self.car, vec3( HALF_LENGTH, -HALF_WIDTH, 0) + OFFSET)
         ]
-        draw.cyclic_polyline(speed_bar)
+        draw.closed_polyline(speed_bar)
 
         # target speed
-        mapped_speed = rangemap(self.target_speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
+        mapped_speed = range_map(self.target_speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
         draw.color(draw.pink)
         draw.line(
             world(self.car, vec3(mapped_speed, -HALF_WIDTH, 0) + OFFSET),
@@ -116,7 +116,7 @@ class Drive(Maneuver):
 
         # current speed
         speed = norm(self.car.velocity)
-        mapped_speed = rangemap(speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
+        mapped_speed = range_map(speed, 0, 2300, -HALF_LENGTH, HALF_LENGTH)
         draw.color(draw.lime)
         draw.line(
             world(self.car, vec3(mapped_speed, -HALF_WIDTH, 0) + OFFSET),

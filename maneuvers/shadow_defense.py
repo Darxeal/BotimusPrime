@@ -3,6 +3,8 @@ from maneuvers.kit import *
 from maneuvers.driving.travel import Travel
 from maneuvers.driving.stop import Stop
 from maneuvers.driving.drive import Drive
+from utils.vector_math import nearest_point, farthest_point
+
 
 class ShadowDefense(Maneuver):
 
@@ -18,7 +20,7 @@ class ShadowDefense(Maneuver):
         near_goal = ground_distance(car, info.my_goal.center) < 3000
         side_shift = 400 if near_goal else 2000
         points = [target_pos + vec3(side_shift, 0, 0), target_pos - vec3(side_shift, 0, 0)]
-        target_pos = nearest_point(face_target, points) if near_goal else furthest_point(face_target, points)
+        target_pos = nearest_point(face_target, points) if near_goal else farthest_point(face_target, points)
 
         self.target = Arena.clamp(target_pos, 500)
 

@@ -30,7 +30,7 @@ class GameInfo(Game):
         self.about_to_be_scored_on = False
         self.time_of_goal = -1
 
-        self.ball_predictions: List[Ball] = list()
+        self.ball_predictions: List[Ball] = []
 
         self.teammates: List[Car] = []
         self.opponents: List[Car] = []
@@ -51,21 +51,13 @@ class GameInfo(Game):
                 self.pads[30]]
 
     def get_teammates(self) -> List[Car]:
-        cars: List[Car] = []
-        for i in range(self.num_cars):
-            if self.cars[i].team == self.team and self.cars[i].id != self.id:
-                cars.append(self.cars[i])
-        return cars
+        return [self.cars[i] for i in range(self.num_cars)
+                if self.cars[i].team == self.team and self.cars[i].id != self.id]
 
     def get_opponents(self) -> List[Car]:
-        cars: List[Car] = []
-        for i in range(self.num_cars):
-            if self.cars[i].team != self.team:
-                cars.append(self.cars[i])
-        return cars
+        return [self.cars[i] for i in range(self.num_cars) if self.cars[i].team != self.team]
 
     def predict_ball(self, num_steps, dt):
-
         self.about_to_score = False
         self.about_to_be_scored_on = False
         self.time_of_goal = -1

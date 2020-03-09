@@ -69,7 +69,7 @@ class Recovery(Maneuver):
                 draw.crosshair(self.landing_pos)
 
         draw.color(draw.green)
-        draw.vector(self.car.position, facing(self.aerial_turn.target) * 200)
+        draw.vector(self.car.position, forward(self.aerial_turn.target) * 200)
 
         draw.color(draw.red)
         draw.vector(self.car.position, self.car.forward() * 200)

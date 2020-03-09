@@ -3,6 +3,8 @@ from maneuvers.kit import *
 from maneuvers.driving.drive import Drive
 from maneuvers.jumps.half_flip import HalfFlip
 from rlutilities.mechanics import Wavedash, Dodge
+from utils.intercept import estimate_max_car_speed, estimate_time
+
 
 class Travel(Maneuver):
 

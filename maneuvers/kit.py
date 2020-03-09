@@ -11,10 +11,9 @@ from utils.intercept import Intercept
 from utils.arena import Arena
 from utils.game_info import GameInfo
 
-from tools.drawing import DrawingTool
+from utils.drawing import DrawingTool
 
 class Maneuver:
-
     def __init__(self, car):
         self.car: Car = car
         self.controls: Input = Input()

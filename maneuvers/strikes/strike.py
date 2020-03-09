@@ -84,7 +84,7 @@ class Strike(Maneuver):
 
         if not self._has_drawn_prediction:
             self._has_drawn_prediction = True
-            draw.ball_prediction(self.info, self.intercept.time)
+            draw.ball_prediction(self.info.ball_predictions, self.intercept.time)
 
 
     @staticmethod

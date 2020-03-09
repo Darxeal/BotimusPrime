@@ -9,5 +9,5 @@ class CloseShot(DodgeShot):
 
     def configure(self, intercept: Intercept):
         
-        self.target[0] = signclamp(self.intercept.ground_pos[0], 400)
+        self.target[0] = abs_clamp(self.intercept.ground_pos[0], 400)
         super().configure(intercept)

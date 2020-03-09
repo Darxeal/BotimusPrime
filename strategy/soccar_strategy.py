@@ -1,34 +1,22 @@
 from rlbot.agents.base_agent import GameTickPacket
 
-from utils.game_info import GameInfo
-from rlutilities.linear_algebra import *
-from rlutilities.simulation import Car, Ball
-
-from utils.vector_math import *
-from utils.math import *
-from utils.misc import *
-from utils.intercept import Intercept
-from utils.arena import Arena
-
-from tools.drawing import DrawingTool
-
-from maneuvers.kit import Maneuver
-from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.kickoffs.diagonal import DiagonalKickoff
-from maneuvers.driving.stop import Stop
 from maneuvers.air.recovery import Recovery
-from maneuvers.strikes.dodge_shot import DodgeShot
-from maneuvers.strikes.strike import Strike
-from maneuvers.strikes.dodge_strike import DodgeStrike
-from maneuvers.strikes.ground_shot import GroundShot
+from maneuvers.driving.stop import Stop
+from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
-
+from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
+from maneuvers.strikes.strike import Strike
+from rlutilities.linear_algebra import vec3
+from rlutilities.simulation import Car
 from strategy.offense import Offense
+from utils.arena import Arena
+from utils.drawing import DrawingTool
+from utils.game_info import GameInfo
+from utils.intercept import Intercept, estimate_time
+from utils.vector_math import align, ground, ground_distance, distance
 
-import time
-
-#This file is a Wintertide-deadline mess and definitely not something you should learn from..
 
 class SoccarStrategy:
     def __init__(self, info: GameInfo, drawing_tool: DrawingTool):
