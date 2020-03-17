@@ -30,7 +30,7 @@ class Strike(Maneuver):
 
     def configure(self, intercept: Intercept):
         self.arrive.target = intercept.ground_pos
-        self.arrive.time = intercept.time
+        self.arrive.arrival_time = intercept.time
         self.arrive.drive.backwards = self._should_strike_backwards
 
     def update(self):
@@ -66,7 +66,7 @@ class Strike(Maneuver):
             if self.update_requirement():
 
                 prediction_steps = int((self.intercept.time - self.car.time + 1) * 60)
-                self.info.predict_ball(prediction_steps, 1/60)
+                self.info.predict_ball(prediction_steps, 1/120)
                 self._has_drawn_prediction = False
                 self.update()
 

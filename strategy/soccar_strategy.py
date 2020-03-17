@@ -159,12 +159,13 @@ class SoccarStrategy:
                 return any_shot
             return self.clear_into_corner(my_hit)
 
+        if distance(their_best_hit.ground_pos, their_goal) < distance(their_best_hit.ground_pos, my_goal):
+            opponents_align = -align(opponent.position, their_best_hit.ball, their_goal)
+        else:
+            opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
+
         # 1v1
         if not info.teammates:
-            if distance(their_best_hit.ground_pos, their_goal) < distance(their_best_hit.ground_pos, my_goal):
-                opponents_align = -align(opponent.position, their_best_hit.ball, their_goal)
-            else:
-                opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
 
             # I can get to ball faster than them
             if should_commit and my_hit.time < their_best_hit.time - 0.8:
@@ -230,7 +231,6 @@ class SoccarStrategy:
             if car.boost < 50:
                 return Refuel(car, info, my_goal)
 
-        shadow_distance = 5500
-        shadow_distance -= self.aggresivity * 500
+        shadow_distance = 4000 + opponents_align * 1500
         shadow_distance = max(shadow_distance, 3000)
         return ShadowDefense(car, info, their_best_hit.ground_pos, shadow_distance)

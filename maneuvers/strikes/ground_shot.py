@@ -23,4 +23,4 @@ class GroundShot(Strike):
         
         self.arrive.target = intercept.ball.position - hit_dir * 105
         self.arrive.target_direction = hit_dir
-        self.arrive.time = intercept.time
+        self.arrive.arrival_time = intercept.time

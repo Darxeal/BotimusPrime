@@ -1,4 +1,5 @@
-from maneuvers.kit import *
+from maneuvers.kit import Maneuver
+from rlutilities.linear_algebra import dot
 
 
 class Stop(Maneuver):
