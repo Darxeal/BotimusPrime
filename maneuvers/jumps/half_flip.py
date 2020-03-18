@@ -1,12 +1,12 @@
-import math
-from math import sqrt
-
-from rlutilities.linear_algebra import vec2, vec3, mat3, norm, normalize, look_at, angle_between, clip, cross, dot, sgn, xy, axis_to_rotation, rotation_to_axis, transpose
-from rlutilities.simulation import Car, Input
+from rlutilities.linear_algebra import vec2, dot, sgn
 from rlutilities.mechanics import Dodge
+from rlutilities.simulation import Car, Input
+
 
 class HalfFlip:
-
+    """
+    This class is from the old RLUtilities, made by chip
+    """
     def __init__(self, car: Car, use_boost=False):
         self.car = car
         self.use_boost = use_boost
@@ -49,5 +49,4 @@ class HalfFlip:
 
         self.timer += dt
 
-        self.finished = (self.timer > timeout) or \
-                        (self.car.on_ground and self.timer > 0.5)
+        self.finished = (self.timer > timeout) or (self.car.on_ground and self.timer > 0.5)
