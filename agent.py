@@ -11,11 +11,7 @@ from utils.game_info import GameInfo
 
 
 class BotimusPrime(BaseAgent):
-    
     RENDERING = True
-
-    PREDICTION_RATE = 120
-    PREDICTION_DURATION = 8
 
     def __init__(self, name, team, index):
         super().__init__(name, team, index)
@@ -37,8 +33,8 @@ class BotimusPrime(BaseAgent):
 
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining
-        self.tick_counter += 1
         if self.tick_counter < 10:
+            self.tick_counter += 1
             return Input()
 
         self.info.read_packet(packet, self.get_field_info())
@@ -66,7 +62,7 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.clear()
             
-            self.info.predict_ball(self.PREDICTION_RATE * self.PREDICTION_DURATION, 1 / self.PREDICTION_RATE)
+            self.info.predict_ball()
             self.maneuver = self.strategy.choose_maneuver()
         
         # execute maneuver

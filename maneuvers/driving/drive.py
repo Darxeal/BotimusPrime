@@ -88,7 +88,7 @@ class Drive(Maneuver):
 
     def render(self, draw: DrawingTool):
         draw.color(draw.cyan)
-        draw.square(self.target_pos + vec3(0, 0, 10), 50)
+        draw.square(self.target_pos, 50)
 
         target_direction = direction(self.car.position, self.target_pos)
         draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())

@@ -75,6 +75,13 @@ class DrawingTool:
             self._opacity, self._R, self._G, self._B
         )
 
+    @staticmethod
+    def visible(pos: vec3) -> vec3:
+        # make sure the position isn't below the floor or hidden in the grass
+        if pos[2] < 10:
+            return vec3(pos[0], pos[1], 10)
+        return pos
+
     # primitive render items
 
     def point(self, pos: vec3, size: float = 5):
@@ -83,9 +90,7 @@ class DrawingTool:
 
     def line(self, pos1: vec3, pos2: vec3):
         self._check_limit()
-        p1, p2 = vec3(to_vec3(pos1)), vec3(to_vec3(pos2))
-        if p1[2] < 10: p1[2] = 10
-        if p2[2] < 10: p2[2] = 10
+        p1, p2 = (self.visible(to_vec3(pos)) for pos in [pos1, pos2])
         self._renderer.draw_line_3d(p1, p2, self._get_color())
 
     def string(self, pos: vec3, text, scale=1):
@@ -96,10 +101,10 @@ class DrawingTool:
         self._check_limit()
         self._renderer.draw_string_2d(x, y, int(scale), int(scale), str(text), self._get_color())
 
-    def polyline(self, iterable):
-        if len(iterable) > 1:
-            self._check_limit()
-            self._renderer.draw_polyline_3d(iterable, self._get_color())
+    def polyline(self, points: List[vec3]):
+        if len(points) > 1:
+            self._check_limit(len(points))
+            self._renderer.draw_polyline_3d([self.visible(p) for p in points], self._get_color())
 
     # advanced shapes
 

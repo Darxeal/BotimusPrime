@@ -57,7 +57,7 @@ class GameInfo(Game):
     def get_opponents(self) -> List[Car]:
         return [self.cars[i] for i in range(self.num_cars) if self.cars[i].team != self.team]
 
-    def predict_ball(self, num_steps, dt):
+    def predict_ball(self, time_limit=6.0, dt=1/120):
         self.about_to_score = False
         self.about_to_be_scored_on = False
         self.time_of_goal = -1
@@ -65,7 +65,7 @@ class GameInfo(Game):
         self.ball_predictions = []
         prediction = Ball(self.ball)
 
-        for _ in range(0, num_steps):
+        while prediction.time < self.ball.time + time_limit:
             prediction.step(dt)
             self.ball_predictions.append(Ball(prediction))
 
