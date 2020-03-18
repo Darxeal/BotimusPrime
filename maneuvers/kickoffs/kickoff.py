@@ -1,14 +1,18 @@
-from maneuvers.kit import *
-
 from maneuvers.driving.drive import Drive
-
-from rlutilities.mechanics import AerialTurn
 from maneuvers.jumps.air_dodge import AirDodge
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.kit import Maneuver
+from rlutilities.linear_algebra import vec3, norm, sgn, look_at
+from rlutilities.mechanics import AerialTurn
+from rlutilities.simulation import Car
+from utils.drawing import DrawingTool
+from utils.game_info import GameInfo
+from utils.vector_math import distance
 
 
 class Kickoff(Maneuver):
-    '''The simplest boost and dodge at the end kickoff.'''
+    """
+    Go straight for the ball, dodge in the middle and at the end
+    """
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car)
         self.info = info
@@ -58,11 +62,6 @@ class Kickoff(Maneuver):
             self.action.controls.throttle = 1
             if car.on_ground:
                 self.finished = True
-                # self.phase = 6
-                # self.action = DodgeShot(car, self.info, self.info.their_goal.center)
-
-        if self.phase == 6:
-            self.finished = self.action.finished
 
         if self.phase == "anti-fake-kickoff":
             self.drive.target_pos = vec3(80, 0, 0)
@@ -70,22 +69,6 @@ class Kickoff(Maneuver):
 
         self.action.step(dt)
         self.controls = self.action.controls
-
-
-        # if not self.dodging and :
-
-        
-
-        #     if is_opponent_going_for_kickoff:
-        #         self.action = self.dodge
-        #         self.dodging = True
-        #     else:
-        #         # if not, don't dodge and steer a bit to the side to aim for a top-corner
-        #         self.action.target = self.info.ball.position + vec3(100, 0, 0)
-
-        # self.action.step(dt)
-        # self.controls = self.action.controls
-        # self.finished = self.info.ball.position[0] != 0
 
     def render(self, draw: DrawingTool):
         if hasattr(self.action, "render"):
