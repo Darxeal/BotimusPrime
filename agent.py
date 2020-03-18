@@ -3,7 +3,7 @@ from typing import Optional
 from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
 
 from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.simulation import Input
 from strategy.soccar_strategy import SoccarStrategy
 from utils.drawing import DrawingTool

@@ -1,6 +1,6 @@
 from maneuvers.driving.drive import Drive
 from maneuvers.jumps.half_flip import HalfFlip
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, dot, vec2
 from rlutilities.mechanics import Wavedash, Dodge
 from rlutilities.simulation import Car

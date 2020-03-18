@@ -1,9 +1,11 @@
 from typing import List, Optional
 
-from maneuvers.kit import *
-
-from rlutilities.simulation import Field
+from maneuvers.maneuver import Maneuver
+from rlutilities.linear_algebra import vec3, dot, norm, angle_between, normalize, cross, mat3, look_at, xy
 from rlutilities.mechanics import AerialTurn
+from rlutilities.simulation import Car, Input, sphere, Field
+from utils.drawing import DrawingTool
+from utils.vector_math import forward
 
 
 class Recovery(Maneuver):

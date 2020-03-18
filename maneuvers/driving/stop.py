@@ -1,4 +1,4 @@
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import dot
 
 

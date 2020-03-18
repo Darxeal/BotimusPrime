@@ -1,6 +1,6 @@
 import math
 
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot
 from utils.arena import Arena
 from utils.drawing import DrawingTool

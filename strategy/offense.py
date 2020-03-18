@@ -1,17 +1,14 @@
-
-from utils.game_info import GameInfo
-
-from utils.vector_math import *
-from utils.intercept import Intercept
-
-
-from maneuvers.kit import Maneuver
 from maneuvers.dribbling.dribble import Dribble
+from maneuvers.maneuver import Maneuver
+from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.ground_shot import GroundShot
 from maneuvers.strikes.mirror_shot import MirrorShot
-from maneuvers.strikes.close_shot import CloseShot
-from utils.vector_math import align
+from rlutilities.linear_algebra import vec3
+from rlutilities.simulation import Car
+from utils.game_info import GameInfo
+from utils.intercept import Intercept
+from utils.vector_math import distance, ground_distance, align
 
 
 class Offense:

@@ -1,4 +1,4 @@
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from maneuvers.driving.drive import Drive
 from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car, Ball

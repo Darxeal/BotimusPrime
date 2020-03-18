@@ -1,5 +1,5 @@
 from maneuvers.jumps.jump import Jump
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot, normalize, sgn
 
 

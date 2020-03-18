@@ -2,7 +2,7 @@ from typing import Optional
 
 from maneuvers.driving.drive import Drive
 from maneuvers.driving.travel import Travel
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car
 from utils.drawing import DrawingTool

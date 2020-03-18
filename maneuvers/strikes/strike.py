@@ -2,7 +2,7 @@ import math
 from typing import List, Optional
 
 from maneuvers.driving.arrive import Arrive
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot
 from rlutilities.simulation import Car, Ball
 from utils.drawing import DrawingTool

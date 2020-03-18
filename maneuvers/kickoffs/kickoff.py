@@ -1,6 +1,6 @@
 from maneuvers.driving.drive import Drive
 from maneuvers.jumps.air_dodge import AirDodge
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, sgn, look_at
 from rlutilities.mechanics import AerialTurn
 from rlutilities.simulation import Car

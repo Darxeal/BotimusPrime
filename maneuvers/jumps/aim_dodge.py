@@ -1,5 +1,5 @@
 from maneuvers.jumps.air_dodge import AirDodge
-from maneuvers.kit import Maneuver
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, normalize, look_at
 from rlutilities.mechanics import AerialTurn
 from rlutilities.simulation import Car
