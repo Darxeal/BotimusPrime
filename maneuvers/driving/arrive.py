@@ -27,6 +27,7 @@ class Arrive(Maneuver):
         self.target_direction: Optional[None] = None
         self.target: vec3 = None
         self.arrival_time: float = 0
+        self.backwards: bool = False
 
         self.lerp_t = 0.6
         self.allow_dodges_and_wavedashes: bool = True
@@ -69,11 +70,13 @@ class Arrive(Maneuver):
         if (
             self.allow_dodges_and_wavedashes and norm(car.velocity) < target_speed - 600
             or not self.travel.driving  # a dodge/wavedash is in progress
+            and not self.backwards
         ):
             self.travel.target = shifted_target
             self.travel.step(dt)
             self.controls = self.travel.controls
         else:
+            self.drive.backwards = self.backwards
             self.drive.step(dt)
             self.controls = self.drive.controls
 

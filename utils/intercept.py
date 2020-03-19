@@ -11,6 +11,7 @@ from utils.vector_math import distance, direction, ground
 class Intercept:
     def __init__(self, car: Car, ball_predictions, predicate: callable = None, backwards=False):
         self.ball: Optional[Ball] = None
+        self.car: Car = car
         self.is_viable = True
 
         # find the first reachable ball slice that also meets the predicate

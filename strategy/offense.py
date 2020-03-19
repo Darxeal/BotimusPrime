@@ -16,13 +16,14 @@ class Offense:
     def __init__(self, info: GameInfo):
         self.info = info
 
-    def direct_shot(self, car: Car, target: vec3) -> Maneuver:
+    def direct_shot(self, target: vec3) -> Maneuver:
+        car = self.info.my_car
         dodge_shot = DodgeShot(car, self.info, target)
         ground_shot = GroundShot(car, self.info, target)
 
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
-            or distance(dodge_shot.intercept.ground_pos, target) < 4000
+            or ground_distance(dodge_shot.intercept, target) < 4000
             or distance(ground_shot.intercept.ball.velocity, car.velocity) < 500
         ):
             if (
@@ -33,13 +34,14 @@ class Offense:
             return dodge_shot
         return ground_shot
 
-    def any_shot(self, car: Car, target: vec3, intercept: Intercept) -> Maneuver:
+    def any_shot(self, target: vec3, intercept: Intercept) -> Maneuver:
         ball = intercept.ball
+        car = self.info.my_car
 
         if (
-            (100 < ball.position[2] or ball.velocity[2] > 300)
+            (100 < ball.position[2] or abs(ball.velocity[2]) > 300)
             and abs(ball.velocity[2]) < 1500
-            and ground_distance(car, intercept) < 1500
+            and ground_distance(car, ball) < 1500
             and ground_distance(ball, self.info.my_goal.center) > 1000
         ):
             is_opponent_close = False
@@ -53,4 +55,4 @@ class Offense:
         if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
         
-        return self.direct_shot(car, target)
+        return self.direct_shot(target)

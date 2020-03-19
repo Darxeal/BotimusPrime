@@ -39,7 +39,7 @@ class Strike(Maneuver):
     def configure(self, intercept: Intercept):
         self.arrive.target = intercept.ground_pos
         self.arrive.arrival_time = intercept.time
-        self.arrive.drive.backwards = self._should_strike_backwards
+        self.arrive.backwards = self._should_strike_backwards
 
     def update_intercept(self):
         self.intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate)

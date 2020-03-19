@@ -45,9 +45,10 @@ class Refuel(Maneuver):
         self.travel.step(dt)
         self.controls = self.travel.controls
 
-        # finish when someone pick up the pad
+        # finish when someone picks up the pad
         if not self.pad.is_active and self.pad_was_active:
             self.finished = True
+        self.pad_was_active = self.pad.is_active
 
         # finish when we don't need to pick up the boost anymore
         if self.car.boost > 99:
@@ -58,4 +59,4 @@ class Refuel(Maneuver):
 
         if not self.pad.is_active:
             draw.color(draw.yellow)
-            draw.string(self.pad.position, str(self.pad.timer))
+            draw.string(self.pad.position + vec3(0, 0, 100), self.pad.timer)

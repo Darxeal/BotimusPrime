@@ -58,7 +58,7 @@ class Travel(Maneuver):
                 if forward_speed > 0:
                     use_boost_instead = self.waste_boost and car.boost > 20
 
-                    if car_speed > 1000 and not use_boost_instead:
+                    if car_speed > 1200 and not use_boost_instead:
                         if time_left > self.DODGE_DURATION:
                             dodge = Dodge(car)
                             dodge.duration = 0.05

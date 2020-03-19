@@ -4,6 +4,7 @@ from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerS
 
 from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.maneuver import Maneuver
+from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
 from strategy.soccar_strategy import SoccarStrategy
 from utils.drawing import DrawingTool
@@ -38,7 +39,6 @@ class BotimusPrime(BaseAgent):
             return Input()
 
         self.info.read_packet(packet, self.get_field_info())
-        self.strategy.packet = packet
 
         # cancel maneuver if a kickoff is happening and current maneuver isn't a kickoff maneuver
         if packet.game_info.is_kickoff_pause and not isinstance(self.maneuver, Kickoff):
@@ -72,6 +72,8 @@ class BotimusPrime(BaseAgent):
 
             if self.RENDERING:
                 self.draw.group("maneuver")
+                self.draw.color(self.draw.yellow)
+                self.draw.string(self.info.my_car.position + vec3(0, 0, 100), type(self.maneuver).__name__)
                 self.maneuver.render(self.draw)
 
             # cancel maneuver when finished
