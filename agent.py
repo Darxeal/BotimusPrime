@@ -5,7 +5,7 @@ from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerS
 from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Input
+from rlutilities.simulation import Input, Car
 from strategy.soccar_strategy import SoccarStrategy
 from utils.drawing import DrawingTool
 from utils.game_info import GameInfo
@@ -27,7 +27,7 @@ class BotimusPrime(BaseAgent):
         self.controls: SimpleControllerState = SimpleControllerState()
 
     def initialize_agent(self):
-        self.info = GameInfo(self.index, self.team)
+        self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
         self.draw = DrawingTool(self.renderer)
         self.strategy = SoccarStrategy(self.info, self.draw)
@@ -63,7 +63,7 @@ class BotimusPrime(BaseAgent):
                 self.draw.clear()
             
             self.info.predict_ball()
-            self.maneuver = self.strategy.choose_maneuver()
+            self.maneuver = self.strategy.choose_maneuver(self.info.my_car)
         
         # execute maneuver
         if self.maneuver is not None:

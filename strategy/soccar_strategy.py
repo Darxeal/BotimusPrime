@@ -6,10 +6,7 @@ from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
-from maneuvers.strikes.dodge_shot import DodgeShot
-from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
 from strategy.offense import Offense
 from utils.arena import Arena
@@ -29,23 +26,24 @@ class SoccarStrategy:
         intercepts = [Intercept(car, self.info.ball_predictions) for car in cars]
         return min(intercepts, key=lambda intercept: intercept.time)
 
-    def choose_maneuver(self):
+    def choose_maneuver(self, car: Car):
         info = self.info
         offense = self.offense
-
         ball = info.ball
-        car = info.my_car
+
+        teammates = info.get_teammates(car)
+        opponents = info.get_opponents(car)
 
         their_goal = ground(info.their_goal.center)
         my_goal = ground(info.my_goal.center)
 
         my_hit = Intercept(car, info.ball_predictions)
-        their_best_hit = self.best_intercept(info.opponents)
+        their_best_hit = self.best_intercept(opponents)
         opponent = their_best_hit.car
 
         should_commit = True
-        if info.teammates:
-            best_team_intercept = self.best_intercept(info.teammates)
+        if teammates:
+            best_team_intercept = self.best_intercept(teammates)
             if best_team_intercept.time < my_hit.time - 0.05:
                 should_commit = False
 
@@ -67,7 +65,7 @@ class SoccarStrategy:
 
             if align(car.position, my_hit.ball, their_goal) > 0.0:
 
-                return offense.direct_shot(their_goal)
+                return offense.direct_shot(car, their_goal)
 
             return ClearIntoCorner(car, info)
 
@@ -89,7 +87,7 @@ class SoccarStrategy:
             and ground_distance(car, my_goal) < 2500
         ):
             if align(car.position, my_hit.ball, their_goal) > 0:
-                return offense.direct_shot(their_goal)
+                return offense.direct_shot(car, their_goal)
             return ClearIntoCorner(car, info)
 
         if distance(their_best_hit, their_goal) < distance(their_best_hit, my_goal):
@@ -98,11 +96,11 @@ class SoccarStrategy:
             opponents_align = align(opponent.position, their_best_hit.ball, my_goal)
 
         # 1v1
-        if not info.teammates:
+        if not teammates:
 
             # I can get to ball faster than them
             if should_commit and my_hit.time < their_best_hit.time - 0.8:
-                strike = offense.any_shot(their_goal, my_hit)
+                strike = offense.any_shot(car, their_goal, my_hit)
 
                 if not isinstance(strike, Strike):
                     return strike
@@ -129,7 +127,7 @@ class SoccarStrategy:
                 and my_hit.time < their_best_hit.time - opponents_align * 1.5
             ):
 
-                strike = offense.any_shot(their_goal, my_hit)
+                strike = offense.any_shot(car, their_goal, my_hit)
 
                 if not isinstance(strike, Strike) or strike.intercept.is_viable \
                 and (not info.about_to_score or strike.intercept.time < info.time_of_goal - 0.5):
@@ -154,12 +152,12 @@ class SoccarStrategy:
                     return refuel
 
             if opponents_align < 0:
-                return offense.any_shot(their_goal, my_hit)
+                return offense.any_shot(car, their_goal, my_hit)
 
         # teamplay
         else:
             if should_commit:
-                return offense.any_shot(their_goal, my_hit)
+                return offense.any_shot(car, their_goal, my_hit)
 
             if car.boost < 50:
                 return Refuel(car, info, my_goal)

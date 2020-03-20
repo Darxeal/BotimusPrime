@@ -41,7 +41,7 @@ class Kickoff(Maneuver):
 
                 # detect if an opponent is going for kickoff
                 is_opponent_going_for_kickoff = False
-                for opponent in self.info.opponents:
+                for opponent in self.info.get_opponents(car):
                     if distance(self.info.ball, opponent) < 1500:
                         is_opponent_going_for_kickoff = True
 
