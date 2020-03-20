@@ -69,6 +69,7 @@ class Arrive(Maneuver):
 
         if (
             self.allow_dodges_and_wavedashes and norm(car.velocity) < target_speed - 600
+            and car.boost < 20
             or not self.travel.driving  # a dodge/wavedash is in progress
             and not self.backwards
         ):

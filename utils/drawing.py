@@ -14,7 +14,7 @@ class DrawingTool:
     white = 255, 255, 255
     gray = 128, 128, 128
     blue = 0, 0, 255
-    red = 255, 0, 0
+    red = 255, 50, 50
     green = 0, 128, 0
     lime = 0, 255, 0
     yellow = 255, 255, 0
@@ -27,7 +27,7 @@ class DrawingTool:
     def __init__(self, renderer: RenderingManager):
         self._renderer = renderer
 
-        self._opacity = 0
+        self._opacity = 255
         self._R = 0
         self._G = 0
         self._B = 0
@@ -86,7 +86,7 @@ class DrawingTool:
 
     def point(self, pos: vec3, size: float = 5):
         self._check_limit()
-        self._renderer.draw_rect_3d(to_vec3(pos) + vec3(0, 0, 5), size, size, 1, self._get_color(), 1)
+        self._renderer.draw_rect_3d(self.visible(to_vec3(pos)), size, size, 1, self._get_color(), 1)
 
     def line(self, pos1: vec3, pos2: vec3):
         self._check_limit()
@@ -156,7 +156,7 @@ class DrawingTool:
         ])
 
     def ball_prediction(self, ball_predictions: List[Ball], time_limit: float = None):
-        points = [ball.position for ball in ball_predictions if not time_limit or ball.time > time_limit]
+        points = [ball.position for ball in ball_predictions if not time_limit or ball.time < time_limit]
         self.group('prediction')
         self.color(self.yellow)
         self.polyline(points)

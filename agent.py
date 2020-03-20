@@ -73,7 +73,7 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.group("maneuver")
                 self.draw.color(self.draw.yellow)
-                self.draw.string(self.info.my_car.position + vec3(0, 0, 100), type(self.maneuver).__name__)
+                self.draw.string(self.info.my_car.position + vec3(0, 0, 50), type(self.maneuver).__name__)
                 self.maneuver.render(self.draw)
 
             # cancel maneuver when finished
