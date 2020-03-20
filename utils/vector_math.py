@@ -1,4 +1,4 @@
-from rlutilities.linear_algebra import vec3, norm, normalize, dot, mat3, angle_between, vec2
+from rlutilities.linear_algebra import vec3, norm, normalize, dot, mat3, angle_between, vec2, xy
 from rlutilities.simulation import Car, Ball
 
 
@@ -45,7 +45,7 @@ def world(car: Car, pos: vec3) -> vec3:
 
 
 def angle_to(car: Car, target: vec3, backwards=False) -> float:
-    return abs(angle_between(car.forward() * (-1 if backwards else 1), direction(car.position, target)))
+    return abs(angle_between(xy(car.forward()) * (-1 if backwards else 1), ground_direction(car.position, target)))
 
 
 def forward(mat: mat3) -> vec3:

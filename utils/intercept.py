@@ -27,6 +27,7 @@ class Intercept:
         if self.ball is None:
             if not ball_predictions:
                 self.ball = Ball()
+                self.ball.time = math.inf
             else:
                 self.ball = ball_predictions[-1]
             self.is_viable = False

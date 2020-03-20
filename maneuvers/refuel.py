@@ -50,8 +50,8 @@ class Refuel(Maneuver):
             self.finished = True
         self.pad_was_active = self.pad.is_active
 
-        # finish when we don't need to pick up the boost anymore
-        if self.car.boost > 99:
+        # finish when we picked the boost up but the previous condition somehow wasn't true
+        if self.car.boost > 99 or distance(self.car, self.pad) < 100:
             self.finished = True
 
     def render(self, draw: DrawingTool):
