@@ -63,7 +63,7 @@ class BotimusPrime(BaseAgent):
                 self.draw.clear()
             
             self.info.predict_ball()
-            self.maneuver = self.strategy.choose_maneuver(self.info.my_car)
+            self.maneuver = self.strategy.choose_maneuver(self.info.cars[self.index])
         
         # execute maneuver
         if self.maneuver is not None:
@@ -73,7 +73,7 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.group("maneuver")
                 self.draw.color(self.draw.yellow)
-                self.draw.string(self.info.my_car.position + vec3(0, 0, 50), type(self.maneuver).__name__)
+                self.draw.string(self.info.cars[self.index].position + vec3(0, 0, 50), type(self.maneuver).__name__)
                 self.maneuver.render(self.draw)
 
             # cancel maneuver when finished
