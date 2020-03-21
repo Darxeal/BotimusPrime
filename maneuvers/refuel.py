@@ -63,4 +63,4 @@ class Refuel(Maneuver):
 
         if not self.pad.is_active:
             draw.color(draw.yellow)
-            draw.string(self.pad.position + vec3(0, 0, 100), self.pad.timer)
+            draw.string(self.pad.position + vec3(0, 0, 100), int(self.pad.timer*100)/100)

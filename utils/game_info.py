@@ -1,5 +1,7 @@
 from typing import List
 
+from rlbot.utils.structures.game_data_struct import GameTickPacket, FieldInfoPacket
+
 from rlutilities.simulation import Game, Car, Ball, Pad
 from rlutilities.linear_algebra import vec3
 
@@ -33,17 +35,16 @@ class GameInfo(Game):
 
         self.large_boost_pads: List[Pad] = []
 
-    def read_packet(self, packet, field_info):
+    def read_packet(self, packet: GameTickPacket, field_info: FieldInfoPacket):
         self.read_game_information(packet, field_info)
-        self.large_boost_pads = self.get_large_boost_pads()
+        self.large_boost_pads = self._get_large_boost_pads(field_info)
+
+        # invert large boost pad timers
+        for pad in self.large_boost_pads:
+            pad.timer = 10.0 - pad.timer
         
-    def get_large_boost_pads(self) -> List[Pad]:
-        return [self.pads[3], 
-                self.pads[4], 
-                self.pads[15],
-                self.pads[18],
-                self.pads[29],
-                self.pads[30]]
+    def _get_large_boost_pads(self, field_info: FieldInfoPacket) -> List[Pad]:
+        return [self.pads[i] for i in range(field_info.num_boosts) if field_info.boost_pads[i].is_full_boost]
 
     def get_teammates(self, car: Car) -> List[Car]:
         return [self.cars[i] for i in range(self.num_cars)
