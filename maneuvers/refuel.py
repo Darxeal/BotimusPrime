@@ -18,7 +18,7 @@ class Refuel(Maneuver):
 
         pos = (target + car.position * 2 + info.my_goal.center * 2) / 5
         self.pad = self.best_boostpad_to_pickup(car, info.large_boost_pads, pos)
-        self.pad_was_active = self.pad.is_active
+        self.pad_was_active = self.pad and self.pad.is_active
 
         self.travel = Travel(car, self.pad.position, waste_boost=True)
 
@@ -38,6 +38,10 @@ class Refuel(Maneuver):
         return best_pad
 
     def step(self, dt):
+        if self.pad is None:
+            self.finished = True
+            return
+
         # slow down when we're about to pick up the boost, so we can turn faster afterwards
         if distance(self.car, self.pad) < norm(self.car.velocity) * 0.2:
             self.travel.drive.target_speed = 1400
