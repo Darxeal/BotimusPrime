@@ -30,7 +30,7 @@ class BotimusPrime(BaseAgent):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
         self.draw = DrawingTool(self.renderer)
-        self.strategy = SoccarStrategy(self.info, self.draw)
+        self.strategy = SoccarStrategy(self.info)
 
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining

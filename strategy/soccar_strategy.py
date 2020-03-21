@@ -10,15 +10,13 @@ from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
 from strategy.offense import Offense
 from utils.arena import Arena
-from utils.drawing import DrawingTool
 from utils.game_info import GameInfo
 from utils.intercept import Intercept, estimate_time
 from utils.vector_math import align, ground, ground_distance, distance
 
 
 class SoccarStrategy:
-    def __init__(self, info: GameInfo, drawing_tool: DrawingTool):
-        self.draw = drawing_tool
+    def __init__(self, info: GameInfo):
         self.info = info
         self.offense = Offense(info)
 
