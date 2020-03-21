@@ -1,5 +1,6 @@
 from maneuvers.dribbling.dribble import Dribble
 from maneuvers.maneuver import Maneuver
+from maneuvers.strikes.aerial_strike import AerialStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.ground_shot import GroundShot
@@ -19,6 +20,11 @@ class Offense:
     def direct_shot(self, car: Car, target: vec3) -> Maneuver:
         dodge_shot = DodgeShot(car, self.info, target)
         ground_shot = GroundShot(car, self.info, target)
+
+        if car.boost > 40:
+            aerial_strike = AerialStrike(car, self.info, target)
+            if aerial_strike.intercept.time < dodge_shot.intercept.time:
+                return aerial_strike
 
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
