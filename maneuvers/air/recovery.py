@@ -26,7 +26,7 @@ class Recovery(Maneuver):
         self.aerial_turn.step(dt)
         self.controls = self.aerial_turn.controls
 
-        self.controls.boost = angle_between(self.car.forward(), vec3(0, 0, -1)) < 0.8 and not self.landing
+        self.controls.boost = angle_between(self.car.forward(), vec3(0, 0, -1)) < 1.5 and not self.landing
         self.controls.throttle = 1  # in case we're turtling
 
         self.finished = self.car.on_ground
@@ -38,7 +38,7 @@ class Recovery(Maneuver):
         collision_normal: Optional[vec3] = None
 
         dt = 1/60
-        simulation_duration = 1.0
+        simulation_duration = 0.8
         for i in range(int(simulation_duration / dt)):
             dummy.step(Input(), dt)
             self.trajectory.append(vec3(dummy.position))
@@ -47,7 +47,7 @@ class Recovery(Maneuver):
             collision_ray = Field.collide(collision_sphere)
             collision_normal = collision_ray.direction
 
-            if norm(collision_normal) > 0.0 and i > 20:
+            if (norm(collision_normal) > 0.0 or dummy.position[2] < 0) and i > 20:
                 self.landing = True
                 self.landing_pos = dummy.position
                 break
