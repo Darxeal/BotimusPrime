@@ -14,7 +14,7 @@ class DrawingTool:
     white = 255, 255, 255
     gray = 128, 128, 128
     blue = 0, 0, 255
-    red = 255, 50, 50
+    red = 255, 70, 70
     green = 0, 128, 0
     lime = 0, 255, 0
     yellow = 255, 255, 0

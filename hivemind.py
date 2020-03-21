@@ -1,21 +1,15 @@
-from typing import Dict, Optional, List
+from typing import Dict, List
 
+from rlbot.agents.hivemind.python_hivemind import PythonHivemind
 from rlbot.utils.structures.bot_input_struct import PlayerInput
 from rlbot.utils.structures.game_data_struct import GameTickPacket
-from rlbot.agents.hivemind.python_hivemind import PythonHivemind
 
-from maneuvers.maneuver import Maneuver
-from rlutilities.simulation import Input, Car
+from maneuvers.kickoffs.kickoff import Kickoff
+from rlutilities.linear_algebra import vec3
+from strategy.hivemind_strategy import HivemindStrategy
 from utils.drawing import DrawingTool
+from utils.drone import Drone
 from utils.game_info import GameInfo
-
-
-class Drone:
-    def __init__(self, car: Car, index: int):
-        self.car = car
-        self.index = index
-        self.controls: Input = Input()
-        self.maneuver: Optional[Maneuver] = None
 
 
 class BotimusHivemind(PythonHivemind):
@@ -25,6 +19,9 @@ class BotimusHivemind(PythonHivemind):
         self.team: int = None
         self.draw: DrawingTool = None
         self.drones: List[Drone] = []
+        self.strategy: HivemindStrategy = None
+
+        self.last_latest_touch_time = 0.0
 
     def initialize_hive(self, packet: GameTickPacket) -> None:
         index = next(iter(self.drone_indices))
@@ -32,25 +29,50 @@ class BotimusHivemind(PythonHivemind):
 
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
+        self.strategy = HivemindStrategy(self.info)
         self.draw = DrawingTool(self.renderer)
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
         self.logger.info('Botimus hivemind initialized')
 
-    @staticmethod
-    def to_player_input(controls: Input) -> PlayerInput:
-        player_input = PlayerInput()
-        player_input.throttle = controls.throttle
-        player_input.steer = controls.steer
-        player_input.pitch = controls.pitch
-        player_input.yaw = controls.yaw
-        player_input.roll = controls.roll
-        player_input.jump = controls.jump
-        player_input.boost = controls.boost
-        player_input.handbrake = controls.handbrake
-        return player_input
-
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
         self.info.read_packet(packet, self.get_field_info())
 
-        return {drone.index: self.to_player_input(drone.controls) for drone in self.drones}
+        # if a kickoff is happening and none of the drones have a Kickoff maneuver active, reset all drone maneuvers
+        if packet.game_info.is_kickoff_pause and Kickoff not in [type(drone.maneuver) for drone in self.drones]:
+            for drone in self.drones:
+                drone.maneuver = None
+
+        # reset drone maneuvers when an opponent hits the ball
+        touch = packet.game_ball.latest_touch
+        if touch.time_seconds > self.last_latest_touch_time and touch.team != self.team:
+            self.last_latest_touch_time = touch.time_seconds
+            for drone in self.drones:
+                if drone.car.on_ground and not drone.controls.jump:  # don't reset a drone while dodging/recovering
+                    drone.maneuver = None
+
+        # if at least one drone doesn't have an active maneuver, execute strategy code
+        if None in [drone.maneuver for drone in self.drones]:
+            self.logger.info("Setting maneuvers")
+            self.strategy.set_maneuvers(self.drones)
+
+        for drone in self.drones:
+            if drone.maneuver is None:
+                continue
+
+            # execute maneuvers
+            drone.maneuver.step(self.info.time_delta)
+            drone.controls = drone.maneuver.controls
+
+            drone.maneuver.render(self.draw)
+
+            # draw names of maneuvers above our drones
+            self.draw.color(self.draw.yellow)
+            self.draw.string(drone.car.position + vec3(0, 0, 50), type(drone.maneuver).__name__)
+
+            # expire finished maneuvers
+            if drone.maneuver.finished:
+                drone.maneuver = None
+
+        self.draw.execute()
+        return {drone.index: drone.get_player_input() for drone in self.drones}

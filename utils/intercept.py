@@ -17,7 +17,8 @@ class Intercept:
         # find the first reachable ball slice that also meets the predicate
         speed = 1000 if backwards else estimate_max_car_speed(car)
 
-        for ball in ball_predictions:
+        for i in range(0, len(ball_predictions)):
+            ball = ball_predictions[i]
             time = estimate_time(car, ball.position, speed, -1 if backwards else 1)
             if time < ball.time - car.time and (predicate is None or predicate(car, ball)):
                 self.ball = ball
