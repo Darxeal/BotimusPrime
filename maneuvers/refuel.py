@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Set
 
 from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
@@ -12,18 +12,19 @@ from utils.vector_math import distance
 
 
 class Refuel(Maneuver):
-    def __init__(self, car: Car, info: GameInfo, target: vec3):
+    def __init__(self, car: Car, info: GameInfo, target: vec3, forbidden_pads: Set[Pad] = set()):
         super().__init__(car)
         self.info = info
 
         pos = (target + car.position * 2 + info.my_goal.center * 2) / 5
-        self.pad = self.best_boostpad_to_pickup(car, info.large_boost_pads, pos)
+        pads = set(info.large_boost_pads) - forbidden_pads
+        self.pad = self.best_boostpad_to_pickup(car, pads, pos)
         self.pad_was_active = self.pad and self.pad.is_active
 
         self.travel = Travel(car, self.pad.position, waste_boost=True)
 
     @staticmethod
-    def best_boostpad_to_pickup(car: Car, pads: List[Pad], pos: vec3) -> Pad:
+    def best_boostpad_to_pickup(car: Car, pads: Set[Pad], pos: vec3) -> Pad:
         best_pad = None
         best_dist = math.inf
 

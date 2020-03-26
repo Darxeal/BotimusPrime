@@ -74,5 +74,6 @@ class BotimusHivemind(PythonHivemind):
             if drone.maneuver.finished:
                 drone.maneuver = None
 
+        self.strategy.render(self.draw)
         self.draw.execute()
         return {drone.index: drone.get_player_input() for drone in self.drones}

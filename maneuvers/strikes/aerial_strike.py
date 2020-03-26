@@ -30,7 +30,7 @@ class AerialStrike(Strike):
         self.aerial.target = intercept.position - ground_direction(intercept, self.target) * 50
         self.aerial.arrival_time = intercept.time
 
-    def simulate_flight(self, car: Car, write_to_flight_path=False) -> Car:
+    def simulate_flight(self, car: Car, write_to_flight_path=True) -> Car:
         test_car = Car(car)
         test_aerial = Aerial(test_car)
         test_aerial.target = self.aerial.target
@@ -76,7 +76,7 @@ class AerialStrike(Strike):
                     future_car.position += future_car.velocity * time
 
                     # simulate aerial fot the extrapolated car again
-                    future_simulated_car = self.simulate_flight(future_car)
+                    future_simulated_car = self.simulate_flight(future_car, write_to_flight_path=False)
 
                     # if the aerial is also successful, that means we should continue driving instead of taking off
                     # this makes sure that we go for the most late possible aerials, which are the most effective
