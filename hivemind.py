@@ -51,6 +51,11 @@ class BotimusHivemind(PythonHivemind):
                 if drone.car.on_ground and not drone.controls.jump:  # don't reset a drone while dodging/recovering
                     drone.maneuver = None
 
+        # reset drone maneuver when it gets demoed
+        for drone in self.drones:
+            if drone.maneuver and drone.car.demolished:
+                drone.maneuver = None
+
         # if at least one drone doesn't have an active maneuver, execute strategy code
         if None in [drone.maneuver for drone in self.drones]:
             self.logger.info("Setting maneuvers")
