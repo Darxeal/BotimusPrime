@@ -30,6 +30,7 @@ class HivemindStrategy:
     def set_maneuvers(self, drones: List[Drone]):
         info = self.info
         their_goal = ground(info.their_goal.center)
+        our_goal = ground(info.my_goal.center)
 
         if self.drone_going_for_ball is not None and self.drone_going_for_ball.maneuver is None:
             self.drone_going_for_ball = None
@@ -62,7 +63,10 @@ class HivemindStrategy:
                 strike = Kickoff(best_intercept.car, info)
 
             # if not completely out of position, go for a shot
-            elif align(best_intercept.car.position, best_intercept.ball, their_goal) > -0.3:
+            elif (
+                align(best_intercept.car.position, best_intercept.ball, their_goal) > -0.3
+                or ground_distance(best_intercept, our_goal) > 6000
+            ):
                 strike = self.offense.any_shot(best_intercept.car, their_goal, best_intercept)
 
             else:  # otherwise try to clear
