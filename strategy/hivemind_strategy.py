@@ -2,12 +2,14 @@ from typing import List, Optional, Dict
 
 from maneuvers.air.recovery import Recovery
 from maneuvers.driving.stop import Stop
-from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.kickoffs.simple_kickoff import SimpleKickoff
+from maneuvers.kickoffs.speed_flip_kickoff import SpeedFlipKickoff
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car, Pad
+from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
 from utils.arena import Arena
 from utils.drawing import DrawingTool
@@ -60,7 +62,7 @@ class HivemindStrategy:
             self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == best_intercept.car)
 
             if info.kickoff_pause:
-                strike = Kickoff(best_intercept.car, info)
+                strike = KickoffStrategy.choose_kickoff(info, best_intercept.car)
 
             # if not completely out of position, go for a shot
             elif (

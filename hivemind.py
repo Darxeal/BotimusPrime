@@ -39,7 +39,7 @@ class BotimusHivemind(PythonHivemind):
         self.info.read_packet(packet, self.get_field_info())
 
         # if a kickoff is happening and none of the drones have a Kickoff maneuver active, reset all drone maneuvers
-        if packet.game_info.is_kickoff_pause and Kickoff not in [type(drone.maneuver) for drone in self.drones]:
+        if packet.game_info.is_kickoff_pause and not any(isinstance(drone.maneuver, Kickoff) for drone in self.drones):
             for drone in self.drones:
                 drone.maneuver = None
 

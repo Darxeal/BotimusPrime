@@ -8,6 +8,7 @@ from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
+from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
 from utils.arena import Arena
 from utils.game_info import GameInfo
@@ -51,7 +52,7 @@ class SoccarStrategy:
 
         # kickoff
         if should_commit and ball.position[0] == 0 and ball.position[1] == 0:
-            return Kickoff(car, info)
+            return KickoffStrategy.choose_kickoff(info, car)
 
         # don't save our own shots
         if info.about_to_score:
