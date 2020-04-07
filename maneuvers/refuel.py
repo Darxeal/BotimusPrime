@@ -21,7 +21,7 @@ class Refuel(Maneuver):
         self.pad = self.best_boostpad_to_pickup(car, pads, pos)
         self.pad_was_active = self.pad and self.pad.is_active
 
-        self.travel = Travel(car, self.pad.position, waste_boost=True)
+        self.travel = Travel(car, self.pad.position or info.my_goal.center, waste_boost=True)
 
     @staticmethod
     def best_boostpad_to_pickup(car: Car, pads: Set[Pad], pos: vec3) -> Pad:
