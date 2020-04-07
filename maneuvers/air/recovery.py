@@ -60,7 +60,8 @@ class Recovery(Maneuver):
                                            f[1], l[1], u[1],
                                            f[2], l[2], u[2])
         else:
-            self.aerial_turn.target = look_at(vec3(0, 0, -1), xy(self.car.velocity))
+            target_direction = normalize(normalize(self.car.velocity) - vec3(0, 0, 3))
+            self.aerial_turn.target = look_at(target_direction, vec3(0, 0, 1))
 
     def render(self, draw: DrawingTool):
         if self.landing:
