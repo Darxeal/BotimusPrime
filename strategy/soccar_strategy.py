@@ -2,7 +2,6 @@ from typing import List
 
 from maneuvers.air.recovery import Recovery
 from maneuvers.driving.stop import Stop
-from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
@@ -22,6 +21,8 @@ class SoccarStrategy:
         self.offense = Offense(info)
 
     def best_intercept(self, cars: List[Car]) -> Intercept:
+        if not cars:
+            return Intercept(Car(), self.info.ball_predictions)
         intercepts = [Intercept(car, self.info.ball_predictions) for car in cars]
         return min(intercepts, key=lambda intercept: intercept.time)
 

@@ -5,7 +5,7 @@ from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerS
 from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Input, Car
+from rlutilities.simulation import Input
 from strategy.soccar_strategy import SoccarStrategy
 from utils.drawing import DrawingTool
 from utils.game_info import GameInfo
@@ -34,7 +34,7 @@ class BotimusPrime(BaseAgent):
 
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining
-        if self.tick_counter < 10:
+        if self.tick_counter < 20:
             self.tick_counter += 1
             return Input()
 
