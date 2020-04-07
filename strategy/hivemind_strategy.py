@@ -26,6 +26,7 @@ class HivemindStrategy:
 
         # the drone that is currently committed to hitting the ball
         self.drone_going_for_ball: Optional[Drone] = None
+        self.defending_drone: Optional[Drone] = None
 
         self.boost_reservations: Dict[Drone, Pad] = {}
 
@@ -36,6 +37,9 @@ class HivemindStrategy:
 
         if self.drone_going_for_ball is not None and self.drone_going_for_ball.maneuver is None:
             self.drone_going_for_ball = None
+
+        if self.defending_drone is not None and self.defending_drone.maneuver is None:
+            self.defending_drone = None
 
         # recovery
         for drone in drones:
@@ -88,14 +92,11 @@ class HivemindStrategy:
                     drone.maneuver = Refuel(drone.car, info, info.ball.position, forbidden_pads=reserved_pads)
                     self.boost_reservations[drone] = drone.maneuver.pad  # reserve chosen boost pad
                 else:
-                    drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 5000)
+                    shadow_distance = 3000
+                    if self.defending_drone is None:
+                        self.defending_drone = drone
+                        shadow_distance = 8000
+                    drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, shadow_distance)
 
     def render(self, draw: DrawingTool):
-        if self.drone_going_for_ball:
-            draw.color(draw.orange)
-            draw.line(self.drone_going_for_ball.car.position, self.info.ball.position)
-
-        for drone in self.boost_reservations:
-            draw.color(draw.pink)
-            pad = self.boost_reservations[drone]
-            draw.line(drone.car.position, pad.position)
+        pass
