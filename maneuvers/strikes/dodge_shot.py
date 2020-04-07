@@ -8,7 +8,7 @@ from utils.vector_math import ground_direction
 class DodgeShot(DodgeStrike):
 
     def intercept_predicate(self, car: Car, ball: Ball):
-        return ball.position[2] < 350 and abs(car.position[0]) < Arena.size[0] - 300
+        return ball.position[2] < 300
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
