@@ -80,7 +80,7 @@ class HivemindStrategy:
             if good_intercepts:
                 best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
             else:
-                best_intercept = max(our_intercepts, key=lambda i: align(i.car.position, i.ball, their_goal))
+                best_intercept = min(our_intercepts, key=lambda i: ground_distance(i.car, our_goal))
 
             # find out which drone does the intercept belong to
             self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == best_intercept.car)
@@ -112,7 +112,7 @@ class HivemindStrategy:
                     shadow_distance = 3000
                     if self.defending_drone is None:
                         self.defending_drone = drone
-                        shadow_distance = 8000
+                        shadow_distance = 7000
                     drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, shadow_distance)
 
     def render(self, draw: DrawingTool):
