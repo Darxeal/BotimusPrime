@@ -6,17 +6,24 @@ from rlutilities.mechanics import Aerial
 from rlutilities.simulation import Car, Ball
 from utils.drawing import DrawingTool
 from utils.game_info import GameInfo
-from utils.intercept import Intercept, estimate_time
+from utils.intercept import Intercept
 from utils.math import range_map
 from utils.vector_math import ground_direction, angle_to, distance, ground_distance, direction
 
 
 class AerialStrike(Strike):
     MAX_DISTANCE_ERROR = 50
+    DELAY_TAKEOFF = True
+    MINIMAL_HEIGHT = 400
+    MAXIMAL_HEIGHT = 800
+    MINIMAL_HEIGHT_TIME = 1.0
+    MAXIMAL_HEIGHT_TIME = 2.5
+    DOUBLE_JUMP = False
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
         self.aerial = Aerial(car)
         self.aerial.angle_threshold = 0.8
+        self.aerial.single_jump = not self.DOUBLE_JUMP
         super().__init__(car, info, target)
         self.arrive.allow_dodges_and_wavedashes = False
 
@@ -25,11 +32,16 @@ class AerialStrike(Strike):
         self._flight_path: List[vec3] = []
 
     def intercept_predicate(self, car: Car, ball: Ball):
-        return ball.position[2] > 500 and ball.time - car.time > range_map(ball.position[2], 300, 1900, 0.8, 3.5)
+        required_time = range_map(ball.position[2],
+                                  self.MINIMAL_HEIGHT,
+                                  self.MAXIMAL_HEIGHT,
+                                  self.MINIMAL_HEIGHT_TIME,
+                                  self.MAXIMAL_HEIGHT_TIME)
+        return self.MINIMAL_HEIGHT < ball.position[2] < self.MAXIMAL_HEIGHT and ball.time - car.time > required_time
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
-        self.aerial.target = intercept.position - direction(intercept, self.target) * 50
+        self.aerial.target = intercept.position - direction(intercept, self.target) * 70
         self.aerial.up = normalize(ground_direction(intercept, self.car) + vec3(0, 0, 0.5))
         self.aerial.arrival_time = intercept.time
 
@@ -40,6 +52,7 @@ class AerialStrike(Strike):
         test_aerial.arrival_time = self.aerial.arrival_time
         test_aerial.angle_threshold = self.aerial.angle_threshold
         test_aerial.up = self.aerial.up
+        test_aerial.single_jump = self.aerial.single_jump
 
         if write_to_flight_path:
             self._flight_path.clear()
@@ -56,11 +69,11 @@ class AerialStrike(Strike):
 
     def step(self, dt):
         if self.aerialing:
-            self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), self.car.up())
+            self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), vec3(0, 0, 1))
             self.aerial.step(dt)
             self.controls = self.aerial.controls
             self.finished = self.aerial.finished
-            print(self.controls.jump)
+
         else:
             super().step(dt)
 
@@ -76,21 +89,26 @@ class AerialStrike(Strike):
             elif distance(simulated_car, self.aerial.target) < self.MAX_DISTANCE_ERROR:
                 if angle_to(self.car, self.aerial.target) < 0.1 or norm(self.car.velocity) < 1000:
 
-                    # extrapolate current state a small amount of time
-                    future_car = Car(self.car)
-                    time = 0.2
-                    future_car.time += time
-                    future_car.position += future_car.velocity * time
+                    if self.DELAY_TAKEOFF:
+                        # extrapolate current state a small amount of time
+                        future_car = Car(self.car)
+                        time = 0.2
+                        future_car.time += time
+                        displacement = future_car.velocity * time if norm(future_car.velocity) > 500\
+                            else normalize(future_car.velocity) * 500 * time
+                        future_car.position += displacement
 
-                    # simulate aerial fot the extrapolated car again
-                    future_simulated_car = self.simulate_flight(future_car, write_to_flight_path=False)
+                        # simulate aerial fot the extrapolated car again
+                        future_simulated_car = self.simulate_flight(future_car, write_to_flight_path=False)
 
-                    # if the aerial is also successful, that means we should continue driving instead of taking off
-                    # this makes sure that we go for the most late possible aerials, which are the most effective
-                    if distance(future_simulated_car, self.aerial.target) > self.MAX_DISTANCE_ERROR:
-                        self.aerialing = True
+                        # if the aerial is also successful, that means we should continue driving instead of taking off
+                        # this makes sure that we go for the most late possible aerials, which are the most effective
+                        if distance(future_simulated_car, self.aerial.target) > self.MAX_DISTANCE_ERROR:
+                            self.aerialing = True
+                        else:
+                            self.too_early = True
                     else:
-                        self.too_early = True
+                        self.aerialing = True
 
             else:
                 # self.controls.boost = True
@@ -100,3 +118,12 @@ class AerialStrike(Strike):
         super().render(draw)
         draw.color(draw.lime if self.aerialing else (draw.orange if self.too_early else draw.red))
         draw.polyline(self._flight_path)
+
+
+class FastAerialStrike(AerialStrike):
+    DELAY_TAKEOFF = False
+    MINIMAL_HEIGHT = 800
+    MAXIMAL_HEIGHT = 1800
+    MINIMAL_HEIGHT_TIME = 1.5
+    MAXIMAL_HEIGHT_TIME = 3.0
+    DOUBLE_JUMP = True

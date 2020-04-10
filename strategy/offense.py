@@ -1,6 +1,6 @@
 from maneuvers.dribbling.dribble import Dribble
 from maneuvers.maneuver import Maneuver
-from maneuvers.strikes.aerial_strike import AerialStrike
+from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.ground_shot import GroundShot
@@ -23,8 +23,10 @@ class Offense:
 
         if car.boost > 40:
             aerial_strike = AerialStrike(car, self.info, target)
-            if aerial_strike.intercept.time < dodge_shot.intercept.time:
-                return aerial_strike
+            fast_aerial = FastAerialStrike(car, self.info, target)
+
+            if min(aerial_strike.intercept.time, fast_aerial.intercept.time) < dodge_shot.intercept.time:
+                return min([aerial_strike, fast_aerial], key=lambda strike: strike.intercept.time)
 
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
