@@ -16,6 +16,9 @@ class SpeedFlip(Maneuver):
         self.use_boost = use_boost
         self.timer = 0.0
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt: float):
 
         # Always throttle.

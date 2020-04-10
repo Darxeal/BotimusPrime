@@ -32,6 +32,9 @@ class DodgeStrike(Strike):
         self.dodge.target = intercept.ball.position
         self.arrive.additional_shift = additional_jump * 500
 
+    def interruptible(self) -> bool:
+        return not self.dodging and super().interruptible()
+
     def step(self, dt):
         if self.dodging:
             self.dodge.step(dt)

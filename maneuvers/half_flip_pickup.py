@@ -13,6 +13,9 @@ class HalfFlipPickup(Maneuver):
         self.phase = 1
         self.action = self.drive
 
+    def interruptible(self) -> bool:
+        return self.action is self.drive
+
     def step(self, dt: float):
         if self.phase == 1 and norm(self.car.velocity) > 600:
             self.action = HalfFlip(self.car)

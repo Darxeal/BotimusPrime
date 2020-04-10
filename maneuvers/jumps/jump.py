@@ -15,6 +15,9 @@ class Jump:
 
         self.finished = False
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt):
 
         self.controls.jump = 1 if self.timer < self.duration else 0

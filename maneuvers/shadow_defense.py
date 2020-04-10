@@ -37,6 +37,9 @@ class ShadowDefense(Maneuver):
 
         self.start_time = car.time
 
+    def interruptible(self) -> bool:
+        return self.travel.interruptible()
+
     def step(self, dt):
         self.travel.step(dt)
         self.controls = self.travel.controls

@@ -47,7 +47,7 @@ class BotimusHivemind(PythonHivemind):
         if touch.time_seconds > self.last_latest_touch_time and touch.team != self.team:
             self.last_latest_touch_time = touch.time_seconds
             for drone in self.drones:
-                if drone.car.on_ground and not drone.controls.jump:  # don't reset a drone while dodging/recovering
+                if drone.maneuver and drone.maneuver.interruptible():  # don't reset a drone while dodging/recovering
                     drone.maneuver = None
 
         # reset drone maneuver when it gets demoed

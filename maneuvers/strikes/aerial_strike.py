@@ -67,6 +67,9 @@ class AerialStrike(Strike):
 
         return test_car
 
+    def interruptible(self) -> bool:
+        return self.aerialing or super().interruptible()
+
     def step(self, dt):
         if self.aerialing:
             self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), vec3(0, 0, 1))

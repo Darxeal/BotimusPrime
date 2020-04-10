@@ -38,6 +38,9 @@ class Refuel(Maneuver):
 
         return best_pad
 
+    def interruptible(self) -> bool:
+        return self.travel.interruptible()
+
     def step(self, dt):
         if self.pad is None:
             self.finished = True

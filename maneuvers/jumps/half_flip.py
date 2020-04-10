@@ -22,6 +22,9 @@ class HalfFlip:
 
         self.finished = False
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt):
 
         boost_delay = 0.4

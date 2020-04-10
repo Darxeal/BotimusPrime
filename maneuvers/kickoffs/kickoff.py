@@ -17,6 +17,9 @@ class Kickoff(Maneuver):
         self.action: Maneuver = self.drive
         self.phase = 1
 
+    def interruptible(self) -> bool:
+        return False
+
     def counter_fake_kickoff(self):
         if any(distance(self.info.ball, opponent) < 1500 for opponent in self.info.get_opponents(self.car)):
             return

@@ -58,6 +58,9 @@ class Strike(Maneuver):
         if not self.intercept.is_viable or self.intercept.time > self._initial_time + self.max_additional_time:
             self.finished = True
 
+    def interruptible(self) -> bool:
+        return self.arrive.interruptible()
+
     def step(self, dt):
         if (
             self._last_update_time + self.update_interval < self.car.time < self.intercept.time - self.stop_updating

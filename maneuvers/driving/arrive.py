@@ -23,6 +23,7 @@ class Arrive(Maneuver):
         super().__init__(car)
         self.drive = Drive(car)
         self.travel = Travel(car)
+        self.action = self.drive
 
         self.target_direction: Optional[None] = None
         self.target: vec3 = None
@@ -32,6 +33,9 @@ class Arrive(Maneuver):
         self.lerp_t = 0.57
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
+
+    def interruptible(self) -> bool:
+        return self.action.interruptible()
 
     def step(self, dt):
         target = self.target
@@ -61,25 +65,29 @@ class Arrive(Maneuver):
             shifted_arrival_time = self.arrival_time
 
         self.drive.target_pos = shifted_target
+        self.travel.target = shifted_target
 
         dist_to_target = ground_distance(car.position, shifted_target)
         time_left = nonzero(shifted_arrival_time - car.time)
         target_speed = clamp(dist_to_target / time_left, 0, 2300)
         self.drive.target_speed = target_speed
+        self.drive.backwards = self.backwards
 
         if (
-            self.allow_dodges_and_wavedashes and norm(car.velocity) < target_speed - 600
-            and car.boost < 20
+            (
+                self.allow_dodges_and_wavedashes
+                and norm(car.velocity) < target_speed - 600
+                and car.boost < 20
+                and not self.backwards
+            )
             or not self.travel.driving  # a dodge/wavedash is in progress
-            and not self.backwards
         ):
-            self.travel.target = shifted_target
-            self.travel.step(dt)
-            self.controls = self.travel.controls
+            self.action = self.travel
         else:
-            self.drive.backwards = self.backwards
-            self.drive.step(dt)
-            self.controls = self.drive.controls
+            self.action = self.drive
+
+        self.action.step(dt)
+        self.controls = self.action.controls
 
         self.finished = self.car.time >= self.arrival_time
 

@@ -11,5 +11,8 @@ class Maneuver:
     def step(self, dt: float):
         pass
 
+    def interruptible(self) -> bool:
+        return True
+
     def render(self, draw: DrawingTool):
         pass

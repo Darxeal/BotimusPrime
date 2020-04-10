@@ -17,6 +17,9 @@ class AimDodge(Maneuver):
         self.jump = self.dodge.jump
         self.target = target
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt):
         self.dodge.step(dt)
         self.controls = self.dodge.controls

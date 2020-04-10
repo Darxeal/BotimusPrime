@@ -23,6 +23,9 @@ class Dribble(Maneuver):
         self.flick = AirDodge(car, 0.15, info.ball.position)
         self.flicking = False
 
+    def interruptible(self) -> bool:
+        return not self.flicking
+
     def step(self, dt):
         if not self.flicking:
             self.carry.step(dt)

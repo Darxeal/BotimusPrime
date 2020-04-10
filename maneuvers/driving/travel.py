@@ -37,6 +37,9 @@ class Travel(Maneuver):
         self.drive = Drive(car, self.target, 2300, backwards)
         self.action = self.drive
 
+    def interruptible(self) -> bool:
+        return self.driving and self.car.on_ground
+
     def step(self, dt):
         car = self.car
         target = ground(self.target)

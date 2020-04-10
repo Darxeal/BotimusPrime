@@ -68,8 +68,8 @@ class HivemindStrategy:
 
         # decide which drone is gonna commit
         if self.drone_going_for_ball is None:
-            ready_drones = [drone for drone in drones
-                            if drone.car.on_ground and not drone.controls.jump and not drone.car.demolished]
+            ready_drones = [drone for drone in drones if not drone.car.demolished
+                            and (drone.maneuver is None or drone.maneuver.interruptible())]
             if not ready_drones:
                 return
 

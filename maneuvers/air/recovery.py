@@ -20,6 +20,9 @@ class Recovery(Maneuver):
         self.trajectory: List[vec3] = []
         self.landing_pos: Optional[vec3] = None
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt):
         self.simulate_landing()
 

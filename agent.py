@@ -53,7 +53,7 @@ class BotimusPrime(BaseAgent):
             self.last_latest_touch_time = touch.time_seconds
 
             # don't reset when we're dodging, wavedashing or recovering
-            if self.info.my_car.on_ground and not self.controls.jump:
+            if self.maneuver and self.maneuver.interruptible():
                 self.maneuver = None
 
         # choose maneuver

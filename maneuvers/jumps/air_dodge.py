@@ -20,6 +20,9 @@ class AirDodge(Maneuver):
         self.state_timer = 0.0
         self.total_timer = 0.0
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt):
 
         recovery_time = 0.0 if (self.target is None) else 0.4
