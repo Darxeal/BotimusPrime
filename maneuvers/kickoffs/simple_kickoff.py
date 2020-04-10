@@ -18,6 +18,9 @@ class SimpleKickoff(Kickoff):
         super().__init__(car, info)
         self.drive.target_pos = vec3(0, sgn(info.my_goal.center[1]) * 100, 0)
 
+    def interruptible(self) -> bool:
+        return self.action is self.drive
+
     def step(self, dt):
         car = self.car
 
@@ -34,7 +37,7 @@ class SimpleKickoff(Kickoff):
                 self.phase = 3
 
         if self.phase == 3:
-            if distance(car, self.info.ball) < norm(car.velocity) * 0.4:
+            if distance(car, vec3(0, 0, 93)) < norm(car.velocity) * 0.4:
                 self.phase = 4
                 self.action = AirDodge(car, 0.05, self.info.ball.position)
 
@@ -42,13 +45,6 @@ class SimpleKickoff(Kickoff):
         
         if self.phase == 4:
             if self.action.finished:
-                self.action = AerialTurn(car)
-                self.phase = 5
-
-        if self.phase == 5:
-            self.action.target = look_at(self.info.my_goal.center, vec3(0, 0, 1))
-            self.action.controls.throttle = 1
-            if car.on_ground:
                 self.finished = True
 
         super().step(dt)

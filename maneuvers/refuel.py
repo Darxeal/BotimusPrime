@@ -21,7 +21,7 @@ class Refuel(Maneuver):
         self.pad = self.best_boostpad_to_pickup(car, pads, pos)
         self.pad_was_active = self.pad and self.pad.is_active
 
-        self.travel = Travel(car, self.pad.position or info.my_goal.center, waste_boost=True)
+        self.travel = Travel(car, self.pad.position if self.pad else info.my_goal.center, waste_boost=True)
 
     @staticmethod
     def best_boostpad_to_pickup(car: Car, pads: Set[Pad], pos: vec3) -> Pad:
@@ -65,6 +65,6 @@ class Refuel(Maneuver):
     def render(self, draw: DrawingTool):
         self.travel.render(draw)
 
-        if not self.pad.is_active:
+        if self.pad and not self.pad.is_active:
             draw.color(draw.yellow)
             draw.string(self.pad.position + vec3(0, 0, 100), int(self.pad.timer*100)/100)

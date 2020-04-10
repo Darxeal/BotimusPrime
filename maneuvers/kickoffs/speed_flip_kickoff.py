@@ -24,7 +24,7 @@ class SpeedFlipKickoff(Kickoff):
                 self.phase = 2
 
         if self.phase == 2:
-            if self.action.finished:
+            if self.action.finished and self.info.ball.position[0] != 0:
                 self.finished = True
 
         super().step(dt)

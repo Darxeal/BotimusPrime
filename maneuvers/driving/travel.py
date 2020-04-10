@@ -87,6 +87,10 @@ class Travel(Maneuver):
         if self.driving and not car.on_ground:
             self.controls.boost = False
 
+        # make sure we're not stuck turtling
+        if not car.on_ground:
+            self.controls.throttle = 1
+
         if self.action.finished and not self.driving:
             self.driving = True
             self._time_on_ground = 0
