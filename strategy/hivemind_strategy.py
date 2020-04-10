@@ -1,22 +1,17 @@
 from typing import List, Optional, Dict
 
 from maneuvers.air.recovery import Recovery
-from maneuvers.driving.stop import Stop
 from maneuvers.half_flip_pickup import HalfFlipPickup
-from maneuvers.kickoffs.simple_kickoff import SimpleKickoff
-from maneuvers.kickoffs.speed_flip_kickoff import SpeedFlipKickoff
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
-from maneuvers.strikes.strike import Strike
-from rlutilities.simulation import Car, Pad
+from rlutilities.simulation import Pad
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
-from utils.arena import Arena
 from utils.drawing import DrawingTool
 from utils.drone import Drone
 from utils.game_info import GameInfo
-from utils.intercept import Intercept, estimate_time
+from utils.intercept import Intercept
 from utils.vector_math import align, ground, ground_distance, distance
 
 
