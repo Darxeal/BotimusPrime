@@ -72,7 +72,7 @@ class AerialStrike(Strike):
 
     def step(self, dt):
         if self.aerialing:
-            self.aerial.target_orientation = look_at(direction(self.car, self.target), vec3(0, 0, 1))
+            self.aerial.target_orientation = look_at(direction(self.car, self.target), vec3(0, 0, -1))
             self.aerial.step(dt)
             self.controls = self.aerial.controls
             self.finished = self.aerial.finished
