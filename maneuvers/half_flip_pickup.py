@@ -27,7 +27,7 @@ class HalfFlipPickup(Maneuver):
             self.action = self.drive
             self.phase = 3
 
-        if self.phase == 3 and norm(self.car.velocity) > 1500:
+        if self.phase == 3 and norm(self.car.velocity) > 1300:
             self.finished = True
 
         self.action.step(dt)

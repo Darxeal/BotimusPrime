@@ -41,7 +41,7 @@ class AerialStrike(Strike):
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
-        self.aerial.target = intercept.position - direction(intercept, self.target) * 70
+        self.aerial.target = intercept.position - direction(intercept, self.target) * 80
         self.aerial.up = normalize(ground_direction(intercept, self.car) + vec3(0, 0, 0.5))
         self.aerial.arrival_time = intercept.time
 
@@ -72,7 +72,7 @@ class AerialStrike(Strike):
 
     def step(self, dt):
         if self.aerialing:
-            self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), vec3(0, 0, 1))
+            self.aerial.target_orientation = look_at(direction(self.car, self.target), vec3(0, 0, 1))
             self.aerial.step(dt)
             self.controls = self.aerial.controls
             self.finished = self.aerial.finished

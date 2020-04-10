@@ -43,7 +43,7 @@ class DodgeStrike(Strike):
             super().step(dt)
             if (
                 self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.2
-                and abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 500
+                and abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 800
             ):
                 self.dodging = True
 
