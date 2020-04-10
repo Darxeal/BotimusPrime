@@ -102,18 +102,22 @@ class HivemindStrategy:
             if not isinstance(drone.maneuver, Refuel) and drone in self.boost_reservations:
                 del self.boost_reservations[drone]
 
+        # drones that need boost go for boost
         for drone in drones:
             if drone.maneuver is None:
                 if drone.car.boost < 40:
                     reserved_pads = {self.boost_reservations[drone] for drone in self.boost_reservations}
                     drone.maneuver = Refuel(drone.car, info, info.ball.position, forbidden_pads=reserved_pads)
                     self.boost_reservations[drone] = drone.maneuver.pad  # reserve chosen boost pad
-                else:
-                    shadow_distance = 3000
-                    if self.defending_drone is None:
-                        self.defending_drone = drone
-                        shadow_distance = 7000
-                    drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, shadow_distance)
+
+        # pick one drone that will stay far back
+        unemployed_drones = [drone for drone in drones if drone.maneuver is None]
+        if unemployed_drones:
+            self.defending_drone = min(unemployed_drones, key=lambda d: ground_distance(d.car, info.my_goal.center))
+
+        for drone in unemployed_drones:
+            shadow_distance = 7000 if drone is self.defending_drone else 3000
+            drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, shadow_distance)
 
     def render(self, draw: DrawingTool):
         pass
