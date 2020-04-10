@@ -84,10 +84,10 @@ class Car():
 class ControlPoint():
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: vec3, arg1: vec3, arg2: vec3) -> None: 
         pass
     @overload
-    def __init__(self, arg0: vec3, arg1: vec3, arg2: vec3) -> None: ...
+    def __init__(self) -> None: ...
 
     n: vec3
     p: vec3
@@ -96,10 +96,10 @@ class ControlPoint():
 class Curve():
 
     @overload
-    def __init__(self, arg0: List[vec3]) -> None: 
+    def __init__(self, arg0: List[ControlPoint]) -> None: 
         pass
     @overload
-    def __init__(self, arg0: List[ControlPoint]) -> None: ...
+    def __init__(self, arg0: List[vec3]) -> None: ...
     def calculate_distances(self) -> None: ...
     def calculate_max_speeds(self, arg0: float, arg1: float) -> float: ...
     def calculate_tangents(self) -> None: ...
@@ -137,7 +137,7 @@ class Game():
     gravity = -650.0
     map = 'map_not_set'
 
-    def __init__(self, arg0: int, arg1: int) -> None: ...
+    def __init__(self, arg0: int) -> None: ...
     def read_game_information(self, arg0: object, arg1: object) -> None: ...
     @staticmethod
     def set_mode(arg0: str) -> None: ...
@@ -146,10 +146,8 @@ class Game():
     cars: List[Car[8]]
     frame: int
     frame_delta: int
-    id: int
     kickoff_pause: bool
     match_ended: bool
-    my_car: Car
     num_cars: int
     overtime: bool
     pads: List[Pad]
@@ -211,10 +209,10 @@ class ray():
 class sphere():
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: vec3, arg1: float) -> None: 
         pass
     @overload
-    def __init__(self, arg0: vec3, arg1: float) -> None: ...
+    def __init__(self) -> None: ...
 
     center: vec3
     radius: float

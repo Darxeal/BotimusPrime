@@ -24,7 +24,7 @@ class Goal:
 class GameInfo(Game):
 
     def __init__(self, team):
-        super().__init__(0, team)
+        super().__init__(team)
         self.my_goal = Goal(team)
         self.their_goal = Goal(1 - team)
 
