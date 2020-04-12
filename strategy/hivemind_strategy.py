@@ -16,8 +16,9 @@ from utils.vector_math import align, ground, ground_distance, distance
 
 
 class HivemindStrategy:
-    def __init__(self, info: GameInfo):
+    def __init__(self, info: GameInfo, logger):
         self.info: GameInfo = info
+        self.logger = logger
         self.offense: Offense = Offense(info)
 
         # the drone that is currently committed to hitting the ball
