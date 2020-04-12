@@ -12,7 +12,7 @@ from utils.drone import Drone
 from utils.game_info import GameInfo
 
 
-class BotimusHivemind(PythonHivemind):
+class Beehive(PythonHivemind):
     def __init__(self, *args):
         super().__init__(*args)
         self.info: GameInfo = None
@@ -29,11 +29,11 @@ class BotimusHivemind(PythonHivemind):
 
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
-        self.strategy = HivemindStrategy(self.info)
+        self.strategy = HivemindStrategy(self.info, self.logger)
         self.draw = DrawingTool(self.renderer)
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
-        self.logger.info('Botimus hivemind initialized')
+        self.logger.info('Beehive initialized')
 
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
         self.info.read_packet(packet, self.get_field_info())
