@@ -13,8 +13,10 @@ class Goal:
     DISTANCE = 5120.0
 
     def __init__(self, team):
-        sign = -1 if team == 0 else 1
-        self.center = vec3(0, sign * Goal.DISTANCE, Goal.HEIGHT / 2.0)
+        sign = 1 - 2 * team
+        self.center = vec3(0, -sign * Goal.DISTANCE, Goal.HEIGHT / 2.0)
+        self.l_post = vec3(sign * Goal.WIDTH / 2, -sign * Goal.DISTANCE, 0)
+        self.r_post = vec3(-sign * Goal.WIDTH / 2, -sign * Goal.DISTANCE, 0)
         self.team = team
 
     def inside(self, pos) -> bool:
@@ -34,17 +36,24 @@ class GameInfo(Game):
         self.time_of_goal = -1
 
         self.large_boost_pads: List[Pad] = []
+        self.small_boost_pads: List[Pad] = []
 
     def read_packet(self, packet: GameTickPacket, field_info: FieldInfoPacket):
         self.read_game_information(packet, field_info)
         self.large_boost_pads = self._get_large_boost_pads(field_info)
+        self.small_boost_pads = self._get_small_boost_pads(field_info)
 
         # invert large boost pad timers
         for pad in self.large_boost_pads:
             pad.timer = 10.0 - pad.timer
+        for pad in self.small_boost_pads:
+            pad.timer = 4.0 - pad.timer
         
     def _get_large_boost_pads(self, field_info: FieldInfoPacket) -> List[Pad]:
         return [self.pads[i] for i in range(field_info.num_boosts) if field_info.boost_pads[i].is_full_boost]
+
+    def _get_small_boost_pads(self, field_info: FieldInfoPacket) -> List[Pad]:
+        return [self.pads[i] for i in range(field_info.num_boosts) if not field_info.boost_pads[i].is_full_boost]
 
     def get_teammates(self, car: Car) -> List[Car]:
         return [self.cars[i] for i in range(self.num_cars)
