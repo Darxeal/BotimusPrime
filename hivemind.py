@@ -30,10 +30,11 @@ class Beehive(PythonHivemind):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
         self.strategy = HivemindStrategy(self.info, self.logger)
-        self.draw = DrawingTool(self.renderer)
+        self.draw = DrawingTool(self.renderer, self.team)
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
-        self.logger.info('Beehive initialized')
+        self.logger.setLevel("DEBUG")  # change to INFO for tournament
+        self.logger.info("Beehive initialized")
 
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
         self.info.read_packet(packet, self.get_field_info())
@@ -61,7 +62,7 @@ class Beehive(PythonHivemind):
 
         # if at least one drone doesn't have an active maneuver, execute strategy code
         if None in [drone.maneuver for drone in self.drones]:
-            self.logger.info("Setting maneuvers")
+            self.logger.debug("Setting maneuvers")
             self.strategy.set_maneuvers(self.drones)
 
         for drone in self.drones:
