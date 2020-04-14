@@ -71,37 +71,50 @@ if __name__ == "__main__":
         vec3(0.0, 0.0, 1.0)
     )
     dt = 1.0 / 120.0
+       
+    times = [0.0]
+    heights = [0.0]
 
-    max_heights = []
-    max_height_times = []
+    jump_sim = JumpSim(initial_pos, initial_vel, orientation, 0.2, 0.2 + dt)
+    max_height = 0.0
+    max_height_time = 0.0
+    while not jump_sim.done:
+        jump_sim.step(dt)
+        times.append(jump_sim.timer)
+        heights.append(jump_sim.position[2])
 
-    for i in linspace(dt, 0.2, 10):
-        times = [0.0]
-        heights = [initial_pos[2]]
+        if jump_sim.position[2] > max_height:
+            max_height = jump_sim.position[2]
+            max_height_time = jump_sim.timer
+        else:
+            break
 
-        jump_sim = JumpSim(initial_pos, initial_vel, orientation, i, i + dt)
-        max_height = 0.0
-        max_height_time = 0.0
-        while not jump_sim.done:
-            jump_sim.step(dt)
-            times.append(jump_sim.timer)
-            heights.append(jump_sim.position[2])
+    plt.plot(heights, times)
+    plt.scatter([max_height], [max_height_time])
 
-            if jump_sim.position[2] > max_height:
-                max_height = jump_sim.position[2]
-                max_height_time = jump_sim.timer
+    def f(x):
+        a = 1.872348977E-8
+        b = -1.126747937E-5
+        c = 3.560647225E-3
+        d = -7.446058499E-3
+        return a * x**3 + b * x**2 + c * x + d
 
-        max_heights.append(max_height)
-        max_height_times.append(max_height_time)
+    def g(x):
+        a = 4.448405035E-11
+        b = -2.688967668E-8
+        c = 3.678194738E-6
+        d = 1.908793073E-3
+        e = 2.870888799E-2
+        return a * x**4 + b * x**3 + c * x**2 + d * x + e
 
-        plt.plot(times, heights)
+    x = linspace(0, 500, 100)
+    y1 = [f(x_i) for x_i in x]
+    y2 = [g(x_i) for x_i in x]
 
-    plt.scatter(max_height_times, max_heights)
+    # plt.plot(x, y1)
+    # plt.plot(x, y2)
 
-    x = linspace(0.9, 1.4, 10)
-    y = [530 * xi - 230 for xi in x]
-    plt.plot(x, y)
+    for i, ii in zip(heights, times):
+        print(i, "\t", ii)
 
     plt.show()
-
-    
