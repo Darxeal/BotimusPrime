@@ -10,11 +10,13 @@ from utils.vector_math import ground_distance, ground, ground_direction, directi
 
 MIN_ALIGNMENT = 0.9
 MIN_DIST_BEFORE_SPEED_CONTROL = 1500
+JUMP_FALSE_TICKS = 2
+ALLOWED_TIME_ERROR = 0.1
 
 class DoubleJump(Strike):
 
     def intercept_predicate(self, car, ball):
-        return 200 < ball.position[2] < 450
+        return 250 < ball.position[2] < 550
 
     def __init__(self, car: Car, info: GameInfo, target=None):
         self.drive = Drive(car)
@@ -41,7 +43,7 @@ class DoubleJump(Strike):
             if self.timer <= 0.2:
                 self.controls.jump = True
             # single tick between jumps
-            elif self.timer <= 0.2 + dt:
+            elif self.timer <= 0.2 + dt * JUMP_FALSE_TICKS:
                 self.controls.jump = False
             # second jump
             else:
@@ -50,11 +52,11 @@ class DoubleJump(Strike):
             self.timer += dt
 
         else:
-            self.finished = self.intercept.time > self.info.time
+            self.finished = self.intercept.time < self.info.time
 
             if self.car.on_ground:
                 # manage speed before jump
-                distance_to_target = ground_distance(self.car.position, self.drive.target)
+                distance_to_target = ground_distance(self.car.position, self.intercept.position)
                 if distance_to_target < MIN_DIST_BEFORE_SPEED_CONTROL:
                     target_speed = distance_to_target / self.time_for_jump
                     self.drive.target_speed = -target_speed if self._should_strike_backwards else target_speed
@@ -66,14 +68,14 @@ class DoubleJump(Strike):
             
                 # decide when to jump
                 ground_vel = ground(self.car.velocity)
-                direction_to_target = ground_direction(self.car.position, self.drive.target)
+                direction_to_target = ground_direction(self.car.position, self.intercept.position)
                 alignment = dot(normalize(ground_vel), direction_to_target)
                 # check alignment
                 if alignment >= MIN_ALIGNMENT:
                     # check that speed is correct
                     speed_in_direction = dot(ground_vel, direction_to_target)
                     time_to_target = distance_to_target / speed_in_direction
-                    if time_to_target <= self.time_for_jump:
+                    if self.time_for_jump - ALLOWED_TIME_ERROR <= time_to_target <= self.time_for_jump + ALLOWED_TIME_ERROR:
                         self.jumping = True
 
             # after jump (when the car is in the air)
