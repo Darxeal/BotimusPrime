@@ -53,10 +53,11 @@ def forward(mat: mat3) -> vec3:
 
 
 def align(pos: vec3, ball: Ball, goal: vec3):
+    pos_to_ball = ground_direction(pos, ball)
     return max(
-        dot(ground_direction(pos, ball), ground_direction(ball, goal)),
-        dot(ground_direction(pos, ball), ground_direction(ball, goal + vec3(800, 0, 0))),
-        dot(ground_direction(pos, ball), ground_direction(ball, goal - vec3(800, 0, 0)))
+        dot(pos_to_ball, ground_direction(ball, goal)),
+        dot(pos_to_ball, ground_direction(ball, goal + vec3(800, 0, 0))),
+        dot(pos_to_ball, ground_direction(ball, goal - vec3(800, 0, 0)))
     )
 
 
