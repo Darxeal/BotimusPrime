@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List
 
 from rlbot.agents.hivemind.python_hivemind import PythonHivemind
@@ -33,7 +34,8 @@ class Beehive(PythonHivemind):
         self.draw = DrawingTool(self.renderer, self.team)
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
-        self.logger.setLevel("DEBUG")  # change to INFO for tournament
+        self.logger.handlers[0].setLevel(logging.NOTSET)  # override handler level
+        self.logger.setLevel(logging.DEBUG)  # change level here (DEBUG, INFO, etc.)
         self.logger.info("Beehive initialized")
 
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
