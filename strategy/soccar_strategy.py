@@ -19,6 +19,7 @@ class SoccarStrategy:
     def __init__(self, info: GameInfo):
         self.info = info
         self.offense = Offense(info)
+        self.offense.allow_dribbles = True
 
     def best_intercept(self, cars: List[Car]) -> Intercept:
         if not cars:
