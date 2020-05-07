@@ -72,3 +72,4 @@ class Offense:
             if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
                 is_opponent_close = True
                 break
+        return is_opponent_close
