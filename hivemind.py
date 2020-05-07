@@ -44,7 +44,7 @@ class Beehive(PythonHivemind):
         # if a kickoff is happening and none of the drones have a Kickoff maneuver active, reset all drone maneuvers
         if (
             packet.game_info.is_kickoff_pause
-            and self.info.ball.position[0] == 0
+            and self.info.ball.position[0] == 0 and self.info.ball.position[1] == 0
             and not any(isinstance(drone.maneuver, Kickoff) for drone in self.drones)
         ):
             self.strategy.set_kickoff_maneuvers(self.drones)
