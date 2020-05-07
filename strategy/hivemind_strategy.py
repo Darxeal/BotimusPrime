@@ -6,16 +6,15 @@ from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
 from maneuvers.strikes.double_jump import DoubleJump
-from maneuvers.driving.arrive import Arrive
 from rlutilities.simulation import Pad
-from rlutilities.linear_algebra import dot, vec3
+from rlutilities.linear_algebra import vec3
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
 from utils.drawing import DrawingTool
 from utils.drone import Drone
 from utils.game_info import GameInfo
 from utils.intercept import Intercept
-from utils.vector_math import align, ground, ground_distance, distance, ground_direction
+from utils.vector_math import align, ground, ground_distance, distance
 from utils.arena import Arena
 
 
@@ -105,14 +104,13 @@ class HivemindStrategy:
 
         # all without maneuver go into defence
         unemployed_drones = [drone for drone in drones if drone.maneuver is None]
-        unemployed_drones.sort(key=lambda drone: ground_distance(drone.car, our_goal), reverse=True)
+        if unemployed_drones:
+            self.defending_drone = min(unemployed_drones, key=lambda d: ground_distance(d.car, info.my_goal.center))	
+
         for drone in unemployed_drones:
-            if self.drone_defending is None:
-                shadow_distance = 3000
-                self.drone_defending = drone
-            else:
-                shadow_distance = 7000
-            drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, shadow_distance)
+            # TODO Better rotations
+            shadow_distance = 7000 if drone is self.defending_drone else 3000
+            drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, shadow_distance)
 
     def find_drone_going_for_ball(self, ready_drones: List[Drone]):
         info = self.info
