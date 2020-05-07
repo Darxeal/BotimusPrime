@@ -25,7 +25,7 @@ class AimDodge(Maneuver):
         self.controls = self.dodge.controls
         self.finished = self.dodge.finished
         if not self.dodge.jump.finished and not self.car.on_ground:
-            target_direction = direction(self.car, self.target + vec3(0, 0, 300))
+            target_direction = direction(self.car, self.target + vec3(0, 0, 200))
             up = target_direction * (-1)
             up[2] = 1
             up = normalize(up)

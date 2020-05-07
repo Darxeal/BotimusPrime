@@ -19,6 +19,7 @@ class SoccarStrategy:
     def __init__(self, info: GameInfo):
         self.info = info
         self.offense = Offense(info)
+        self.offense.allow_dribbles = True
 
     def best_intercept(self, cars: List[Car]) -> Intercept:
         if not cars:
@@ -41,18 +42,13 @@ class SoccarStrategy:
         their_best_hit = self.best_intercept(opponents)
         opponent = their_best_hit.car
 
-        should_commit = True
-        if teammates:
-            best_team_intercept = self.best_intercept(teammates)
-            if best_team_intercept.time < my_hit.time - 0.05:
-                should_commit = False
-
         # recovery
         if not car.on_ground:
             return Recovery(car)
 
         # kickoff
-        if should_commit and ball.position[0] == 0 and ball.position[1] == 0:
+        should_go = all(distance(mate, ball) > distance(car, ball) for mate in teammates)
+        if should_go and ball.position[0] == 0 and ball.position[1] == 0:
             return KickoffStrategy.choose_kickoff(info, car)
 
         # don't save our own shots
@@ -72,8 +68,7 @@ class SoccarStrategy:
         # fallback
         if align(car.position, my_hit.ball, my_goal) > 0.2:
             if (
-                should_commit
-                and ground_distance(my_hit, my_goal) < 4000
+                ground_distance(my_hit, my_goal) < 4000
                 and abs(car.position[1]) < abs(my_hit.position[1])
             ):
                 return ClearIntoCorner(car, info)
@@ -81,8 +76,7 @@ class SoccarStrategy:
 
         # clear
         if (
-            should_commit
-            and ground_distance(my_hit, my_goal) < 3500
+            ground_distance(my_hit, my_goal) < 3500
             and abs(my_hit.position[0]) < 3000
             and ground_distance(car, my_goal) < 2500
         ):
@@ -99,7 +93,7 @@ class SoccarStrategy:
         if not teammates:
 
             # I can get to ball faster than them
-            if should_commit and my_hit.time < their_best_hit.time - 0.8:
+            if my_hit.time < their_best_hit.time - 0.8:
                 strike = offense.any_shot(car, their_goal, my_hit)
 
                 if not isinstance(strike, Strike):
@@ -122,8 +116,7 @@ class SoccarStrategy:
 
             # they are out of position
             if (
-                should_commit
-                and opponents_align < -0.1
+                opponents_align < -0.1
                 and my_hit.time < their_best_hit.time - opponents_align * 1.5
             ):
 
@@ -156,11 +149,10 @@ class SoccarStrategy:
 
         # teamplay
         else:
-            if should_commit:
-                return offense.any_shot(car, their_goal, my_hit)
-
-            if car.boost < 50:
+            if car.boost < 40:
                 return Refuel(car, info, my_goal)
+            else:
+                return offense.any_shot(car, their_goal, my_hit)
 
         shadow_distance = 4000 + opponents_align * 1500
         shadow_distance = max(shadow_distance, 3000)

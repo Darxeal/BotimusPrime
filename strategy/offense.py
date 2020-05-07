@@ -16,6 +16,7 @@ class Offense:
 
     def __init__(self, info: GameInfo):
         self.info = info
+        self.allow_dribbles = False
 
     def direct_shot(self, car: Car, target: vec3) -> Maneuver:
         dodge_shot = DodgeShot(car, self.info, target)
@@ -44,19 +45,20 @@ class Offense:
     def any_shot(self, car: Car, target: vec3, intercept: Intercept) -> Maneuver:
         ball = intercept.ball
 
-        # if (
-        #     (100 < ball.position[2] or abs(ball.velocity[2]) > 300)
-        #     and abs(ball.velocity[2]) < 1500
-        #     and ground_distance(car, ball) < 1500
-        #     and ground_distance(ball, self.info.my_goal.center) > 1000
-        # ):
-        #     is_opponent_close = False
-        #     for opponent in self.info.get_opponents(car):
-        #         if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
-        #             is_opponent_close = True
-        #             break
-        #     if not is_opponent_close:
-        #         return Dribble(car, self.info, target)
+        if (
+            self.allow_dribbles
+            and (100 < ball.position[2] or abs(ball.velocity[2]) > 300)
+            and abs(ball.velocity[2]) < 1500
+            and ground_distance(car, ball) < 1500
+            and ground_distance(ball, self.info.my_goal.center) > 1000
+        ):
+            is_opponent_close = False
+            for opponent in self.info.get_opponents(car):
+                if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
+                    is_opponent_close = True
+                    break
+            if not is_opponent_close:
+                return Dribble(car, self.info, target)
 
         if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
