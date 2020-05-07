@@ -5,9 +5,10 @@ from maneuvers.half_flip_pickup import HalfFlipPickup
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.strikes.clear_into_corner import ClearIntoCorner
+from maneuvers.strikes.double_jump import DoubleJump
 from maneuvers.driving.arrive import Arrive
 from rlutilities.simulation import Pad
-from rlutilities.linear_algebra import dot
+from rlutilities.linear_algebra import dot, vec3
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
 from utils.drawing import DrawingTool
@@ -18,7 +19,7 @@ from utils.vector_math import align, ground, ground_distance, distance, ground_d
 from utils.arena import Arena
 
 
-MIN_GOOD_ALIGN = 0.5
+MIN_GOOD_ALIGN = 0.2
 MIN_PASS_ALIGN = 0.3
 PASS_ESTIMATED_BALL_SPEED = 1000
 
@@ -30,6 +31,8 @@ class HivemindStrategy:
 
         # the drone that is currently committed to hitting the ball
         self.drone_going_for_ball: Optional[Drone] = None
+        # drone that stays back near the goal
+        self.drone_defending: Optional[Drone] = None
 
         self.boost_reservations: Dict[Drone, Pad] = {}
 
@@ -54,10 +57,14 @@ class HivemindStrategy:
 
     def set_maneuvers(self, drones: List[Drone]):
         info = self.info
+        our_goal = ground(info.my_goal.center)
 
         # drone finished its maneuver, no one is going for ball
         if self.drone_going_for_ball is not None and self.drone_going_for_ball.maneuver is None:
             self.drone_going_for_ball = None
+        # drone finished its maneuver, no one is defending
+        if self.drone_defending is not None and self.drone_defending.maneuver is None:
+            self.drone_defending = None
         
         ready_drones = [drone for drone in drones if not drone.car.demolished
                             and (drone.maneuver is None or drone.maneuver.interruptible()) 
@@ -98,9 +105,13 @@ class HivemindStrategy:
 
         # all without maneuver go into defence
         unemployed_drones = [drone for drone in drones if drone.maneuver is None]
+        unemployed_drones.sort(key=lambda drone: ground_distance(drone.car, our_goal), reverse=True)
         for drone in unemployed_drones:
-            # TODO Reposition
-            shadow_distance = 7000 # 3000 for defending
+            if self.drone_defending is None:
+                shadow_distance = 3000
+                self.drone_defending = drone
+            else:
+                shadow_distance = 7000
             drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, shadow_distance)
 
     def find_drone_going_for_ball(self, ready_drones: List[Drone]):
@@ -122,53 +133,21 @@ class HivemindStrategy:
             self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == best_intercept.car)
             # take a shot
             self.drone_going_for_ball.maneuver = self.offense.any_shot(best_intercept.car, their_goal, best_intercept)
-            ready_drones.remove(self.drone_going_for_ball)
-            return
 
-        # consider passing
-        # FIXME passes suck right now. Maybe the receiving drone should also be locked in? Custom maneuver?
-        if len(ready_drones) > 1:
-            # find the fastest pass with decent alignment
-            for intercept in sorted(our_intercepts, key=lambda i: i.time):
-                drone_to_ball = ground_direction(intercept.car.position, intercept.ball)
-                other_drones = [drone for drone in ready_drones if drone.car != intercept.car]
-                # using linear prediction
-                predicted_positions = [Arena.clamp(drone.car.position + drone.car.velocity * (intercept.time - info.time)) for drone in other_drones]
-                ball_to_drones = [ground_direction(intercept.ball, pos) for pos in predicted_positions]
-                alignments = [dot(drone_to_ball, ball_to_drone) for ball_to_drone in ball_to_drones]
-                good_passes = [(drone, alignment) for drone, alignment in zip(other_drones, alignments) if alignment > MIN_PASS_ALIGN]
+        else:
+            # if no good shot, pick one closest to our goal
+            best_intercept = min(our_intercepts, key=lambda i: ground_distance(i.car, our_goal))
+            # find out which drone does the intercept belong to
+            self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == best_intercept.car)
+            # try to clear
+            if 250 < best_intercept.ball.position[2] < 550:
+                # taken out of ClearIntoCorner
+                one_side = [vec3(Arena.size[0], Arena.size[1] * i/5, 0) for i in range(-5, 5)]
+                other_side = [vec3(-p[0], p[1], 0) for p in one_side]
+                target = ClearIntoCorner.pick_easiest_target(best_intercept.car, best_intercept.ball, one_side + other_side)
+                self.drone_going_for_ball.maneuver = DoubleJump(best_intercept.car, info, target=target)
+            self.drone_going_for_ball.maneuver = ClearIntoCorner(best_intercept.car, info)
 
-                # since intercepts are sorted, take first one with good passes
-                if good_passes:
-                    self.logger.debug("GOING FOR A PASS!")
-
-                    receiving_drone = max(good_passes, key=lambda tup: tup[1])[0]
-
-                    # find pass location and time
-                    pass_location = ground((Arena.clamp(receiving_drone.car.position + receiving_drone.car.velocity * intercept.time) + their_goal) / 2)
-                    pass_time = (intercept.time - info.time) + ground_distance(pass_location, intercept.ball) / PASS_ESTIMATED_BALL_SPEED
-
-                    # make receiving drone drive to location
-                    receiving_drone.maneuver = Arrive(receiving_drone.car)
-                    receiving_drone.maneuver.target_direction = ground_direction(receiving_drone.car.position, their_goal)
-                    receiving_drone.maneuver.target = pass_location
-                    receiving_drone.maneuver.arrival_time = pass_time
-
-                    # hit towards the pass location
-                    self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == intercept.car)
-                    self.drone_going_for_ball.maneuver = self.offense.any_shot(intercept.car, pass_location, intercept)
-
-                    # remove from ready drones
-                    ready_drones.remove(self.drone_going_for_ball)
-                    ready_drones.remove(receiving_drone)
-                    return
-
-        # if no pass, just pick closest
-        best_intercept = min(our_intercepts, key=lambda i: ground_distance(i.car, our_goal))
-        # find out which drone does the intercept belong to
-        self.drone_going_for_ball = next(drone for drone in ready_drones if drone.car == best_intercept.car)
-        # try to clear
-        self.drone_going_for_ball.maneuver = ClearIntoCorner(best_intercept.car, info)
         ready_drones.remove(self.drone_going_for_ball)
 
     def render(self, draw: DrawingTool):
