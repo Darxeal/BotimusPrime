@@ -19,8 +19,6 @@ from utils.arena import Arena
 
 
 MIN_GOOD_ALIGN = 0.2
-MIN_PASS_ALIGN = 0.3
-PASS_ESTIMATED_BALL_SPEED = 1000
 
 class HivemindStrategy:
     def __init__(self, info: GameInfo, logger):
