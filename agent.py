@@ -29,7 +29,7 @@ class BotimusPrime(BaseAgent):
     def initialize_agent(self):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
-        self.draw = DrawingTool(self.renderer)
+        self.draw = DrawingTool(self.renderer, self.team)
         self.strategy = SoccarStrategy(self.info)
 
     def get_output(self, packet: GameTickPacket):
