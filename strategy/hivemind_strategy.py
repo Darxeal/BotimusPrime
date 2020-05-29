@@ -89,7 +89,7 @@ class HivemindStrategy:
 
             # if not completely out of position, go for a shot
             if (
-                align(best_intercept.car.position, best_intercept.ball, their_goal) > -0.3
+                align(best_intercept.car.position, best_intercept.ball, their_goal) > 0
                 or ground_distance(best_intercept, our_goal) > 6000
             ):
                 strike = self.offense.any_shot(best_intercept.car, their_goal, best_intercept)
@@ -116,10 +116,11 @@ class HivemindStrategy:
         unemployed_drones = [drone for drone in drones if drone.maneuver is None]
         if unemployed_drones:
             self.defending_drone = min(unemployed_drones, key=lambda d: ground_distance(d.car, info.my_goal.center))
+            self.defending_drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, 7000)
+            unemployed_drones.remove(self.defending_drone)
 
         for drone in unemployed_drones:
-            shadow_distance = 7000 if drone is self.defending_drone else 2000
-            drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, shadow_distance)
+            drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 1000)
 
     def render(self, draw: DrawingTool):
         pass
