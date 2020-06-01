@@ -1,7 +1,7 @@
 from typing import List
 
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import vec3, norm, normalize, look_at
+from rlutilities.linear_algebra import vec3, norm, normalize, look_at, axis_to_rotation, dot
 from rlutilities.mechanics import Aerial
 from rlutilities.simulation import Car, Ball
 from utils.drawing import DrawingTool
@@ -72,8 +72,15 @@ class AerialStrike(Strike):
 
     def step(self, dt):
         if self.aerialing:
-            self.aerial.target_orientation = look_at(direction(self.car, self.target), vec3(0, 0, -1))
+
+            # freestyling
+            if self.car.position[2] > 300 and distance(self.car, self.target) > 300:
+                rotation = axis_to_rotation(self.car.forward() * 1.0)
+                self.aerial.up = dot(rotation, self.car.up())
+
+            self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), vec3(0, 0, -1))
             self.aerial.step(dt)
+
             self.controls = self.aerial.controls
             self.finished = self.aerial.finished
 

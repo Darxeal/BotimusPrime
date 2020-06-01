@@ -4,9 +4,9 @@ from maneuvers.air.recovery import Recovery
 from maneuvers.driving.stop import Stop
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
-from maneuvers.strikes.clear_into_corner import ClearIntoCorner
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
+from strategy.defense import Defense
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
 from utils.arena import Arena
@@ -19,6 +19,7 @@ class SoccarStrategy:
     def __init__(self, info: GameInfo):
         self.info = info
         self.offense = Offense(info)
+        self.defense = Defense(info)
         self.offense.allow_dribbles = True
 
     def best_intercept(self, cars: List[Car]) -> Intercept:
@@ -63,7 +64,7 @@ class SoccarStrategy:
 
                 return offense.direct_shot(car, their_goal)
 
-            return ClearIntoCorner(car, info)
+            return self.defense.any_clear(car)
 
         # fallback
         if align(car.position, my_hit.ball, my_goal) > 0.2:
@@ -71,7 +72,7 @@ class SoccarStrategy:
                 ground_distance(my_hit, my_goal) < 4000
                 and abs(car.position[1]) < abs(my_hit.position[1])
             ):
-                return ClearIntoCorner(car, info)
+                return self.defense.any_clear(car)
             return ShadowDefense(car, info, my_hit.ground_pos, 6000)
 
         # clear
@@ -82,7 +83,7 @@ class SoccarStrategy:
         ):
             if align(car.position, my_hit.ball, their_goal) > 0:
                 return offense.direct_shot(car, their_goal)
-            return ClearIntoCorner(car, info)
+            return self.defense.any_clear(car)
 
         if distance(their_best_hit, their_goal) < distance(their_best_hit, my_goal):
             opponents_align = -align(opponent.position, their_best_hit.ball, their_goal)

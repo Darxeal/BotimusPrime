@@ -13,7 +13,8 @@ MIN_DIST_BEFORE_SPEED_CONTROL = 1500
 JUMP_FALSE_TICKS = 2
 ALLOWED_TIME_ERROR = 0.1
 
-class DoubleJump(Strike):
+
+class DoubleJumpStrike(Strike):
 
     def intercept_predicate(self, car, ball):
         return 250 < ball.position[2] < 550
@@ -30,7 +31,7 @@ class DoubleJump(Strike):
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
-        self.drive.target = ground(intercept.position)
+        self.drive.target_pos = ground(intercept.position)
         self.time_for_jump = self.double_jump_time_needed(intercept.position[2])
     
     def interruptible(self) -> bool:

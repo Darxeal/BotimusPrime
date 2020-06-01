@@ -7,6 +7,9 @@ from utils.vector_math import local
 
 
 class SpeedFlipKickoff(Kickoff):
+    """
+    Speedflip into the ball. Works only on corner kickoffs. It's useful only against slow kickoffs.
+    """
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car, info)
         self.drive.target_pos = self.info.my_goal.center * 0.05
@@ -19,7 +22,7 @@ class SpeedFlipKickoff(Kickoff):
                 self.phase = 2
 
         if self.phase == 2:
-            if self.action.finished and self.info.ball.position[0] != 0:
+            if self.action.finished:
                 self.finished = True
 
         super().step(dt)
