@@ -5,6 +5,7 @@ from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.ground_shot import GroundShot
 from maneuvers.strikes.mirror_shot import MirrorShot
+from maneuvers.strikes.double_jump import DoubleJump
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
 from utils.game_info import GameInfo
@@ -52,15 +53,23 @@ class Offense:
             and ground_distance(car, ball) < 1500
             and ground_distance(ball, self.info.my_goal.center) > 1000
         ):
-            is_opponent_close = False
-            for opponent in self.info.get_opponents(car):
-                if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
-                    is_opponent_close = True
-                    break
-            if not is_opponent_close:
+            if not self.opponents_close(car, ball):
                 return Dribble(car, self.info, target)
 
-        if align(car.position, ball, target) < 0.1 and abs(ball.position[1] - target[1]) > 3000:
+        alignment = align(car.position, ball, target)
+        if alignment < 0.1 and abs(ball.position[1] - target[1]) > 3000:
             return MirrorShot(car, self.info, target)
         
+        if 250 < ball.position[2] < 550 and self.opponents_close(car, ball):
+            return DoubleJump(car, self.info, target)
+
         return self.direct_shot(car, target)
+
+
+    def opponents_close(self, car, ball) -> bool:
+        is_opponent_close = False
+        for opponent in self.info.get_opponents(car):
+            if ground_distance(opponent, car) < ball.position[2] * 2 + 1000:
+                is_opponent_close = True
+                break
+        return is_opponent_close

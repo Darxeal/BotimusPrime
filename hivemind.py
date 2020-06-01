@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List
 
 from rlbot.agents.hivemind.python_hivemind import PythonHivemind
@@ -12,7 +13,7 @@ from utils.drone import Drone
 from utils.game_info import GameInfo
 
 
-class BotimusHivemind(PythonHivemind):
+class Beehive(PythonHivemind):
     def __init__(self, *args):
         super().__init__(*args)
         self.info: GameInfo = None
@@ -29,11 +30,13 @@ class BotimusHivemind(PythonHivemind):
 
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
-        self.strategy = HivemindStrategy(self.info)
-        self.draw = DrawingTool(self.renderer)
+        self.strategy = HivemindStrategy(self.info, self.logger)
+        self.draw = DrawingTool(self.renderer, self.team)
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
-        self.logger.info('Botimus hivemind initialized')
+        self.logger.handlers[0].setLevel(logging.NOTSET)  # override handler level
+        self.logger.setLevel(logging.DEBUG)  # change level here (DEBUG, INFO, etc.)
+        self.logger.info("Beehive initialized")
 
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
         self.info.read_packet(packet, self.get_field_info())
@@ -41,7 +44,7 @@ class BotimusHivemind(PythonHivemind):
         # if a kickoff is happening and none of the drones have a Kickoff maneuver active, reset all drone maneuvers
         if (
             packet.game_info.is_kickoff_pause
-            and self.info.ball.position[0] == 0
+            and self.info.ball.position[0] == 0 and self.info.ball.position[1] == 0
             and not any(isinstance(drone.maneuver, Kickoff) for drone in self.drones)
         ):
             self.strategy.set_kickoff_maneuvers(self.drones)
@@ -61,7 +64,7 @@ class BotimusHivemind(PythonHivemind):
 
         # if at least one drone doesn't have an active maneuver, execute strategy code
         if None in [drone.maneuver for drone in self.drones]:
-            self.logger.info("Setting maneuvers")
+            self.logger.debug("Setting maneuvers")
             self.strategy.set_maneuvers(self.drones)
 
         for drone in self.drones:

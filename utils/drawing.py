@@ -24,8 +24,9 @@ class DrawingTool:
     purple = 128, 0, 128
     teal = 0, 128, 128
 
-    def __init__(self, renderer: RenderingManager):
+    def __init__(self, renderer: RenderingManager, team: int):
         self._renderer = renderer
+        self._team = str(team)
 
         self._opacity = 255
         self._R = 0
@@ -36,7 +37,7 @@ class DrawingTool:
         self._group_id = 'default'
 
     def begin(self):
-        self._renderer.begin_rendering(self._group_id)
+        self._renderer.begin_rendering(self._group_id + self._team)
         self._items_drawn = 0
 
     def _check_limit(self, items=1):
@@ -46,7 +47,7 @@ class DrawingTool:
             self._items_drawn = 0
             self._renderer.end_rendering()
             self._group_id += 'a'
-            self._renderer.begin_rendering(self._group_id)
+            self._renderer.begin_rendering(self._group_id + self._team)
         self._items_drawn += items
 
     def execute(self):
