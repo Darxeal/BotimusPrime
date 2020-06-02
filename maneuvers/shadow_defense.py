@@ -10,8 +10,8 @@ from utils.game_info import GameInfo
 from utils.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, distance, angle_between
 
 
-BOOST_LOOK_RADIUS = 1400
-BOOST_LOOK_ANGLE = 0.4
+BOOST_LOOK_RADIUS = 1200
+BOOST_LOOK_ANGLE = 0.5
 
 class ShadowDefense(Maneuver):
 
@@ -45,6 +45,9 @@ class ShadowDefense(Maneuver):
         return self.travel.interruptible()
 
     def step(self, dt):
+        # update finished state even if we are not using the controls
+        self.travel.step(dt)
+
         if self.travel.finished:
             # turn around to face the target direction
             if angle_to(self.car, self.face_target) > 0.3:
@@ -58,8 +61,6 @@ class ShadowDefense(Maneuver):
                 self.controls = self.stop.controls
 
         else:
-            # update finished state even if we are not using the controls
-            self.travel.step(dt)
             self.pad = None
 
             # collect boost pads on the way (greedy algorithm, assumes first found is best)
@@ -75,7 +76,7 @@ class ShadowDefense(Maneuver):
                         break
 
             # go to the actual target
-            if self.pad is not None:
+            if self.pad is None:
                 self.controls = self.travel.controls
                 
 
