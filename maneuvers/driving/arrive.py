@@ -30,7 +30,7 @@ class Arrive(Maneuver):
         self.arrival_time: float = 0
         self.backwards: bool = False
 
-        self.lerp_t = 0.57
+        self.lerp_t = 0.56
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
 

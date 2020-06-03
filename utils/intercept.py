@@ -43,10 +43,7 @@ def estimate_max_car_speed(car: Car):
 
 
 def estimate_time(car: Car, target, speed, dd=1) -> float:
-    dist = distance(car, target)
-    if dist < 100:
-        return 0
-    travel = dist / speed
+    travel = distance(car, target) / speed
     turning = angle_between(car.forward() * dd, direction(car, target)) / math.pi * 2
     if turning < 1:
         turning **= 2

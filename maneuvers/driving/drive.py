@@ -22,7 +22,7 @@ class Drive(Maneuver):
         target = self.target_pos
 
         # don't try driving outside the arena
-        target = Arena.clamp(target, 100)
+        target = Arena.clamp(target)
 
         # smoothly escape goal
         if abs(self.car.position[1]) > Arena.size[1] - 50:
@@ -30,7 +30,7 @@ class Drive(Maneuver):
             target[0] = abs_clamp(target[0], 700)
 
         if not self.drive_on_walls:
-            if self.car.position[2] > 100:
+            if self.car.position[2] > 200:
                 target = ground(self.car)
 
         local_target = local(self.car, target)
