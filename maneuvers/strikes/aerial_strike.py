@@ -14,10 +14,10 @@ from utils.vector_math import ground_direction, angle_to, distance, ground_dista
 class AerialStrike(Strike):
     MAX_DISTANCE_ERROR = 50
     DELAY_TAKEOFF = True
-    MINIMAL_HEIGHT = 400
+    MINIMAL_HEIGHT = 600
     MAXIMAL_HEIGHT = 800
-    MINIMAL_HEIGHT_TIME = 1.0
-    MAXIMAL_HEIGHT_TIME = 2.5
+    MINIMAL_HEIGHT_TIME = 1.5
+    MAXIMAL_HEIGHT_TIME = 2.0
     DOUBLE_JUMP = False
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
@@ -74,7 +74,7 @@ class AerialStrike(Strike):
         if self.aerialing:
 
             # freestyling
-            if self.car.position[2] > 300 and distance(self.car, self.target) > 300:
+            if self.car.position[2] > 200 and self.aerial.arrival_time - self.car.time > 0.5:
                 rotation = axis_to_rotation(self.car.forward() * 1.0)
                 self.aerial.up = dot(rotation, self.car.up())
 
@@ -90,19 +90,14 @@ class AerialStrike(Strike):
             # simulate aerial from current state
             simulated_car = self.simulate_flight(self.car)
 
-            # if the car ended up too far, we're too fast and we need to slow down
-            if ground_distance(self.car, self.aerial.target) + 100 < ground_distance(self.car, simulated_car):
-                # self.controls.throttle = -1
-                pass
-
             # if it ended up near the target, we could take off
-            elif distance(simulated_car, self.aerial.target) < self.MAX_DISTANCE_ERROR:
+            if distance(simulated_car, self.aerial.target) < self.MAX_DISTANCE_ERROR:
                 if angle_to(self.car, self.aerial.target) < 0.1 or norm(self.car.velocity) < 1000:
 
                     if self.DELAY_TAKEOFF:
                         # extrapolate current state a small amount of time
                         future_car = Car(self.car)
-                        time = 0.2
+                        time = 0.5
                         future_car.time += time
                         displacement = future_car.velocity * time if norm(future_car.velocity) > 500\
                             else normalize(future_car.velocity) * 500 * time
@@ -134,6 +129,6 @@ class FastAerialStrike(AerialStrike):
     DELAY_TAKEOFF = False
     MINIMAL_HEIGHT = 800
     MAXIMAL_HEIGHT = 1800
-    MINIMAL_HEIGHT_TIME = 1.5
-    MAXIMAL_HEIGHT_TIME = 3.0
+    MINIMAL_HEIGHT_TIME = 1.3
+    MAXIMAL_HEIGHT_TIME = 2.5
     DOUBLE_JUMP = True
