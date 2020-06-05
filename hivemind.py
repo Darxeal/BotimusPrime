@@ -97,8 +97,7 @@ class Beehive(PythonHivemind):
             if time <= 0.2:
                 for drone in self.drones:
                     if (
-                        drone.car.on_ground
-                        and (drone.index == index1 or drone.index == index2)
+                        (drone.index == index1 or drone.index == index2)
                         and isinstance(drone.maneuver, (ShadowDefense, Refuel))
                         ):
                         self.logger.debug(f"Drone {drone.index} is avoiding the collision!")

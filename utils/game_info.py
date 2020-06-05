@@ -115,7 +115,7 @@ class GameInfo(Game):
         collisions = []
         for i in range(self.num_cars):
             for j in range(self.num_cars):
-                if i <= j: 
+                if i >= j: 
                     continue
 
                 for step in range(time_steps):
