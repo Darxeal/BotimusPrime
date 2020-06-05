@@ -1,10 +1,14 @@
-from typing import List
+from typing import List, Tuple
 
 from rlbot.utils.structures.game_data_struct import GameTickPacket, FieldInfoPacket
 
 from rlutilities.simulation import Game, Car, Ball, Pad
-from rlutilities.linear_algebra import vec3
+from rlutilities.linear_algebra import vec3, vec2, norm, normalize, cross, rotation, dot, xy
 
+from utils.vector_math import distance
+
+
+COLLISION_THRESHOLD = 150
 
 class Goal:
 
@@ -81,3 +85,44 @@ class GameInfo(Game):
                 if self.their_goal.inside(prediction.position):
                     self.about_to_score = True
                     self.time_of_goal = prediction.time
+
+    def predict_car_drive(self, index, time_limit=2.0, dt=1/60) -> List[vec3]:
+        """Simple prediction of a driving car assuming no acceleration."""
+        car = self.cars[index]
+        time_steps = int(time_limit / dt)
+        speed = norm(car.velocity)
+        ang_vel_z = car.angular_velocity[2]
+
+        # predict circular path
+        if ang_vel_z != 0 and car.on_ground:
+            radius = speed / ang_vel_z
+            centre = car.position - cross(normalize(xy(car.velocity)), vec3(0, 0, 1)) * radius
+            centre_to_car = vec2(car.position - centre)
+            return [
+                vec3(dot(rotation(ang_vel_z * dt * i), centre_to_car)) + centre
+                    for i in range(time_steps)]
+
+        # predict straight path
+        return [car.position + car.velocity * dt * i for i in range(time_steps)]
+
+
+    def detect_collisions(self, time_limit=0.5, dt=1/60) -> List[Tuple[int, int, float]]:
+        """Returns a list of tuples, where the first two elements are
+        indices of cars and the last is time from now until the collision.
+        """
+        time_steps = int(time_limit / dt)
+        predictions = [self.predict_car_drive(i, time_limit=time_limit, dt=dt) for i in range(self.num_cars)]
+        collisions = []
+        for i in range(self.num_cars):
+            for j in range(self.num_cars):
+                if i <= j: 
+                    continue
+
+                for step in range(time_steps):
+                    pos1 = predictions[i][step]
+                    pos2 = predictions[j][step]
+                    if distance(pos1, pos2) < COLLISION_THRESHOLD:
+                        collisions.append((i, j, step * dt))
+                        break
+        
+        return collisions
