@@ -14,7 +14,7 @@ class Recovery(Maneuver):
     def __init__(self, car: Car, jump_when_upside_down=True):
         super().__init__(car)
 
-        self.jump_when_upside_down = True
+        self.jump_when_upside_down = jump_when_upside_down
         self.landing = False
         self.aerial_turn = AerialTurn(self.car)
 
