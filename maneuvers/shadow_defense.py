@@ -7,8 +7,11 @@ from rlutilities.simulation import Car
 from utils.arena import Arena
 from utils.drawing import DrawingTool
 from utils.game_info import GameInfo
-from utils.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to
+from utils.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, distance, angle_between
 
+
+BOOST_LOOK_RADIUS = 1200
+BOOST_LOOK_ANGLE = 0.5
 
 class ShadowDefense(Maneuver):
 
@@ -32,24 +35,24 @@ class ShadowDefense(Maneuver):
         self.travel = Travel(car, target_pos)
         self.travel.finish_distance = 800 if near_goal else 1500
         self.drive = Drive(car)
-        self.drive.target_speed = 1000
         self.stop = Stop(car)
 
         self.start_time = car.time
+
+        self.pad = None
 
     def interruptible(self) -> bool:
         return self.travel.interruptible()
 
     def step(self, dt):
+        # update finished state even if we are not using the controls
         self.travel.step(dt)
-        self.controls = self.travel.controls
-
-        if ground_distance(self.car, self.travel.target) < 3000:
-            self.controls.boost = False
 
         if self.travel.finished:
+            # turn around to face the target direction
             if angle_to(self.car, self.face_target) > 0.3:
                 self.drive.target_pos = self.face_target
+                self.drive.target_speed = 1000
                 self.drive.step(dt)
                 self.controls = self.drive.controls
                 self.controls.handbrake = False
@@ -57,9 +60,35 @@ class ShadowDefense(Maneuver):
                 self.stop.step(dt)
                 self.controls = self.stop.controls
 
+        else:
+            self.pad = None
+
+            # collect boost pads on the way (greedy algorithm, assumes first found is best)
+            if self.car.boost < 90:
+                for pad in self.info.large_boost_pads + self.info.small_boost_pads:
+                    if pad.is_active and distance(self.car, pad) < BOOST_LOOK_RADIUS \
+                        and angle_between(self.travel.target - self.car.position, pad.position - self.car.position) < BOOST_LOOK_ANGLE:
+                        self.pad = pad
+                        self.drive.target_pos = pad.position
+                        self.drive.target_speed = 2200
+                        self.drive.step(dt)
+                        self.controls = self.drive.controls
+                        break
+
+            # go to the actual target
+            if self.pad is None:
+                self.controls = self.travel.controls
+                
+
+        # don't waste boost during downtime
         self.controls.boost = False
 
         self.finished = self.travel.driving and self.car.time > self.start_time + self.DURATION
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)
+        # render target pad
+        if self.pad:
+            draw.color(draw.orange)
+            draw.crosshair(self.pad.position, 150)
+
