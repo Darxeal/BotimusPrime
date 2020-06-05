@@ -6,12 +6,16 @@ from rlbot.utils.structures.bot_input_struct import PlayerInput
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 from maneuvers.kickoffs.kickoff import Kickoff
+from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.refuel import Refuel
 from rlutilities.linear_algebra import vec3
 from strategy.hivemind_strategy import HivemindStrategy
 from utils.drawing import DrawingTool
 from utils.drone import Drone
 from utils.game_info import GameInfo
 
+
+RELEASE = True
 
 class Beehive(PythonHivemind):
     def __init__(self, *args):
@@ -35,7 +39,7 @@ class Beehive(PythonHivemind):
         self.drones = [Drone(self.info.cars[i], i) for i in self.drone_indices]
 
         self.logger.handlers[0].setLevel(logging.NOTSET)  # override handler level
-        self.logger.setLevel(logging.DEBUG)  # change level here (DEBUG, INFO, etc.)
+        self.logger.setLevel(logging.INFO if RELEASE else logging.DEBUG)
         self.logger.info("Beehive initialized")
 
     def get_outputs(self, packet: GameTickPacket) -> Dict[int, PlayerInput]:
@@ -84,6 +88,26 @@ class Beehive(PythonHivemind):
             # expire finished maneuvers
             if drone.maneuver.finished:
                 drone.maneuver = None
+
+        # demo avoidance
+        collisions = self.info.detect_collisions(time_limit=0.2, dt=1/60)
+        for collision in collisions:
+            index1, index2, time = collision
+            self.logger.debug(f"Collision: {index1} ->*<- {index2} in {time:.2f} seconds.")
+            if time <= 0.2:
+                for drone in self.drones:
+                    if (
+                        (drone.index == index1 or drone.index == index2)
+                        and isinstance(drone.maneuver, (ShadowDefense, Refuel))
+                        ):
+                        self.logger.debug(f"Drone {drone.index} is avoiding the collision!")
+                        drone.controls.jump = True
+                        break
+
+        # render predictions
+        # for prediction in [self.info.predict_car_drive(i) for i in range(self.info.num_cars)]:
+        #     self.draw.color(self.draw.yellow)
+        #     self.draw.polyline(prediction)
 
         self.strategy.render(self.draw)
         self.draw.execute()
