@@ -1,4 +1,4 @@
-from maneuvers.strikes.clears import DodgeClear, AerialClear, DoubleJumpClear
+from maneuvers.strikes.clears import DodgeClear, AerialClear, DoubleJumpClear, FastAerialClear
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
 from utils.game_info import GameInfo
@@ -16,4 +16,5 @@ class Defense:
         ]
         if car.boost > 40:  # TODO
             clears.append(AerialClear(car, self.info))
+            clears.append(FastAerialClear(car, self.info))
         return min(clears, key=lambda clear: clear.intercept.time)

@@ -1,4 +1,4 @@
-from maneuvers.strikes.aerial_strike import AerialStrike
+from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.dodge_shot import DodgeShot
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from maneuvers.strikes.strike import Strike
@@ -18,6 +18,12 @@ class DodgeClear(DodgeShot):
 
 
 class AerialClear(AerialStrike):
+    def configure(self, intercept: Intercept):
+        self.target = self.pick_easiest_target(self.car, intercept.ball, _side_points)
+        super().configure(intercept)
+
+
+class FastAerialClear(FastAerialStrike):
     def configure(self, intercept: Intercept):
         self.target = self.pick_easiest_target(self.car, intercept.ball, _side_points)
         super().configure(intercept)

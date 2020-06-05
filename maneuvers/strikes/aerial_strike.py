@@ -16,8 +16,8 @@ class AerialStrike(Strike):
     DELAY_TAKEOFF = True
     MINIMAL_HEIGHT = 600
     MAXIMAL_HEIGHT = 800
-    MINIMAL_HEIGHT_TIME = 1.5
-    MAXIMAL_HEIGHT_TIME = 2.0
+    MINIMAL_HEIGHT_TIME = 1.2
+    MAXIMAL_HEIGHT_TIME = 1.5
     DOUBLE_JUMP = False
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
@@ -74,9 +74,12 @@ class AerialStrike(Strike):
         if self.aerialing:
 
             # freestyling
-            if self.car.position[2] > 200 and self.aerial.arrival_time - self.car.time > 0.5:
-                rotation = axis_to_rotation(self.car.forward() * 1.0)
-                self.aerial.up = dot(rotation, self.car.up())
+            if self.car.position[2] > 200:
+                if self.aerial.arrival_time - self.car.time > 0.7:
+                    rotation = axis_to_rotation(self.car.forward() * 0.5)
+                    self.aerial.up = dot(rotation, self.car.up())
+                else:
+                    self.aerial.up = vec3(0, 0, -1)
 
             self.aerial.target_orientation = look_at(direction(self.car, self.info.ball), vec3(0, 0, -1))
             self.aerial.step(dt)
@@ -90,11 +93,19 @@ class AerialStrike(Strike):
             # simulate aerial from current state
             simulated_car = self.simulate_flight(self.car)
 
+            speed_towards_target = dot(self.car.velocity, direction(self.car, self.aerial.target))
+            time_left = self.aerial.arrival_time - self.car.time
+            speed_needed = ground_distance(self.car, self.aerial.target) / time_left
+
+            # too fast, slow down
+            if speed_towards_target > speed_needed and angle_to(self.car, self.aerial.target) < 0.1:
+                self.controls.throttle = -1
+
             # if it ended up near the target, we could take off
-            if distance(simulated_car, self.aerial.target) < self.MAX_DISTANCE_ERROR:
+            elif distance(simulated_car, self.aerial.target) < self.MAX_DISTANCE_ERROR:
                 if angle_to(self.car, self.aerial.target) < 0.1 or norm(self.car.velocity) < 1000:
 
-                    if self.DELAY_TAKEOFF:
+                    if self.DELAY_TAKEOFF and ground_distance(self.car, self.aerial.target) > 1000:
                         # extrapolate current state a small amount of time
                         future_car = Car(self.car)
                         time = 0.5
