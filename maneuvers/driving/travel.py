@@ -64,7 +64,7 @@ class Travel(Maneuver):
                     if car_speed > 1200 and not use_boost_instead:
                         if time_left > self.DODGE_DURATION:
                             dodge = Dodge(car)
-                            dodge.duration = 0.05
+                            dodge.duration = 0.07
                             dodge.direction = vec2(direction(car, target))
                             self.action = dodge
                             self.driving = False
