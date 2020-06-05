@@ -29,7 +29,7 @@ class DodgeStrike(Strike):
             self.arrive.target = intercept.ground_pos - ground_direction(intercept, self.target) * 110
 
         additional_jump = clamp((intercept.ball.position[2]-92) / 500, 0, 1.5) * self.jump_time_multiplier
-        self.dodge.jump.duration = 0.07 + additional_jump
+        self.dodge.jump.duration = 0.05 + additional_jump
         self.dodge.target = intercept.ball.position
         self.arrive.additional_shift = additional_jump * 500
 
