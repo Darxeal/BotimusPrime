@@ -77,7 +77,7 @@ class HivemindStrategy:
 
             info.predict_ball()
             our_intercepts = [Intercept(drone.car, info.ball_predictions) for drone in ready_drones]
-            good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.0]
+            good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.3]
 
             if good_intercepts:
                 best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
@@ -99,6 +99,9 @@ class HivemindStrategy:
 
             self.drone_going_for_ball.maneuver = strike
 
+            if self.drone_going_for_ball is self.defending_drone:
+                self.defending_drone = None
+
         # clear expired boost reservations
         for drone in drones:
             if not isinstance(drone.maneuver, Refuel) and drone in self.boost_reservations:
@@ -114,13 +117,13 @@ class HivemindStrategy:
 
         # pick one drone that will stay far back
         unemployed_drones = [drone for drone in drones if drone.maneuver is None]
-        if unemployed_drones:
+        if unemployed_drones and self.defending_drone is None:
             self.defending_drone = min(unemployed_drones, key=lambda d: ground_distance(d.car, info.my_goal.center))
             self.defending_drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, 7000)
             unemployed_drones.remove(self.defending_drone)
 
         for drone in unemployed_drones:
-            drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 1000)
+            drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 4000)
 
     def render(self, draw: DrawingTool):
         pass
