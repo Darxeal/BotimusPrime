@@ -1,6 +1,7 @@
 from maneuvers.jumps.aim_dodge import AimDodge
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import norm
+from rlutilities.simulation import Car, Ball
 from utils.intercept import Intercept
 from utils.math import clamp
 from utils.vector_math import ground_direction
@@ -11,8 +12,8 @@ class DodgeStrike(Strike):
     allow_backwards = False
     jump_time_multiplier = 1.0
 
-    def intercept_predicate(self, car, ball):
-        return ball.position[2] < 280
+    def intercept_predicate(self, car: Car, ball: Ball):
+        return ball.position[2] < 300
 
     def __init__(self, car, info, target=None):
         self.dodge = AimDodge(car, 0.1, info.ball.position)
@@ -23,12 +24,14 @@ class DodgeStrike(Strike):
     def configure(self, intercept: Intercept):
         super().configure(intercept)
 
-        if self.target is None:
-            self.arrive.target = intercept.ground_pos + ground_direction(intercept, self.car) * 100
-        else:
-            self.arrive.target = intercept.ground_pos - ground_direction(intercept, self.target) * 110
+        ball = intercept.ball
+        target_direction = ground_direction(ball, self.target)
+        hit_dir = ground_direction(ball.velocity, target_direction * 4000)
 
-        additional_jump = clamp((intercept.ball.position[2]-92) / 500, 0, 1.5) * self.jump_time_multiplier
+        self.arrive.target = intercept.ground_pos - hit_dir * 100
+        self.arrive.target_direction = hit_dir
+
+        additional_jump = clamp((ball.position[2]-92) / 500, 0, 1.5) * self.jump_time_multiplier
         self.dodge.jump.duration = 0.05 + additional_jump
         self.dodge.target = intercept.ball.position
         self.arrive.additional_shift = additional_jump * 500

@@ -1,9 +1,9 @@
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
 from utils.intercept import Intercept
 from utils.math import abs_clamp
 
 
-class CloseShot(DodgeShot):
+class CloseShot(DodgeStrike):
     jump_time_multiplier = 1.1
 
     def configure(self, intercept: Intercept):

@@ -2,7 +2,7 @@ from maneuvers.dribbling.dribble import Dribble
 from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.close_shot import CloseShot
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_shot import GroundShot
 from maneuvers.strikes.mirror_shot import MirrorShot
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
@@ -20,7 +20,7 @@ class Offense:
         self.allow_dribbles = False
 
     def direct_shot(self, car: Car, target: vec3) -> Maneuver:
-        dodge_shot = DodgeShot(car, self.info, target)
+        dodge_shot = DodgeStrike(car, self.info, target)
         ground_shot = GroundShot(car, self.info, target)
 
         if car.boost > 40:  # TODO

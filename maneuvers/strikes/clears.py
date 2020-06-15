@@ -1,5 +1,5 @@
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
@@ -11,7 +11,7 @@ _other_side = [vec3(-p[0], p[1], 0) for p in _one_side]
 _side_points = _one_side + _other_side
 
 
-class DodgeClear(DodgeShot):
+class DodgeClear(DodgeStrike):
     def configure(self, intercept: Intercept):
         self.target = self.pick_easiest_target(self.car, intercept.ball, _side_points)
         super().configure(intercept)

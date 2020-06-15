@@ -1,4 +1,4 @@
-from maneuvers.strikes.dodge_shot import DodgeShot
+from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
@@ -6,7 +6,7 @@ from utils.arena import Arena
 from utils.game_info import GameInfo
 
 
-class MirrorShot(DodgeShot):
+class MirrorShot(DodgeStrike):
     def __init__(self, car: Car, info: GameInfo, target: vec3):
         self.actual_target = target
 
