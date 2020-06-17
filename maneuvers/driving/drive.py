@@ -22,7 +22,7 @@ class Drive(Maneuver):
         target = self.target_pos
 
         # don't try driving outside the arena
-        target = Arena.clamp(target)
+        target = Arena.clamp(target, 100)
 
         # smoothly escape goal
         if abs(self.car.position[1]) > Arena.size[1] - 50:

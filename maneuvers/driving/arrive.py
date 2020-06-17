@@ -30,7 +30,7 @@ class Arrive(Maneuver):
         self.arrival_time: float = 0
         self.backwards: bool = False
 
-        self.lerp_t = 0.56
+        self.lerp_t = 0.57
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
 
@@ -73,6 +73,7 @@ class Arrive(Maneuver):
         self.drive.target_speed = target_speed
         self.drive.backwards = self.backwards
 
+        # dodges and wavedashes can mess up correctly arriving, so we use them only if we really need them
         if (
             (
                 self.allow_dodges_and_wavedashes

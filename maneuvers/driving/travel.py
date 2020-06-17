@@ -54,8 +54,10 @@ class Travel(Maneuver):
 
             # check if it's a good idea to dodge, wavedash or halfflip
             if (
-                self._time_on_ground > 0.2 and car.position[2] < 200
-                and angle_to(car, target, forward_speed < 0) < 0.1
+                self._time_on_ground > 0.2
+                and car.position[2] < 200
+                and car_speed < 2000
+                and angle_to(car, target, backwards=forward_speed < 0) < 0.1
             ):
                 # if going forward, use a dodge or a wavedash
                 if forward_speed > 0:
@@ -91,6 +93,7 @@ class Travel(Maneuver):
         if not car.on_ground:
             self.controls.throttle = 1
 
+        # a dodge/wavedash/halfflip has finished
         if self.action.finished and not self.driving:
             self.driving = True
             self._time_on_ground = 0
