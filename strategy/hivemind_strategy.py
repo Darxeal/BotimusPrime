@@ -5,6 +5,7 @@ from maneuvers.kickoffs.drive_backwards_to_goal import DriveBackwardsToGoal
 from maneuvers.kickoffs.half_flip_pickup import HalfFlipPickup
 from maneuvers.refuel import Refuel
 from maneuvers.shadow_defense import ShadowDefense
+from rlutilities.linear_algebra import norm
 from rlutilities.simulation import Pad
 from strategy.defense import Defense
 from strategy.kickoffs import KickoffStrategy
@@ -124,6 +125,34 @@ class HivemindStrategy:
 
         for drone in unemployed_drones:
             drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 4000)
+
+    def avoid_demos_and_team_bumps(self, drones: List[Drone]):
+        collisions = self.info.detect_collisions(time_limit=0.2, dt=1 / 60)
+        drones_by_index: Dict[int, Drone] = {drone.index: drone for drone in drones}
+
+        for collision in collisions:
+            index1, index2, time = collision
+            self.logger.debug(f"Collision: {index1} ->*<- {index2} in {time:.2f} seconds.")
+
+            # avoid team bumps
+            if index1 in drones_by_index and index2 in drones_by_index:
+                if drones_by_index[index1] is self.drone_going_for_ball:
+                    drones_by_index[index2].controls.jump = drones_by_index[index2].car.on_ground
+                else:
+                    drones_by_index[index1].controls.jump = drones_by_index[index1].car.on_ground
+                # TODO: if both drones aren't going for ball, decide which one is the better choice for jumping
+
+            # dodge demolitions
+            # TODO: Refactor so there's no duplicate code
+            elif index1 in drones_by_index:
+                opponent = self.info.cars[index2]
+                if norm(opponent.velocity) > 2000:
+                    drones_by_index[index1].controls.jump = drones_by_index[index1].car.on_ground
+
+            elif index2 in drones_by_index:
+                opponent = self.info.cars[index1]
+                if norm(opponent.velocity) > 2000:
+                    drones_by_index[index2].controls.jump = drones_by_index[index2].car.on_ground
 
     def render(self, draw: DrawingTool):
         pass

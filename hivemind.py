@@ -89,25 +89,7 @@ class Beehive(PythonHivemind):
             if drone.maneuver.finished:
                 drone.maneuver = None
 
-        # demo avoidance
-        collisions = self.info.detect_collisions(time_limit=0.2, dt=1/60)
-        for collision in collisions:
-            index1, index2, time = collision
-            self.logger.debug(f"Collision: {index1} ->*<- {index2} in {time:.2f} seconds.")
-            if time <= 0.2:
-                for drone in self.drones:
-                    if (
-                        (drone.index == index1 or drone.index == index2)
-                        and isinstance(drone.maneuver, (ShadowDefense, Refuel))
-                        ):
-                        self.logger.debug(f"Drone {drone.index} is avoiding the collision!")
-                        drone.controls.jump = True
-                        break
-
-        # render predictions
-        # for prediction in [self.info.predict_car_drive(i) for i in range(self.info.num_cars)]:
-        #     self.draw.color(self.draw.yellow)
-        #     self.draw.polyline(prediction)
+        self.strategy.avoid_demos_and_team_bumps(self.drones)
 
         self.strategy.render(self.draw)
         self.draw.execute()
