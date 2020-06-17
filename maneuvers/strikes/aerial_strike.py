@@ -14,9 +14,9 @@ from utils.vector_math import ground_direction, angle_to, distance, ground_dista
 class AerialStrike(Strike):
     MAX_DISTANCE_ERROR = 50
     DELAY_TAKEOFF = True
-    MINIMAL_HEIGHT = 600
+    MINIMAL_HEIGHT = 500
     MAXIMAL_HEIGHT = 800
-    MINIMAL_HEIGHT_TIME = 1.2
+    MINIMAL_HEIGHT_TIME = 0.8
     MAXIMAL_HEIGHT_TIME = 1.5
     DOUBLE_JUMP = False
 
@@ -41,7 +41,7 @@ class AerialStrike(Strike):
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
-        self.aerial.target = intercept.position - direction(intercept, self.target) * 80
+        self.aerial.target = intercept.position - direction(intercept, self.target) * 100
         self.aerial.up = normalize(ground_direction(intercept, self.car) + vec3(0, 0, 0.5))
         self.aerial.arrival_time = intercept.time
 
