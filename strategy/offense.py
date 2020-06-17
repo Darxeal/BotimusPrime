@@ -1,3 +1,4 @@
+from maneuvers.air.double_touch import DoubleTouch
 from maneuvers.dribbling.dribble import Dribble
 from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
@@ -27,8 +28,12 @@ class Offense:
             aerial_strike = AerialStrike(car, self.info, target)
             fast_aerial = FastAerialStrike(car, self.info, target)
 
-            if min(aerial_strike.intercept.time, fast_aerial.intercept.time) < dodge_shot.intercept.time:
-                return min([aerial_strike, fast_aerial], key=lambda strike: strike.intercept.time)
+            better_aerial_strike = min([aerial_strike, fast_aerial], key=lambda strike: strike.intercept.time)
+
+            if better_aerial_strike.intercept.time < dodge_shot.intercept.time:
+                if ground_distance(better_aerial_strike.intercept, self.info.their_goal.center) < 5000:
+                    return DoubleTouch(better_aerial_strike)
+                return better_aerial_strike
 
         if (
             dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
