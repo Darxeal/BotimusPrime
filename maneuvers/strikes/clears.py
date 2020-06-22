@@ -3,8 +3,8 @@ from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
-from utils.arena import Arena
-from utils.intercept import Intercept
+from tools.arena import Arena
+from tools.intercept import Intercept
 
 _one_side = [vec3(Arena.size[0], Arena.size[1] * i/5, 0) for i in range(-5, 5)]
 _other_side = [vec3(-p[0], p[1], 0) for p in _one_side]

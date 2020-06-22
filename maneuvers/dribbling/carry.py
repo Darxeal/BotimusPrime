@@ -2,9 +2,9 @@ from maneuvers.maneuver import Maneuver
 from maneuvers.driving.drive import Drive
 from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car, Ball
-from utils.drawing import DrawingTool
-from utils.math import clamp, sign
-from utils.vector_math import distance, ground_distance, direction, local, ground, world
+from tools.drawing import DrawingTool
+from tools.math import clamp, sign
+from tools.vector_math import distance, ground_distance, direction, local, ground, world
 
 
 class Carry(Maneuver):

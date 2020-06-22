@@ -10,9 +10,9 @@ from maneuvers.shadow_defense import ShadowDefense
 from maneuvers.refuel import Refuel
 from rlutilities.linear_algebra import vec3
 from strategy.hivemind_strategy import HivemindStrategy
-from utils.drawing import DrawingTool
-from utils.drone import Drone
-from utils.game_info import GameInfo
+from tools.drawing import DrawingTool
+from tools.drone import Drone
+from tools.game_info import GameInfo
 
 
 RELEASE = True

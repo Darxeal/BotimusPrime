@@ -4,8 +4,8 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot, norm, angle_between, normalize, cross, mat3, look_at, xy
 from rlutilities.mechanics import AerialTurn
 from rlutilities.simulation import Car, Input, sphere, Field
-from utils.drawing import DrawingTool
-from utils.vector_math import forward, three_vec3_to_mat3
+from tools.drawing import DrawingTool
+from tools.vector_math import forward, three_vec3_to_mat3
 
 
 class Recovery(Maneuver):

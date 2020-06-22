@@ -5,10 +5,10 @@ from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm
 from rlutilities.simulation import Car, Pad
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.intercept import estimate_max_car_speed, estimate_time
-from utils.vector_math import distance
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.intercept import estimate_max_car_speed, estimate_time
+from tools.vector_math import distance
 
 
 class Refuel(Maneuver):

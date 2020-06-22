@@ -2,9 +2,9 @@ from maneuvers.jumps.aim_dodge import AimDodge
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import norm
 from rlutilities.simulation import Car, Ball
-from utils.intercept import Intercept
-from utils.math import clamp
-from utils.vector_math import ground_direction
+from tools.intercept import Intercept
+from tools.math import clamp
+from tools.vector_math import ground_direction
 
 
 class DodgeStrike(Strike):

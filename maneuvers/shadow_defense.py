@@ -4,10 +4,10 @@ from maneuvers.driving.drive import Drive
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
-from utils.arena import Arena
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, distance, angle_between
+from tools.arena import Arena
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, distance, angle_between
 
 
 BOOST_LOOK_RADIUS = 1200

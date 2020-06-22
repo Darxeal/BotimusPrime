@@ -1,9 +1,9 @@
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import dot, norm
 from rlutilities.simulation import Field, sphere, Car, Ball
-from utils.arena import Arena
-from utils.intercept import Intercept
-from utils.vector_math import ground_direction
+from tools.arena import Arena
+from tools.intercept import Intercept
+from tools.vector_math import ground_direction
 
 
 class GroundShot(Strike):

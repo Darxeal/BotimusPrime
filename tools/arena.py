@@ -1,5 +1,5 @@
 from rlutilities.linear_algebra import vec3
-from utils.math import abs_clamp
+from tools.math import abs_clamp
 
 
 class Arena:

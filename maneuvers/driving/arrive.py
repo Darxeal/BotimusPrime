@@ -5,10 +5,10 @@ from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car
-from utils.drawing import DrawingTool
-from utils.math import clamp, nonzero
-from utils.misc import turn_radius
-from utils.vector_math import ground_distance
+from tools.drawing import DrawingTool
+from tools.math import clamp, nonzero
+from tools.misc import turn_radius
+from tools.vector_math import ground_distance
 
 
 class Arrive(Maneuver):

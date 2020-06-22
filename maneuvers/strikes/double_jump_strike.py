@@ -3,9 +3,9 @@ from rlutilities.linear_algebra import vec3, dot, normalize, look_at
 from rlutilities.mechanics import AerialTurn
 from maneuvers.strikes.strike import Strike
 from maneuvers.driving.drive import Drive
-from utils.game_info import GameInfo
-from utils.intercept import Intercept
-from utils.vector_math import ground_distance, ground, ground_direction, direction
+from tools.game_info import GameInfo
+from tools.intercept import Intercept
+from tools.vector_math import ground_distance, ground, ground_direction, direction
 
 
 MIN_ALIGNMENT = 0.9

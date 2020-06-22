@@ -2,8 +2,8 @@ from maneuvers.jumps.air_dodge import AirDodge
 from maneuvers.kickoffs.kickoff import Kickoff
 from rlutilities.linear_algebra import vec3, norm, sgn
 from rlutilities.simulation import Car
-from utils.game_info import GameInfo
-from utils.vector_math import distance
+from tools.game_info import GameInfo
+from tools.vector_math import distance
 
 
 class SimpleKickoff(Kickoff):

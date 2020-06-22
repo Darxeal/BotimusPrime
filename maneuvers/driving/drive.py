@@ -2,10 +2,10 @@ import math
 
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot
-from utils.arena import Arena
-from utils.drawing import DrawingTool
-from utils.math import abs_clamp, clamp11
-from utils.vector_math import ground, local, ground_distance, distance, direction
+from tools.arena import Arena
+from tools.drawing import DrawingTool
+from tools.math import abs_clamp, clamp11
+from tools.vector_math import ground, local, ground_distance, distance, direction
 
 
 class Drive(Maneuver):

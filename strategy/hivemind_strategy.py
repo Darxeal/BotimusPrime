@@ -10,11 +10,11 @@ from rlutilities.simulation import Pad
 from strategy.defense import Defense
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
-from utils.drawing import DrawingTool
-from utils.drone import Drone
-from utils.game_info import GameInfo
-from utils.intercept import Intercept
-from utils.vector_math import align, ground, ground_distance, distance
+from tools.drawing import DrawingTool
+from tools.drone import Drone
+from tools.game_info import GameInfo
+from tools.intercept import Intercept
+from tools.vector_math import align, ground, ground_distance, distance
 
 
 class HivemindStrategy:

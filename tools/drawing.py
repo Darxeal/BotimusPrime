@@ -5,8 +5,8 @@ from rlbot.utils.rendering.rendering_manager import RenderingManager
 
 from rlutilities.linear_algebra import vec3, cross
 from rlutilities.simulation import Ball
-from utils.math import clamp
-from utils.vector_math import to_vec3
+from tools.math import clamp
+from tools.vector_math import to_vec3
 
 
 class DrawingTool:

@@ -3,7 +3,7 @@ from maneuvers.kickoffs.simple_kickoff import SimpleKickoff
 from maneuvers.kickoffs.speed_flip_kickoff import SpeedFlipKickoff
 from maneuvers.kickoffs.speed_flip_dodge_kickoff import SpeedFlipDodgeKickoff
 from rlutilities.simulation import Car
-from utils.game_info import GameInfo
+from tools.game_info import GameInfo
 
 
 class KickoffStrategy:

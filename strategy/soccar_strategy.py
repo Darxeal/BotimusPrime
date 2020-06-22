@@ -9,10 +9,10 @@ from rlutilities.simulation import Car
 from strategy.defense import Defense
 from strategy.kickoffs import KickoffStrategy
 from strategy.offense import Offense
-from utils.arena import Arena
-from utils.game_info import GameInfo
-from utils.intercept import Intercept, estimate_time
-from utils.vector_math import align, ground, ground_distance, distance
+from tools.arena import Arena
+from tools.game_info import GameInfo
+from tools.intercept import Intercept, estimate_time
+from tools.vector_math import align, ground, ground_distance, distance
 
 
 class SoccarStrategy:

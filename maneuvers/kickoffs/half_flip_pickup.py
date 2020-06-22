@@ -3,7 +3,7 @@ from maneuvers.jumps.half_flip import HalfFlip
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import norm, vec3
 from rlutilities.simulation import Car, Pad
-from utils.drawing import DrawingTool
+from tools.drawing import DrawingTool
 
 
 class HalfFlipPickup(Maneuver):

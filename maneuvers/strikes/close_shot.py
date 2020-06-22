@@ -1,7 +1,7 @@
 from maneuvers.strikes.dodge_strike import DodgeStrike
 from rlutilities.simulation import Car, Ball
-from utils.intercept import Intercept
-from utils.math import abs_clamp
+from tools.intercept import Intercept
+from tools.math import abs_clamp
 
 
 class CloseShot(DodgeStrike):

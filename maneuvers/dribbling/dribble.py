@@ -3,9 +3,9 @@ from maneuvers.jumps.air_dodge import AirDodge
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot, norm
 from rlutilities.simulation import Car
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.vector_math import ground_direction, distance, ground_distance, direction
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.vector_math import ground_direction, distance, ground_distance, direction
 
 
 class Dribble(Maneuver):

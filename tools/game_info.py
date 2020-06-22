@@ -5,7 +5,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket, FieldInfoPac
 from rlutilities.simulation import Game, Car, Ball, Pad
 from rlutilities.linear_algebra import vec3, vec2, norm, normalize, cross, rotation, dot, xy
 
-from utils.vector_math import distance
+from tools.vector_math import distance
 
 
 COLLISION_THRESHOLD = 150

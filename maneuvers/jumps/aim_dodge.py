@@ -3,7 +3,7 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, normalize, look_at
 from rlutilities.mechanics import AerialTurn
 from rlutilities.simulation import Car
-from utils.vector_math import direction
+from tools.vector_math import direction
 
 
 class AimDodge(Maneuver):

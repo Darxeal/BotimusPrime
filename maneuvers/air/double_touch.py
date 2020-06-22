@@ -2,9 +2,9 @@ from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.mechanics import Aerial
-from utils.air_intercept import AirToAirIntercept
-from utils.drawing import DrawingTool
-from utils.vector_math import direction
+from tools.air_intercept import AirToAirIntercept
+from tools.drawing import DrawingTool
+from tools.vector_math import direction
 
 
 class DoubleTouch(Maneuver):

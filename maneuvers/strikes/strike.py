@@ -5,10 +5,10 @@ from maneuvers.driving.arrive import Arrive
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot
 from rlutilities.simulation import Car, Ball
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.intercept import Intercept
-from utils.vector_math import ground_direction
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.intercept import Intercept
+from tools.vector_math import ground_direction
 
 
 class Strike(Maneuver):

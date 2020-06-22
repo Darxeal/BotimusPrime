@@ -2,9 +2,9 @@ from maneuvers.driving.drive import Drive
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.vector_math import distance
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.vector_math import distance
 
 
 class Kickoff(Maneuver):

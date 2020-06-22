@@ -7,8 +7,8 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
 from strategy.soccar_strategy import SoccarStrategy
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
 
 
 class BotimusPrime(BaseAgent):

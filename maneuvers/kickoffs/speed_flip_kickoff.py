@@ -2,8 +2,8 @@ from maneuvers.jumps.speed_flip import SpeedFlip
 from maneuvers.kickoffs.kickoff import Kickoff
 from rlutilities.linear_algebra import norm
 from rlutilities.simulation import Car
-from utils.game_info import GameInfo
-from utils.vector_math import local
+from tools.game_info import GameInfo
+from tools.vector_math import local
 
 
 class SpeedFlipKickoff(Kickoff):

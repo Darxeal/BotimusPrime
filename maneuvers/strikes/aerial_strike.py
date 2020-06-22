@@ -4,11 +4,11 @@ from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3, norm, normalize, look_at, axis_to_rotation, dot
 from rlutilities.mechanics import Aerial
 from rlutilities.simulation import Car, Ball
-from utils.drawing import DrawingTool
-from utils.game_info import GameInfo
-from utils.intercept import Intercept
-from utils.math import range_map
-from utils.vector_math import ground_direction, angle_to, distance, ground_distance, direction
+from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.intercept import Intercept
+from tools.math import range_map
+from tools.vector_math import ground_direction, angle_to, distance, ground_distance, direction
 
 
 class AerialStrike(Strike):

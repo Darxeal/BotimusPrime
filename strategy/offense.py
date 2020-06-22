@@ -9,9 +9,9 @@ from maneuvers.strikes.mirror_shot import MirrorShot
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
-from utils.game_info import GameInfo
-from utils.intercept import Intercept
-from utils.vector_math import distance, ground_distance, align
+from tools.game_info import GameInfo
+from tools.intercept import Intercept
+from tools.vector_math import distance, ground_distance, align
 
 
 class Offense:

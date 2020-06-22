@@ -4,10 +4,10 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, dot, vec2
 from rlutilities.mechanics import Wavedash, Dodge
 from rlutilities.simulation import Car
-from utils.arena import Arena
-from utils.drawing import DrawingTool
-from utils.intercept import estimate_max_car_speed, estimate_time
-from utils.vector_math import ground, distance, ground_distance, angle_to, direction
+from tools.arena import Arena
+from tools.drawing import DrawingTool
+from tools.intercept import estimate_max_car_speed, estimate_time
+from tools.vector_math import ground, distance, ground_distance, angle_to, direction
 
 
 class Travel(Maneuver):

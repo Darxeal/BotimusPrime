@@ -1,8 +1,8 @@
 from maneuvers.driving.drive import Drive
 from maneuvers.maneuver import Maneuver
 from rlutilities.simulation import Car
-from utils.game_info import GameInfo
-from utils.vector_math import ground_distance
+from tools.game_info import GameInfo
+from tools.vector_math import ground_distance
 
 
 class DriveBackwardsToGoal(Maneuver):

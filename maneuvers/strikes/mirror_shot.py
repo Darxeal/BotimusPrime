@@ -2,8 +2,8 @@ from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
-from utils.arena import Arena
-from utils.game_info import GameInfo
+from tools.arena import Arena
+from tools.game_info import GameInfo
 
 
 class MirrorShot(DodgeStrike):

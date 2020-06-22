@@ -3,9 +3,9 @@ from typing import Optional
 
 from rlutilities.linear_algebra import norm, angle_between, dot
 from rlutilities.simulation import Car, Ball
-from utils.math import clamp
+from tools.math import clamp
 
-from utils.vector_math import distance, direction, ground
+from tools.vector_math import distance, direction, ground
 
 
 class Intercept:

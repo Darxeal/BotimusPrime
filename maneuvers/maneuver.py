@@ -1,5 +1,5 @@
 from rlutilities.simulation import Input, Car
-from utils.drawing import DrawingTool
+from tools.drawing import DrawingTool
 
 
 class Maneuver:
