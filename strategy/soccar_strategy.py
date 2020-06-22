@@ -3,7 +3,7 @@ from typing import List
 from maneuvers.air.recovery import Recovery
 from maneuvers.driving.stop import Stop
 from maneuvers.refuel import Refuel
-from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.general_defense import GeneralDefense
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
 from strategy.defense import Defense
@@ -73,7 +73,7 @@ class SoccarStrategy:
                 and abs(car.position[1]) < abs(my_hit.position[1])
             ):
                 return self.defense.any_clear(car)
-            return ShadowDefense(car, info, my_hit.ground_pos, 6000)
+            return GeneralDefense(car, info, my_hit.ground_pos, 6000)
 
         # clear
         if (
@@ -157,4 +157,4 @@ class SoccarStrategy:
 
         shadow_distance = 4000 + opponents_align * 1500
         shadow_distance = max(shadow_distance, 3000)
-        return ShadowDefense(car, info, their_best_hit.ground_pos, shadow_distance)
+        return GeneralDefense(car, info, their_best_hit.ground_pos, shadow_distance)

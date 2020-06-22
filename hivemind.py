@@ -6,7 +6,7 @@ from rlbot.utils.structures.bot_input_struct import PlayerInput
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 from maneuvers.kickoffs.kickoff import Kickoff
-from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.general_defense import GeneralDefense
 from maneuvers.refuel import Refuel
 from rlutilities.linear_algebra import vec3
 from strategy.hivemind_strategy import HivemindStrategy

@@ -11,6 +11,10 @@ from tools.vector_math import ground, distance, ground_distance, angle_to, direc
 
 
 class Travel(Maneuver):
+    """
+    Get to a location fast, using dodges, wavedashes and maybe a halfflip to gain speed.
+    """
+
     DODGE_DURATION = 1.5
     HALFFLIP_DURATION = 2
     WAVEDASH_DURATION = 1.3

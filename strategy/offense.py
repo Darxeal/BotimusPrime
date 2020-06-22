@@ -1,11 +1,11 @@
 from maneuvers.air.double_touch import DoubleTouch
-from maneuvers.dribbling.dribble import Dribble
+from maneuvers.dribbling.carry_and_flick import CarryAndFlick
 from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_strike import DodgeStrike
-from maneuvers.strikes.ground_shot import GroundShot
-from maneuvers.strikes.mirror_shot import MirrorShot
+from maneuvers.strikes.ground_strike import GroundStrike
+from maneuvers.strikes.mirror_strike import MirrorStrike
 from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
@@ -22,7 +22,7 @@ class Offense:
 
     def direct_shot(self, car: Car, target: vec3) -> Maneuver:
         dodge_shot = DodgeStrike(car, self.info, target)
-        ground_shot = GroundShot(car, self.info, target)
+        ground_shot = GroundStrike(car, self.info, target)
 
         if car.boost > 40:  # TODO
             aerial_strike = AerialStrike(car, self.info, target)
@@ -59,11 +59,11 @@ class Offense:
             and ground_distance(ball, self.info.my_goal.center) > 1000
         ):
             if not self.is_opponent_close(car, ball):
-                return Dribble(car, self.info, target)
+                return CarryAndFlick(car, self.info, target)
 
         alignment = align(car.position, ball, target)
         if alignment < 0.1 and abs(ball.position[1] - target[1]) > 3000:
-            return MirrorShot(car, self.info, target)
+            return MirrorStrike(car, self.info, target)
         
         # if 250 < ball.position[2] < 550 and self.is_opponent_close(car, ball):
         #     return DoubleJumpStrike(car, self.info, target)

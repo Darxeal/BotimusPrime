@@ -4,7 +4,7 @@ from maneuvers.air.recovery import Recovery
 from maneuvers.kickoffs.drive_backwards_to_goal import DriveBackwardsToGoal
 from maneuvers.kickoffs.half_flip_pickup import HalfFlipPickup
 from maneuvers.refuel import Refuel
-from maneuvers.shadow_defense import ShadowDefense
+from maneuvers.general_defense import GeneralDefense
 from rlutilities.linear_algebra import norm
 from rlutilities.simulation import Pad
 from strategy.defense import Defense
@@ -120,11 +120,11 @@ class HivemindStrategy:
         unemployed_drones = [drone for drone in drones if drone.maneuver is None]
         if unemployed_drones and self.defending_drone is None:
             self.defending_drone = min(unemployed_drones, key=lambda d: ground_distance(d.car, info.my_goal.center))
-            self.defending_drone.maneuver = ShadowDefense(self.defending_drone.car, info, info.ball.position, 7000)
+            self.defending_drone.maneuver = GeneralDefense(self.defending_drone.car, info, info.ball.position, 7000)
             unemployed_drones.remove(self.defending_drone)
 
         for drone in unemployed_drones:
-            drone.maneuver = ShadowDefense(drone.car, info, info.ball.position, 4000)
+            drone.maneuver = GeneralDefense(drone.car, info, info.ball.position, 4000)
 
     def avoid_demos_and_team_bumps(self, drones: List[Drone]):
         collisions = self.info.detect_collisions(time_limit=0.2, dt=1 / 60)

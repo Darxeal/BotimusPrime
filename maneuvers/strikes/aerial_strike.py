@@ -71,11 +71,13 @@ class AerialStrike(Strike):
         return self.aerialing or super().interruptible()
 
     def step(self, dt):
+        time_left = self.aerial.arrival_time - self.car.time
+
         if self.aerialing:
 
             # freestyling
             if self.car.position[2] > 200:
-                if self.aerial.arrival_time - self.car.time > 0.7:
+                if time_left > 0.7:
                     rotation = axis_to_rotation(self.car.forward() * 0.5)
                     self.aerial.up = dot(rotation, self.car.up())
                 else:
@@ -93,8 +95,7 @@ class AerialStrike(Strike):
             # simulate aerial from current state
             simulated_car = self.simulate_flight(self.car)
 
-            speed_towards_target = dot(self.car.velocity, direction(self.car, self.aerial.target))
-            time_left = self.aerial.arrival_time - self.car.time
+            speed_towards_target = dot(self.car.velocity, ground_direction(self.car, self.aerial.target))
             speed_needed = ground_distance(self.car, self.aerial.target) / time_left
 
             # too fast, slow down

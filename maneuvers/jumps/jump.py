@@ -1,10 +1,9 @@
 from rlutilities.simulation import Input
 
+# Most of this class is from the old RLUtilities, made by chip
+
 
 class Jump:
-    """
-    This class is from the old RLUtilities, made by chip
-    """
     def __init__(self, duration):
 
         self.duration = duration

@@ -8,6 +8,9 @@ from tools.vector_math import ground_direction
 
 
 class DodgeStrike(Strike):
+    """
+    Strike the ball by dodging into it.
+    """
 
     allow_backwards = False
     jump_time_multiplier = 1.0

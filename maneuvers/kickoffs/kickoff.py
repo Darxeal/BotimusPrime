@@ -8,6 +8,12 @@ from tools.vector_math import distance
 
 
 class Kickoff(Maneuver):
+    """
+    Base class for kickoffs. Every kickoff maneuver should inherit from this. Usually kickoffs are made
+    out of multiple phases (for example drive - dodge - drive - dodge). This class can help with that.
+    Just write your phase logic in your step function, set the 'self.action' attribute and call super().step().
+    If you don't want that, just override step() normally.
+    """
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car)
         self.info: GameInfo = info

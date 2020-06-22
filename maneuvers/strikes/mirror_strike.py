@@ -6,7 +6,11 @@ from tools.arena import Arena
 from tools.game_info import GameInfo
 
 
-class MirrorShot(DodgeStrike):
+class MirrorStrike(DodgeStrike):
+    """
+    Strike the ball in a way that it bounces off the wall towards the target.
+    This is usually too slow to result in a goal right away, but you can easily follow it up with another shot.
+    """
     def __init__(self, car: Car, info: GameInfo, target: vec3):
         self.actual_target = target
 
@@ -17,4 +21,5 @@ class MirrorShot(DodgeStrike):
 
     @staticmethod
     def mirrored_pos(pos: vec3, wall_sign: int):
-        return vec3(2 * Arena.size[0] * wall_sign - pos[0], pos[1], pos[2])
+        mirrored_x = 2 * Arena.size[0] * wall_sign - pos[0]
+        return vec3(mirrored_x, pos[1], pos[2])

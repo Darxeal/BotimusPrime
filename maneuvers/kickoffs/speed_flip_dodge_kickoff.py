@@ -9,7 +9,7 @@ from tools.vector_math import local, ground_distance
 
 class SpeedFlipDodgeKickoff(Kickoff):
     """
-    Speed flips and dodges into the ball. Works only on corner kickoffs.
+    Speed flip and then dodge into the ball. Works only on corner kickoffs.
     """
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car, info)

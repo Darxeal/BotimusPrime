@@ -8,7 +8,7 @@ from tools.game_info import GameInfo
 from tools.vector_math import ground_direction, distance, ground_distance, direction
 
 
-class Dribble(Maneuver):
+class CarryAndFlick(Maneuver):
     """
     Carry the ball on roof, and flick it if an opponent is close or
     if fast enough and facing the target.

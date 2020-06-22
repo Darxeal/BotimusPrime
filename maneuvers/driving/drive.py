@@ -4,7 +4,7 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot
 from tools.arena import Arena
 from tools.drawing import DrawingTool
-from tools.math import abs_clamp, clamp11
+from tools.math import abs_clamp, clamp11, clamp
 from tools.vector_math import ground, local, ground_distance, distance, direction
 
 
@@ -85,6 +85,11 @@ class Drive(Maneuver):
         # finish when close
         if distance(self.car, self.target_pos) < 100:
             self.finished = True
+
+    @staticmethod
+    def turn_radius(speed: float) -> float:
+        spd = clamp(speed, 0, 2300)
+        return 156 + 0.1 * spd + 0.000069 * spd ** 2 + 0.000000164 * spd ** 3 + -5.62E-11 * spd ** 4
 
     def render(self, draw: DrawingTool):
         draw.color(draw.cyan)

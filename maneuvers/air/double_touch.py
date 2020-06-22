@@ -2,12 +2,15 @@ from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.mechanics import Aerial
-from tools.air_intercept import AirToAirIntercept
+from tools.intercept import AirToAirIntercept
 from tools.drawing import DrawingTool
 from tools.vector_math import direction
 
 
 class DoubleTouch(Maneuver):
+    """
+    Execute a regular AerialStrike, but when it finishes, look if we could continue aerialing for a second hit.
+    """
     def __init__(self, aerial_strike: AerialStrike):
         super().__init__(aerial_strike.car)
         self.aerial_strike = aerial_strike

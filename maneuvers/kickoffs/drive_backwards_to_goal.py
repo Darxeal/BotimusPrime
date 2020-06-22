@@ -6,6 +6,13 @@ from tools.vector_math import ground_distance
 
 
 class DriveBackwardsToGoal(Maneuver):
+    """
+    Simply drive backwards until we are in the center of our goal.
+    This is useful if we are the nearest car to our goal on kickoff, in case we lose a kickoff horribly,
+    we are in a good position to save.
+    Note: This isn't an actual kickoff maneuver (it doesn't go for the ball), so it doesn't inherit from Kickoff.
+    """
+
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car)
         self.drive = Drive(car)

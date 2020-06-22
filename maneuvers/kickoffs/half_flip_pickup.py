@@ -3,10 +3,14 @@ from maneuvers.jumps.half_flip import HalfFlip
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import norm, vec3
 from rlutilities.simulation import Car, Pad
-from tools.drawing import DrawingTool
 
 
 class HalfFlipPickup(Maneuver):
+    """
+    Drive backwards towards a boost pad, halfflip, pick up the boost pad and then turn towards the center.
+    This is useful on kickoffs when there are two cars on the corner position.
+    Note: This isn't an actual kickoff maneuver (it doesn't go for the ball), so it doesn't inherit from Kickoff.
+    """
     def __init__(self, car: Car, pad: Pad):
         super().__init__(car)
         self.drive = Drive(car, target_pos=pad.position, target_speed=2300, backwards=True)
@@ -32,6 +36,3 @@ class HalfFlipPickup(Maneuver):
 
         self.action.step(dt)
         self.controls = self.action.controls
-
-    def render(self, draw: DrawingTool):
-        super().render(draw)

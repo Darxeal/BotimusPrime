@@ -7,15 +7,23 @@ from rlutilities.simulation import Car
 from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
-from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, distance, angle_between
+from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to,\
+    distance, angle_between
 
 
-BOOST_LOOK_RADIUS = 1200
-BOOST_LOOK_ANGLE = 0.5
-
-class ShadowDefense(Maneuver):
+class GeneralDefense(Maneuver):
+    """
+    First, attempt to rotate on the far side, and when far away enough from the target (usually the ball),
+    turn around to face it. If already far enough and facing the target, just stop and wait.
+    Also try to pickup boost pads along the way.
+    This state expires after a short amount of time, so we can look if there's something better to do. If not,
+    it can be simply instantiated again.
+    """
 
     DURATION = 0.5
+
+    BOOST_LOOK_RADIUS = 1200
+    BOOST_LOOK_ANGLE = 0.5
 
     def __init__(self, car: Car, info: GameInfo, face_target: vec3, distance_from_target: float):
         super().__init__(car)
@@ -64,10 +72,16 @@ class ShadowDefense(Maneuver):
             self.pad = None
 
             # collect boost pads on the way (greedy algorithm, assumes first found is best)
-            if self.car.boost < 90:
+            if self.car.boost < 90 and self.travel.interruptible():
+                to_target = ground_direction(self.car, self.travel.target)
+
                 for pad in self.info.large_boost_pads + self.info.small_boost_pads:
-                    if pad.is_active and distance(self.car, pad) < BOOST_LOOK_RADIUS \
-                        and angle_between(self.travel.target - self.car.position, pad.position - self.car.position) < BOOST_LOOK_ANGLE:
+                    to_pad = ground_direction(self.car, pad)
+
+                    if (
+                        pad.is_active and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
+                        and angle_between(to_target, to_pad) < self.BOOST_LOOK_ANGLE
+                    ):
                         self.pad = pad
                         self.drive.target_pos = pad.position
                         self.drive.target_speed = 2200
@@ -78,7 +92,6 @@ class ShadowDefense(Maneuver):
             # go to the actual target
             if self.pad is None:
                 self.controls = self.travel.controls
-                
 
         # don't waste boost during downtime
         self.controls.boost = False
@@ -87,8 +100,9 @@ class ShadowDefense(Maneuver):
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)
+
         # render target pad
         if self.pad:
-            draw.color(draw.orange)
-            draw.crosshair(self.pad.position, 150)
+            draw.color(draw.blue)
+            draw.circle(self.pad.position, 50)
 

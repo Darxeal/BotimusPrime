@@ -8,8 +8,6 @@ from rlutilities.linear_algebra import vec3, vec2, norm, normalize, cross, rotat
 from tools.vector_math import distance
 
 
-COLLISION_THRESHOLD = 150
-
 class Goal:
 
     WIDTH = 1784.0
@@ -105,6 +103,7 @@ class GameInfo(Game):
         # predict straight path
         return [car.position + car.velocity * dt * i for i in range(time_steps)]
 
+    COLLISION_THRESHOLD = 150
 
     def detect_collisions(self, time_limit=0.5, dt=1/60) -> List[Tuple[int, int, float]]:
         """Returns a list of tuples, where the first two elements are
@@ -121,7 +120,7 @@ class GameInfo(Game):
                 for step in range(time_steps):
                     pos1 = predictions[i][step]
                     pos2 = predictions[j][step]
-                    if distance(pos1, pos2) < COLLISION_THRESHOLD:
+                    if distance(pos1, pos2) < self.COLLISION_THRESHOLD:
                         collisions.append((i, j, step * dt))
                         break
         

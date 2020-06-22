@@ -7,7 +7,6 @@ from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car
 from tools.drawing import DrawingTool
 from tools.math import clamp, nonzero
-from tools.misc import turn_radius
 from tools.vector_math import ground_distance
 
 
@@ -50,7 +49,7 @@ class Arrive(Maneuver):
             shift = clamp(ground_distance(car.position, target) * self.lerp_t, 0, car_speed * 1.5)
 
             # if we're too close to the target, aim for the actual target so we don't miss it
-            if shift - self.additional_shift < turn_radius(clamp(car_speed, 1400, 2000) * 1.1):
+            if shift - self.additional_shift < Drive.turn_radius(clamp(car_speed, 1400, 2000) * 1.1):
                 shift = 0
             else:
                 shift += self.additional_shift

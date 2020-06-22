@@ -2,10 +2,11 @@ from rlutilities.linear_algebra import vec2, dot, sgn
 from rlutilities.mechanics import Dodge
 from rlutilities.simulation import Car, Input
 
+# Most of this class is from the old RLUtilities, made by chip
+
 
 class HalfFlip:
     """
-    This class is from the old RLUtilities, made by chip
     """
     def __init__(self, car: Car, use_boost=False):
         self.car = car
