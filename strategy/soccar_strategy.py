@@ -1,6 +1,6 @@
 from typing import List
 
-from maneuvers.air.recovery import Recovery
+from maneuvers.recovery import Recovery
 from maneuvers.driving.stop import Stop
 from maneuvers.refuel import Refuel
 from maneuvers.general_defense import GeneralDefense

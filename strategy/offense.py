@@ -1,4 +1,4 @@
-from maneuvers.air.double_touch import DoubleTouch
+from maneuvers.strikes.double_touch import DoubleTouch
 from maneuvers.dribbling.carry_and_flick import CarryAndFlick
 from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
@@ -6,7 +6,6 @@ from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_strike import GroundStrike
 from maneuvers.strikes.mirror_strike import MirrorStrike
-from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car
 from tools.game_info import GameInfo

@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict
 
-from maneuvers.air.recovery import Recovery
+from maneuvers.recovery import Recovery
 from maneuvers.kickoffs.drive_backwards_to_goal import DriveBackwardsToGoal
 from maneuvers.kickoffs.half_flip_pickup import HalfFlipPickup
 from maneuvers.refuel import Refuel
