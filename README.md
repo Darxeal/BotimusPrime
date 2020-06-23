@@ -1,25 +1,18 @@
-# BotimusPrime
-A python offline Rocket League bot made with the RLBot framework.
-Currently uses the pypi version of [RLUtilities](https://github.com/samuelpmish/RLUtilities/). Huge thanks to @chip!
+# RLBot
+This repository is related to [RLBot](http://www.rlbot.org/), a framework for running offline Rocket League bots. You can try both Botimus and Bumblebee by downloading RLBotGUI and the BotPack.
 
-This is the latest (Wintertide) version. You can get older versions from the Releases tab.
+# Botimus Prime & Bumblebee
+This repository contains two bots: Botimus Prime and Bumblebee. They share most of the code, but use a different strategy. Botimus can play solo or with different bots, while Bumblebee is designed to play only with copies of itself as teammates. That's because it's a hivemind bot, which means one process is controlling all of the Bumblebees on one team. The ideal team is 3x Bumblebee.
 
-If you have any questions or feedback, contant me on discord ``Darxeal#1784``
+# RLUtilities
+The `rlutilities` folder contains a compiled pybind11 module. RLUtilities is a library with a lot of useful stuff for making Rocket League bots, such as querying the arena mesh, simulating the ball and partially the cars, linear algebra stuff and controllers for various mechanics.
+- [the original RLUtilities by chip](https://github.com/samuelpmish/RLUtilities)
+- [customized fork used in this repo](https://github.com/Darxeal/RLUtilities)
 
-## How to use
-- Go to [rlbot.org](http://www.rlbot.org/) and download RLBot.
-- Download/clone this repository.
-- Click the ``+`` icon next to Player Types and select ``File``.
-- Select the ``botimus.cfg`` file. New Player Type should show up.
-- Make any match configuration you like and start the match. Have fun!
-
-Note: If you aren't using the GUI version, you should also do ``pip install -r requirements.txt``
-
-## Achievements
-- 2nd place in [RLBot 2018 Tournament - 1v1](https://www.youtube.com/watch?v=TPb-6NzXkRw) (old version)
-- 2nd place in [RLBot Wintertide Tournament - 1v1](https://www.youtube.com/watch?v=vRqfJO701oE)
-
-## How it works
-Botimus v2 is a very simple state-machine. It has one state (maneuver) active at a time, until it expires or gets cancelled due to another player hitting the ball. Then it chooses a new maneuver based on its strategy logic. Repeat.
-
-Current strategy can be summarized as: Try to shoot on goal if able to hit the ball sooner than any other car, or if opponent is out of position. Otherwise shadow defense or grab boost.
+# Tournament appearances
+Links to VODs where you can watch Botimus or Bumblebee play, from newest to oldest:
+- [2020 Ultimate Battle League - 3v3](https://www.youtube.com/playlist?list=PL_MJp3c3rJVU2wrnozpNT2f6zex3YmcLB) - First appearance of Bumblebee
+- [RLBot 2019 Lightfall - 1v1](https://youtu.be/2lA0uH_--Ko)
+- [RLBot 2019 Triple Threat - 3v3](https://youtu.be/2lA0uH_--Ko)
+- [RLBot 2019 Wintertide Tournament - 1v1](https://www.youtube.com/watch?v=vRqfJO701oE) - Botimus 2.0
+- [RLBot 2018 August Tournament - 1v1](https://www.youtube.com/watch?v=TPb-6NzXkRw) - First appearance of Botimus
