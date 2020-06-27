@@ -52,7 +52,7 @@ class CarryAndFlick(Maneuver):
                     distance(opponent.position + opponent.velocity, car) < max(300.0, norm(opponent.velocity))
                     and dot(opponent.velocity, direction(opponent, self.info.ball)) > 0.5
                 ):
-                    if distance(car.position, self.info.ball.position) < 200:
+                    if distance(car.position, self.info.ball.position) < 150:
                         self.flicking = True
                     else:
                         self.finished = True
