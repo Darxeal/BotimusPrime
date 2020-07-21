@@ -6,7 +6,7 @@ from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
-from strategy.soccar_strategy import SoccarStrategy
+from strategy import solo_strategy
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 
@@ -18,7 +18,6 @@ class BotimusPrime(BaseAgent):
         super().__init__(name, team, index)
         self.info: GameInfo = None
         self.draw: DrawingTool = None
-        self.strategy: SoccarStrategy = None
 
         self.tick_counter = 0
         self.last_latest_touch_time = 0
@@ -30,7 +29,6 @@ class BotimusPrime(BaseAgent):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
         self.draw = DrawingTool(self.renderer, self.team)
-        self.strategy = SoccarStrategy(self.info)
 
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining
@@ -63,7 +61,7 @@ class BotimusPrime(BaseAgent):
                 self.draw.clear()
             
             self.info.predict_ball()
-            self.maneuver = self.strategy.choose_maneuver(self.info.cars[self.index])
+            self.maneuver = solo_strategy.choose_maneuver(self.info, self.info.cars[self.index])
         
         # execute maneuver
         if self.maneuver is not None:
