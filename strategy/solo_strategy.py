@@ -21,7 +21,7 @@ def best_intercept(info: GameInfo, cars: List[Car]) -> Intercept:
 
 
 def choose_maneuver(info: GameInfo, car: Car):
-    info = info
+    info.predict_ball()
     ball = info.ball
 
     opponents = info.get_opponents(car)

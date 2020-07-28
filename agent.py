@@ -6,7 +6,7 @@ from maneuvers.kickoffs.kickoff import Kickoff
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
-from strategy import solo_strategy
+from strategy import solo_strategy, teamplay_strategy
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 
@@ -61,7 +61,7 @@ class BotimusPrime(BaseAgent):
                 self.draw.clear()
             
             self.info.predict_ball()
-            self.maneuver = solo_strategy.choose_maneuver(self.info, self.info.cars[self.index])
+            self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
         
         # execute maneuver
         if self.maneuver is not None:
