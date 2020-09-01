@@ -96,10 +96,10 @@ class ControlPoint():
 class Curve():
 
     @overload
-    def __init__(self, arg0: List[ControlPoint]) -> None: 
+    def __init__(self, arg0: List[vec3]) -> None: 
         pass
     @overload
-    def __init__(self, arg0: List[vec3]) -> None: ...
+    def __init__(self, arg0: List[ControlPoint]) -> None: ...
     def calculate_distances(self) -> None: ...
     def calculate_max_speeds(self, arg0: float, arg1: float) -> float: ...
     def calculate_tangents(self) -> None: ...
@@ -121,11 +121,11 @@ class Field():
 
     @staticmethod
     @overload
-    def collide(arg0: obb) -> ray: 
+    def collide(arg0: sphere) -> ray: 
         pass
     @staticmethod
     @overload
-    def collide(arg0: sphere) -> ray: ...
+    def collide(arg0: obb) -> ray: ...
     @staticmethod
     def raycast_any(arg0: ray) -> ray: ...
     @staticmethod
@@ -134,10 +134,9 @@ class Field():
     pass
 class Game():
     frametime = 0.008333333767950535
-    gravity = -650.0
     map = 'map_not_set'
 
-    def __init__(self, arg0: int) -> None: ...
+    def __init__(self) -> None: ...
     def read_game_information(self, arg0: object, arg1: object) -> None: ...
     @staticmethod
     def set_mode(arg0: str) -> None: ...
@@ -152,7 +151,6 @@ class Game():
     overtime: bool
     pads: List[Pad]
     round_active: bool
-    team: int
     time: float
     time_delta: float
     time_remaining: float
@@ -198,10 +196,10 @@ class obb():
 class ray():
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: vec3, arg1: vec3) -> None: 
         pass
     @overload
-    def __init__(self, arg0: vec3, arg1: vec3) -> None: ...
+    def __init__(self) -> None: ...
 
     direction: vec3
     start: vec3
@@ -225,8 +223,8 @@ class tri():
 
     pass
 @overload
-def intersect(arg0: sphere, arg1: obb) -> bool:
+def intersect(arg0: obb, arg1: sphere) -> bool:
     pass
 @overload
-def intersect(arg0: obb, arg1: sphere) -> bool:
+def intersect(arg0: sphere, arg1: obb) -> bool:
     pass
