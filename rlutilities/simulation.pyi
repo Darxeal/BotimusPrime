@@ -31,10 +31,10 @@ class Ball():
     restitution = 0.6000000238418579
 
     @overload
-    def __init__(self) -> None: 
+    def __init__(self, arg0: Ball) -> None: 
         pass
     @overload
-    def __init__(self, arg0: Ball) -> None: ...
+    def __init__(self) -> None: ...
     def hitbox(self) -> sphere: ...
     @overload
     def step(self, arg0: float) -> None: 
@@ -142,7 +142,7 @@ class Game():
     def set_mode(arg0: str) -> None: ...
 
     ball: Ball
-    cars: List[Car[8]]
+    cars: List[Car[64]]
     frame: int
     frame_delta: int
     kickoff_pause: bool
@@ -196,10 +196,10 @@ class obb():
 class ray():
 
     @overload
-    def __init__(self, arg0: vec3, arg1: vec3) -> None: 
+    def __init__(self) -> None: 
         pass
     @overload
-    def __init__(self) -> None: ...
+    def __init__(self, arg0: vec3, arg1: vec3) -> None: ...
 
     direction: vec3
     start: vec3
