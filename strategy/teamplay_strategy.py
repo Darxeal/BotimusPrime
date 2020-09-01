@@ -1,5 +1,4 @@
 from maneuvers.general_defense import GeneralDefense
-from maneuvers.kickoffs.drive_backwards_to_goal import DriveBackwardsToGoal
 from maneuvers.recovery import Recovery
 from maneuvers.refuel import Refuel
 from rlutilities.simulation import Car
@@ -11,7 +10,6 @@ from tools.vector_math import align, ground, distance, ground_distance
 
 def choose_maneuver(info: GameInfo, my_car: Car):
     ball = info.ball
-    opponents = info.get_opponents(my_car)
     teammates = info.get_teammates(my_car)
     my_team = [my_car] + teammates
     their_goal = ground(info.their_goal.center)
@@ -27,13 +25,6 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         # if I'm nearest to the ball, go for kickoff
         if min(my_team, key=lambda car: distance(car, ball)) is my_car:
             return kickoffs.choose_kickoff(info, my_car)
-
-        # # if I'm nearest to the goal, defend it
-        # if min(my_team, key=lambda car: distance(car, my_goal)) is my_car:
-        #     return DriveBackwardsToGoal(my_car, info)
-        #
-        # # otherwise grab boost
-        # return Refuel(my_car, info, my_goal)
 
     if my_car.boost < 20:
         return Refuel(my_car, info, ball.position)
@@ -57,10 +48,14 @@ def choose_maneuver(info: GameInfo, my_car: Car):
             or ground_distance(my_intercept, my_goal) > 6000
         ):
             return offense.any_shot(info, my_intercept.car, their_goal, my_intercept)
-        else:  # otherwise try to clear
+
+        # otherwise try to clear
+        else:
             return defense.any_clear(info, my_intercept.car)
 
+    # if I'm nearest to goal, stay far back
     if min(my_team, key=lambda car: distance(car, my_goal)) is my_car:
         return GeneralDefense(my_car, info, my_intercept.position, 7000)
 
+    # otherwise get into position
     return GeneralDefense(my_car, info, my_intercept.position, 4000)

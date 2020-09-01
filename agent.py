@@ -60,8 +60,10 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.clear()
             
-            self.info.predict_ball()
-            self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
+            if self.info.get_teammates(self.info.cars[self.index]):
+                self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
+            else:
+                self.maneuver = solo_strategy.choose_maneuver(self.info, self.info.cars[self.index])
         
         # execute maneuver
         if self.maneuver is not None:
