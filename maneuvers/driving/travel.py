@@ -62,6 +62,7 @@ class Travel(Maneuver):
                 and car.position[2] < 200
                 and car_speed < 2000
                 and angle_to(car, target, backwards=forward_speed < 0) < 0.1
+                and car.gravity[2] < -500  # don't dodge in low gravity
             ):
                 # if going forward, use a dodge or a wavedash
                 if forward_speed > 0:

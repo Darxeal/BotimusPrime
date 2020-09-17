@@ -24,7 +24,7 @@ def direct_shot(info: GameInfo, car: Car, target: vec3) -> Maneuver:
         better_aerial_strike = min([aerial_strike, fast_aerial], key=lambda strike: strike.intercept.time)
 
         if better_aerial_strike.intercept.time < dodge_shot.intercept.time:
-            if ground_distance(better_aerial_strike.intercept, info.their_goal.center) < 5000:
+            if ground_distance(better_aerial_strike.intercept, info.their_goal.center) < 8000:
                 return DoubleTouch(better_aerial_strike)
             return better_aerial_strike
 

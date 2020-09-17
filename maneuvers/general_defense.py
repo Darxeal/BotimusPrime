@@ -94,7 +94,7 @@ class GeneralDefense(Maneuver):
                 self.controls = self.travel.controls
 
         # don't waste boost during downtime
-        self.controls.boost = False
+        if self.car.boost < 100: self.controls.boost = False
 
         self.finished = self.travel.driving and self.car.time > self.start_time + self.DURATION
 
