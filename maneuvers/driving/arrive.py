@@ -51,7 +51,7 @@ class Arrive(Maneuver):
             shift = clamp(ground_distance(car.position, target) * self.lerp_t, 0, clamp(car_speed, 1500, 2300) * 1.6)
 
             # if we're too close to the target, aim for the actual target so we don't miss it
-            if shift - self.additional_shift * 0.2 < Drive.turn_radius(clamp(car_speed, 500, 2300)) * 1.1:
+            if shift - self.additional_shift * 0.4 < Drive.turn_radius(clamp(car_speed, 500, 2300)) * 1.1:
                 shift = 0
             else:
                 shift += self.additional_shift

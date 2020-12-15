@@ -74,7 +74,7 @@ class HivemindStrategy:
 
             info.predict_ball()
             our_intercepts = [Intercept(drone.car, info.ball_predictions) for drone in ready_drones]
-            good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.3]
+            good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.3 and ground_distance(i.car, i) > 2000]
 
             if good_intercepts:
                 best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
