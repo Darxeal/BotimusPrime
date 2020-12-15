@@ -13,7 +13,7 @@ class SpeedFlipDodgeKickoff(Kickoff):
     """
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car, info)
-        self.drive.target_pos = self.info.my_goal.center * 0.06
+        self.drive.target_pos = self.info.my_goal.center * 0.05
         self._speed_flip_start_time = 0.0
 
     def step(self, dt: float):

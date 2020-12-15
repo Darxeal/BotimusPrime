@@ -24,9 +24,10 @@ class DoubleTouch(Maneuver):
         self._flight_path: List[vec3] = []
 
     def find_second_touch(self):
-        self.info.predict_ball(time_limit=4.0)
+        self.info.predict_ball(duration=4.0)
         for i in range(0, len(self.info.ball_predictions), 5):
             ball = self.info.ball_predictions[i]
+            if ball.position[2] < 500: break
             self.aerial.target = ball.position - direction(ball, self.aerial_strike.target) * 80
             self.aerial.arrival_time = ball.time
             final_car = AerialStrike.simulate_flight(self.car, self.aerial, self._flight_path)

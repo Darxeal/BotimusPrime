@@ -45,7 +45,7 @@ class HivemindStrategy:
         for drone in drones:
             if drone not in corner_drones + [self.defending_drone] + [self.drone_going_for_ball]:
                 reserved_pads = {self.boost_reservations[d] for d in self.boost_reservations}
-                drone.maneuver = Refuel(drone.car, self.info, self.info.my_goal.center, forbidden_pads=reserved_pads)
+                drone.maneuver = Refuel(drone.car, self.info, forbidden_pads=reserved_pads)
                 self.boost_reservations[drone] = drone.maneuver.pad
 
     def set_maneuvers(self, drones: List[Drone]):
@@ -109,7 +109,7 @@ class HivemindStrategy:
             if drone.maneuver is None:
                 if drone.car.boost < 30:
                     reserved_pads = {self.boost_reservations[drone] for drone in self.boost_reservations}
-                    drone.maneuver = Refuel(drone.car, info, info.ball.position, forbidden_pads=reserved_pads)
+                    drone.maneuver = Refuel(drone.car, info, forbidden_pads=reserved_pads)
                     self.boost_reservations[drone] = drone.maneuver.pad  # reserve chosen boost pad
 
         # pick one drone that will stay far back
