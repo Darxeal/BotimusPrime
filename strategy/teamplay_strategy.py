@@ -40,6 +40,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
     else:
         best_intercept = min(our_intercepts, key=lambda i: distance(i.car, my_goal))
+        if ground_distance(my_car, my_goal) < 2000:
+            best_intercept = my_intercept
 
     if best_intercept is my_intercept:
         # if not completely out of position, go for a shot
