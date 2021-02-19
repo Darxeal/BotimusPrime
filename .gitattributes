@@ -2,3 +2,4 @@ tests export-ignore
 README.md export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
+release.sh export-ignore
