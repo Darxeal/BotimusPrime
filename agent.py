@@ -30,6 +30,9 @@ class BotimusPrime(BaseAgent):
         self.info.set_mode("soccar")
         self.draw = DrawingTool(self.renderer, self.team)
 
+    def is_hot_reload_enabled(self):
+        return False
+
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining
         if self.tick_counter < 20:
