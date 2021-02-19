@@ -22,8 +22,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     # kickoff
     if ball.position[0] == 0 and ball.position[1] == 0:
 
-        # if I'm nearest to the ball, go for kickoff
-        if min(my_team, key=lambda car: distance(car, ball)) is my_car:
+        # if I'm nearest (or tied) to the ball, go for kickoff
+        if distance(my_car, ball) == min(distance(car, ball) for car in my_team):
             return kickoffs.choose_kickoff(info, my_car)
 
     if my_car.boost < 20:
