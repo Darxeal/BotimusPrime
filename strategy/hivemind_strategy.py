@@ -1,12 +1,12 @@
 from typing import List, Optional, Dict
 
-from maneuvers.recovery import Recovery
+from maneuvers.general_defense import GeneralDefense
 from maneuvers.kickoffs.drive_backwards_to_goal import DriveBackwardsToGoal
 from maneuvers.kickoffs.half_flip_pickup import HalfFlipPickup
+from maneuvers.recovery import Recovery
 from maneuvers.refuel import Refuel
-from maneuvers.general_defense import GeneralDefense
 from rlutilities.linear_algebra import norm
-from rlutilities.simulation import Pad
+from rlutilities.simulation import BoostPad
 from strategy import offense, defense, kickoffs
 from tools.drawing import DrawingTool
 from tools.drone import Drone
@@ -24,7 +24,7 @@ class HivemindStrategy:
         self.drone_going_for_ball: Optional[Drone] = None
         self.defending_drone: Optional[Drone] = None
 
-        self.boost_reservations: Dict[Drone, Pad] = {}
+        self.boost_reservations: Dict[Drone, BoostPad] = {}
 
     def set_kickoff_maneuvers(self, drones: List[Drone]):
         nearest_drone = min(drones, key=lambda drone: ground_distance(drone.car, self.info.ball))

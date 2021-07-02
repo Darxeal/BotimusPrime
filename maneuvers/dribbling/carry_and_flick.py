@@ -2,7 +2,6 @@ from maneuvers.dribbling.carry import Carry
 from maneuvers.jumps.air_dodge import AirDodge
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot, norm
-from rlutilities.mechanics import Dodge
 from rlutilities.simulation import Car
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
@@ -22,7 +21,7 @@ class CarryAndFlick(Maneuver):
         self.info = info
 
         self.carry = Carry(car, info.ball, target)
-        self.flick = Dodge(car)
+        self.flick = AirDodge(car)
         self.flick.duration = 0.15
         self.flick.target = target
         self.flicking = False

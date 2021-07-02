@@ -28,6 +28,7 @@ class BotimusPrime(BaseAgent):
     def initialize_agent(self):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
+        self.info.read_field_info(self.get_field_info())
         self.draw = DrawingTool(self.renderer, self.team)
 
     def is_hot_reload_enabled(self):
@@ -39,7 +40,7 @@ class BotimusPrime(BaseAgent):
             self.tick_counter += 1
             return Input()
 
-        self.info.read_packet(packet, self.get_field_info())
+        self.info.read_packet(packet)
 
         # cancel maneuver if a kickoff is happening and current maneuver isn't a kickoff maneuver
         if packet.game_info.is_kickoff_pause and not isinstance(self.maneuver, Kickoff):
