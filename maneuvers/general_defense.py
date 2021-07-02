@@ -1,13 +1,13 @@
-from maneuvers.driving.travel import Travel
-from maneuvers.driving.stop import Stop
 from maneuvers.driving.drive import Drive
+from maneuvers.driving.stop import Stop
+from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3, dot
-from rlutilities.simulation import Car
+from rlutilities.linear_algebra import vec3
+from rlutilities.simulation import Car, BoostPadState
 from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
-from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to,\
+from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, \
     distance, angle_between
 
 
@@ -81,7 +81,7 @@ class GeneralDefense(Maneuver):
                     to_pad = ground_direction(self.car, pad)
 
                     if (
-                        pad.is_active and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
+                        pad.state == BoostPadState.Available and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
                         and angle_between(to_target, to_pad) < self.BOOST_LOOK_ANGLE
                     ):
                         self.pad = pad

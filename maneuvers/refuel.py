@@ -1,10 +1,10 @@
 import math
-from typing import List, Set, Optional
+from typing import Set, Optional
 
 from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm
-from rlutilities.simulation import Car, Pad
+from rlutilities.simulation import Car, BoostPad, BoostPadState
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 from tools.intercept import estimate_time
@@ -16,21 +16,22 @@ class Refuel(Maneuver):
     Choose a large boost pad and go pick it up.
     """
 
-    def __init__(self, car: Car, info: GameInfo, forbidden_pads: Set[Pad] = set()):
+    def __init__(self, car: Car, info: GameInfo, forbidden_pads: Set[BoostPad] = set()):
         super().__init__(car)
         self.info = info
 
         pads = set(info.large_boost_pads) - forbidden_pads
-        pickupable_pads = {pad for pad in pads if pad.is_active or estimate_time(car, pad.position) * 0.8 > pad.timer}
+        pickupable_pads = {pad for pad in pads if
+                           pad.state == BoostPadState.Available or estimate_time(car, pad.position) * 0.8 > pad.timer}
         pos = (info.ball.position + car.position * 2 + info.my_goal.center) / 4
         self.pad = min(pickupable_pads, key=lambda pad: distance(pad.position, pos)) if pickupable_pads else None
 
-        self.pad_was_active = self.pad and self.pad.is_active
+        self.pad_was_active = self.pad and self.pad.state == BoostPadState.Available
 
         self.travel = Travel(car, self.pad.position if self.pad else info.my_goal.center, waste_boost=True)
 
     @staticmethod
-    def best_boostpad_to_pickup(car: Car, pads: Set[Pad], pos: vec3) -> Optional[Pad]:
+    def best_boostpad_to_pickup(car: Car, pads: Set[BoostPad], pos: vec3) -> Optional[BoostPad]:
         best_pad = None
         best_dist = math.inf
 
@@ -38,7 +39,7 @@ class Refuel(Maneuver):
             dist = distance(pos, pad.position)
             time_estimate = estimate_time(car, pad.position) * 0.7
 
-            if dist < best_dist and (pad.is_active or pad.timer < time_estimate):
+            if dist < best_dist and (pad.state == BoostPadState.Available or pad.timer < time_estimate):
                 best_pad = pad
                 best_dist = dist
 
@@ -60,9 +61,9 @@ class Refuel(Maneuver):
         self.controls = self.travel.controls
 
         # finish when someone picks up the pad
-        if not self.pad.is_active and self.pad_was_active:
+        if not self.pad.state == BoostPadState.Available and self.pad_was_active:
             self.finished = True
-        self.pad_was_active = self.pad.is_active
+        self.pad_was_active = self.pad.state == BoostPadState.Available
 
         # finish when we picked the boost up but the previous condition somehow wasn't true
         if self.car.boost > 99 or distance(self.car, self.pad) < 100:
@@ -71,6 +72,6 @@ class Refuel(Maneuver):
     def render(self, draw: DrawingTool):
         self.travel.render(draw)
 
-        if self.pad and not self.pad.is_active:
+        if self.pad and not self.pad.state == BoostPadState.Available:
             draw.color(draw.yellow)
             draw.string(self.pad.position + vec3(0, 0, 100), int(self.pad.timer*100)/100)
