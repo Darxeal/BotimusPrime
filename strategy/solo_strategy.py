@@ -1,10 +1,11 @@
 from maneuvers.general_defense import GeneralDefense
 from maneuvers.recovery import Recovery
-from maneuvers.refuel import Refuel
+from maneuvers.pickup_boostpad import PickupBoostPad
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import dot
 from rlutilities.simulation import Car
 from strategy import offense, defense, kickoffs
+from strategy.boost_management import choose_boostpad_to_pickup
 from tools.game_info import GameInfo
 from tools.intercept import Intercept
 from tools.math import sign
@@ -35,6 +36,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     banned_boostpads = {pad for pad in info.large_boost_pads if
                         abs(pad.position[1] - their_goal[1]) < abs(my_intercept.position[1] - their_goal[1])
                         or abs(pad.position[0] - my_car.position[0]) > 6000}
+    best_boostpad_to_pickup = choose_boostpad_to_pickup(info, my_car, banned_boostpads)
 
     # if ball is in a dangerous position, clear it
     if (
@@ -47,9 +49,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         return defense.any_clear(info, my_intercept.car)
 
     # if I'm low on boost and the ball is not near my goal, go for boost
-    if my_car.boost < 10 and ground_distance(my_intercept, their_goal) > 3000:
-        refuel = Refuel(my_car, info, forbidden_pads=banned_boostpads)
-        if refuel.pad: return refuel
+    if my_car.boost < 10 and ground_distance(my_intercept, their_goal) > 3000 and best_boostpad_to_pickup is not None:
+        return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     ball_in_their_half = abs(my_intercept.position[1] - their_goal[1]) < 3000
     shadow_distance = 4000 if ball_in_their_half else 6000
@@ -77,9 +78,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
             ):
                 return shot
 
-    if my_car.boost < 30:
-        refuel = Refuel(my_car, info, forbidden_pads=banned_boostpads)
-        if refuel.pad: return refuel
+    if my_car.boost < 30 and best_boostpad_to_pickup is not None:
+        return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     # fallback
     return GeneralDefense(my_car, info, my_intercept.position, shadow_distance, force_nearest=ball_in_their_half)

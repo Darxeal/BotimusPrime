@@ -1,8 +1,9 @@
 from maneuvers.general_defense import GeneralDefense
 from maneuvers.recovery import Recovery
-from maneuvers.refuel import Refuel
+from maneuvers.pickup_boostpad import PickupBoostPad
 from rlutilities.simulation import Car
 from strategy import offense, kickoffs, defense
+from strategy.boost_management import choose_boostpad_to_pickup
 from tools.game_info import GameInfo
 from tools.intercept import Intercept
 from tools.vector_math import align, ground, distance, ground_distance
@@ -27,7 +28,9 @@ def choose_maneuver(info: GameInfo, my_car: Car):
             return kickoffs.choose_kickoff(info, my_car)
 
     if my_car.boost < 20:
-        return Refuel(my_car, info)
+        best_boostpad = choose_boostpad_to_pickup(info, my_car)
+        if best_boostpad is not None:
+            return PickupBoostPad(my_car, best_boostpad)
 
     info.predict_ball()
 
