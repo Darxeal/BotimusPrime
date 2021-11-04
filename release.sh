@@ -1,1 +1,1 @@
-git archive --format zip --output "release.zip" --prefix "Botimus&Bumblebee"/ master
+git archive --format zip --output "release.zip" --prefix "Botimus&Bumblebee"/ HEAD
