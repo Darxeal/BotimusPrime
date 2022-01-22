@@ -3,8 +3,8 @@ from typing import Iterable as iterable
 from typing import Iterator as iterator
 from numpy import float64
 _Shape = Tuple[int, ...]
-import rlutilities.linear_algebra
 import rlutilities.simulation
+import rlutilities.linear_algebra
 __all__  = [
 "Aerial",
 "Boostdash",
