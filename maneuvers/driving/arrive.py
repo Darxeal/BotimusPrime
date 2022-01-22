@@ -33,7 +33,6 @@ class Arrive(Maneuver):
         self.lerp_t = 0.56
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
-        self.asap = False
 
     def interruptible(self) -> bool:
         return self.action.interruptible()
@@ -74,9 +73,6 @@ class Arrive(Maneuver):
 
         if target_speed < 800 and dist_to_target > 500 and angle_to(self.car, shifted_target) < 0.1:
             target_speed = 0
-
-        # if self.asap:
-        #     target_speed += 50
 
         self.drive.target_speed = target_speed
         self.drive.backwards = self.backwards

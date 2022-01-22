@@ -2,7 +2,7 @@ from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import dot, norm
 from rlutilities.simulation import Field, sphere, Car, Ball
 from tools.arena import Arena
-from tools.intercept import Intercept
+from tools.intercept import estimate_time
 from tools.vector_math import ground_direction
 
 
@@ -15,15 +15,18 @@ class GroundStrike(Strike):
     max_distance_from_wall = 120
     max_additional_time = 0.3
 
-    def intercept_predicate(self, car: Car, ball: Ball):
+    def intercept_predicate(self, ball: Ball):
+        if not super().intercept_predicate(ball):
+            return False
+
         if ball.position[2] > 200 or abs(ball.position[1]) > Arena.size[1] - 100:
             return False
         contact_ray = Field.collide(sphere(ball.position, self.max_distance_from_wall))
         return norm(contact_ray.start) > 0 and abs(dot(ball.velocity, contact_ray.direction)) < 300
 
-    def configure(self, intercept: Intercept):
+    def configure(self, intercept: Ball):
         target_direction = ground_direction(intercept, self.target)
-        strike_direction = ground_direction(intercept.ball.velocity, target_direction * 4000)
+        strike_direction = ground_direction(intercept.velocity, target_direction * 4000)
         
         self.arrive.target = intercept.position - strike_direction * 105
         self.arrive.target_direction = strike_direction

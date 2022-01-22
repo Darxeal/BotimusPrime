@@ -12,7 +12,7 @@ from strategy.boost_management import choose_boostpad_to_pickup
 from tools.drawing import DrawingTool
 from tools.drone import Drone
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
+from tools.intercept import Intercept, intercept_estimate
 from tools.vector_math import align, ground, ground_distance, distance
 
 
@@ -80,8 +80,8 @@ class HivemindStrategy:
                 return
 
             info.predict_ball()
-            our_intercepts = [Intercept(drone.car, info.ball_predictions) for drone in ready_drones]
-            good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.3 and ground_distance(i.car, i) > 2000]
+            our_intercepts = [intercept_estimate(drone.car, info.ball_predictions) for drone in ready_drones]
+            good_intercepts = [i for i in our_intercepts if align(i.car.position, i, their_goal) > 0.3 and ground_distance(i.car, i) > 2000]
 
             if good_intercepts:
                 best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
@@ -93,7 +93,7 @@ class HivemindStrategy:
 
             # if not completely out of position, go for a shot
             if (
-                align(best_intercept.car.position, best_intercept.ball, their_goal) > 0
+                align(best_intercept.car.position, best_intercept, their_goal) > 0
                 or ground_distance(best_intercept, our_goal) > 6000
             ):
                 strike = offense.any_shot(info, best_intercept.car, their_goal, best_intercept)

@@ -7,7 +7,7 @@ from rlutilities.simulation import Car
 from strategy import offense, defense, kickoffs
 from strategy.boost_management import choose_boostpad_to_pickup
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
+from tools.intercept import Intercept, intercept_estimate
 from tools.math import sign
 from tools.vector_math import align, ground, ground_distance, ground_direction
 
@@ -28,8 +28,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
 
     info.predict_ball()
 
-    my_intercept = Intercept(my_car, info.ball_predictions)
-    their_intercepts = [Intercept(opponent, info.ball_predictions) for opponent in opponents]
+    my_intercept = intercept_estimate(my_car, info.ball_predictions)
+    their_intercepts = [intercept_estimate(opponent, info.ball_predictions) for opponent in opponents]
     their_intercept = min(their_intercepts, key=lambda i: i.time)
     opponent = their_intercept.car
 
@@ -44,7 +44,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         and (abs(my_intercept.position[0]) < 2000 or abs(my_intercept.position[1]) < 4500)
         and my_car.position[2] < 300
     ):
-        if align(my_car.position, my_intercept.ball, their_goal) > 0.5:
+        if align(my_car.position, my_intercept, their_goal) > 0.5:
             return offense.any_shot(info, my_intercept.car, their_goal, my_intercept, allow_dribble=True)
         return defense.any_clear(info, my_intercept.car)
 
@@ -57,7 +57,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     # if they can hit the ball sooner than me and they aren't out of position, wait in defense
     if (
         their_intercept.time < my_intercept.time
-        and align(opponent.position, their_intercept.ball, my_goal) > -0.1 + opponent.boost / 100
+        and align(opponent.position, their_intercept, my_goal) > -0.1 + opponent.boost / 100
         and ground_distance(opponent, their_intercept) > 300
         and dot(opponent.velocity, ground_direction(their_intercept, my_goal)) > 0
     ):
@@ -65,7 +65,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
 
     # if not completely out of position, go for a shot
     if (
-        align(my_car.position, my_intercept.ball, their_goal) > -0.5
+        align(my_car.position, my_intercept, their_goal) > -0.5
         or ground_distance(my_intercept, their_goal) < 2000
         or ground_distance(opponent, their_intercept) < 300
     ):

@@ -2,9 +2,8 @@ from maneuvers.driving.drive import Drive
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3, dot, normalize, look_at
 from rlutilities.mechanics import Reorient
-from rlutilities.simulation import Car, Input
+from rlutilities.simulation import Car, Input, Ball
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
 from tools.vector_math import ground_distance, ground, ground_direction, direction
 
 MIN_ALIGNMENT = 0.9
@@ -15,7 +14,7 @@ ALLOWED_TIME_ERROR = 0.1
 
 class DoubleJumpStrike(Strike):
 
-    def intercept_predicate(self, car, ball):
+    def intercept_predicate(self, ball: Ball):
         return 250 < ball.position[2] < 550
 
     def __init__(self, car: Car, info: GameInfo, target=None):
@@ -28,7 +27,7 @@ class DoubleJumpStrike(Strike):
 
         super().__init__(car, info, target)
 
-    def configure(self, intercept: Intercept):
+    def configure(self, intercept: Ball):
         super().configure(intercept)
         self.drive.target_pos = ground(intercept.position)
         self.time_for_jump = self.double_jump_time_needed(intercept.position[2])

@@ -23,24 +23,24 @@ def get_target_points(ball: Ball) -> List[vec3]:
 
 
 class DodgeClear(DodgeStrike):
-    def configure(self, intercept: Intercept):
-        self.target = self.pick_easiest_target(self.car, intercept.ball, get_target_points(intercept.ball))
+    def configure(self, intercept: Ball):
+        self.target = self.pick_easiest_target(self.car, intercept, get_target_points(intercept))
         super().configure(intercept)
 
 
 class AerialClear(AerialStrike):
-    def configure(self, intercept: Intercept):
-        self.target = self.pick_easiest_target(self.car, intercept.ball, get_target_points(intercept.ball))
+    def configure(self, intercept: Ball):
+        self.target = self.pick_easiest_target(self.car, intercept, get_target_points(intercept))
         super().configure(intercept)
 
 
 class FastAerialClear(FastAerialStrike):
-    def configure(self, intercept: Intercept):
-        self.target = self.pick_easiest_target(self.car, intercept.ball, get_target_points(intercept.ball))
+    def configure(self, intercept: Ball):
+        self.target = self.pick_easiest_target(self.car, intercept, get_target_points(intercept))
         super().configure(intercept)
 
 
 class DoubleJumpClear(DoubleJumpStrike):
-    def configure(self, intercept: Intercept):
-        self.target = self.pick_easiest_target(self.car, intercept.ball, get_target_points(intercept.ball))
+    def configure(self, intercept: Ball):
+        self.target = self.pick_easiest_target(self.car, intercept, get_target_points(intercept))
         super().configure(intercept)

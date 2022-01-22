@@ -1,7 +1,9 @@
+from typing import Optional
+
 from maneuvers.strikes.double_touch import DoubleTouch
 from maneuvers.dribbling.carry_and_flick import CarryAndFlick
 from maneuvers.maneuver import Maneuver
-from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
+from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike, AirRollStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_strike import GroundStrike
@@ -10,53 +12,57 @@ from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3, dot
 from rlutilities.simulation import Car, Ball
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
 from tools.vector_math import distance, ground_distance, align
+
+
+def aerial_shot(info: GameInfo, car: Car, target: vec3) -> Optional[AerialStrike]:
+    aerial_strikes = [
+        AirRollStrike(car, info, target),
+        FastAerialStrike(car, info, target),
+    ]
+
+    strikes_i_have_enough_boost_for = [strike for strike in aerial_strikes if strike.boost_required() < car.boost]
+    if not strikes_i_have_enough_boost_for:
+        return None
+
+    return min(strikes_i_have_enough_boost_for, key=lambda strike: strike.intercept.time)
 
 
 def direct_shot(info: GameInfo, car: Car, target: vec3) -> Strike:
     dodge_shot = DodgeStrike(car, info, target)
     ground_shot = GroundStrike(car, info, target)
+    aerial_strike = aerial_shot(info, car, target)
 
-    if car.boost > 40:  # TODO
-        # aerial_strike = AerialStrike(car, info, target)
-        fast_aerial = FastAerialStrike(car, info, target)
-
-        better_aerial_strike = min([fast_aerial], key=lambda strike: strike.intercept.time)
-
-        if (
-            better_aerial_strike.intercept.time < dodge_shot.intercept.time
-            and abs(better_aerial_strike.intercept.position[1] - info.their_goal.center[1]) > 500
-        ):
-            if ground_distance(better_aerial_strike.intercept, info.their_goal.center) < 8000:
-                return DoubleTouch(better_aerial_strike)
-            return better_aerial_strike
+    if (
+        aerial_strike is not None
+        and aerial_strike.intercept.time < dodge_shot.intercept.time
+        and abs(aerial_strike.intercept.position[1] - info.their_goal.center[1]) > 500
+    ):
+        return aerial_strike
 
     if (
         dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
         or ground_distance(dodge_shot.intercept, target) < 2000
-        or distance(ground_shot.intercept.ball.velocity, car.velocity) < 500
+        or distance(ground_shot.intercept.velocity, car.velocity) < 500
         or is_opponent_close(info, 300)
     ):
         if (
-            distance(dodge_shot.intercept.ground_pos, target) < 4000
-            and abs(dodge_shot.intercept.ground_pos[0]) < 2000
+            ground_distance(dodge_shot.intercept, target) < 4000
+            and abs(dodge_shot.intercept.position.x) < 2000
         ):
             return CloseShot(car, info, target)
         return dodge_shot
     return ground_shot
 
 
-def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Intercept, allow_dribble=False) -> Maneuver:
-    ball = intercept.ball
-
+def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Ball, allow_dribble=False) -> Maneuver:
     if (
         allow_dribble
-        and (ball.position[2] > 100 or abs(ball.velocity[2]) > 250 or distance(car, info.ball) < 300)
-        and abs(ball.velocity[2]) < 700
-        and ground_distance(car, ball) < 1500
-        and ground_distance(ball, info.my_goal.center) > 1000
-        and ground_distance(ball, info.their_goal.center) > 1000
+        and (intercept.position[2] > 100 or abs(intercept.velocity[2]) > 250 or distance(car, info.ball) < 300)
+        and abs(intercept.velocity[2]) < 700
+        and ground_distance(car, intercept) < 1500
+        and ground_distance(intercept, info.my_goal.center) > 1000
+        and ground_distance(intercept, info.their_goal.center) > 1000
         and not is_opponent_close(info, info.ball.position[2] * 2 + 1000)
     ):
         return CarryAndFlick(car, info, target)
@@ -64,8 +70,8 @@ def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Intercept, allow
     direct = direct_shot(info, car, target)
 
     if not isinstance(direct, GroundStrike) and intercept.time < car.time + 4.0:
-        alignment = align(car.position, ball, target)
-        if alignment < -0.3 and abs(ball.position[1] - target[1]) > 3000:
+        alignment = align(car.position, intercept, target)
+        if alignment < -0.3 and abs(intercept.position[1] - target[1]) > 3000:
             return MirrorStrike(car, info, target)
 
     return direct

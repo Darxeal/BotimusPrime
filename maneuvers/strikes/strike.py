@@ -3,16 +3,15 @@ from typing import List, Optional
 
 from maneuvers.driving.arrive import Arrive
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3, dot
+from rlutilities.linear_algebra import vec3, dot, xy
 from rlutilities.simulation import Car, Ball
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
+from tools.intercept import find_intercept, estimate_time
 from tools.vector_math import ground_direction
 
 
 class Strike(Maneuver):
-    allow_backwards = False
     update_interval = 0.2
     stop_updating = 0.1
     max_additional_time = 0.4
@@ -24,40 +23,24 @@ class Strike(Maneuver):
         self.target: Optional[vec3] = target
 
         self.arrive = Arrive(car)
-        self.intercept: Intercept = None
+        self.intercept: Ball = None
 
         self._has_drawn_prediction = False
         self._last_update_time = car.time
-        self._should_strike_backwards = False
-        self._initial_time = math.inf
         self.update_intercept()
         self._initial_time = self.intercept.time
 
-    def intercept_predicate(self, car: Car, ball: Ball):
-        return True
+    def intercept_predicate(self, ball: Ball):
+        return estimate_time(self.car, ball.position) < ball.time - self.car.time
 
-    def configure(self, intercept: Intercept):
-        self.arrive.target = intercept.ground_pos
+    def configure(self, intercept: Ball):
+        self.arrive.target = xy(intercept.position)
         self.arrive.arrival_time = intercept.time
-        self.arrive.backwards = self._should_strike_backwards
-        self.arrive.asap = not intercept.predicate_later_than_time
 
     def update_intercept(self):
-        self.intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate)
-
-        if self.allow_backwards:
-            backwards_intercept = Intercept(self.car, self.info.ball_predictions, self.intercept_predicate,
-                                            backwards=True)
-            if backwards_intercept.time + 0.1 < self.intercept.time:
-                self.intercept = backwards_intercept
-                self._should_strike_backwards = True
-            else:
-                self._should_strike_backwards = False
-
+        self.intercept = find_intercept(self.info.ball_predictions, self.intercept_predicate)
         self.configure(self.intercept)
         self._last_update_time = self.car.time
-        if not self.intercept.is_viable or self.intercept.time > self._initial_time + self.max_additional_time:
-            self.finished = True
 
     def interruptible(self) -> bool:
         return self.arrive.interruptible()
@@ -71,8 +54,8 @@ class Strike(Maneuver):
             self._has_drawn_prediction = False
             self.update_intercept()
 
-        if self.intercept.time - self.car.time > 1.0 and self.interruptible() and not self.car.on_ground:
-            self.finished = True
+            if self.intercept.time > self._initial_time + self.max_additional_time:
+                self.expire("This strike has delayed the intercept too much.")
 
         self.arrive.step(dt)
         self.controls = self.arrive.controls
@@ -81,18 +64,18 @@ class Strike(Maneuver):
             self.controls.throttle = 0
 
         if self.arrive.finished:
-            self.finished = True
+            self.expire("Arrive finished")
 
     def render(self, draw: DrawingTool):
         self.arrive.render(draw)
         draw.color(draw.lime)
-        draw.circle(self.intercept.ground_pos, Ball.radius)
-        draw.point(self.intercept.ball.position)
+        draw.circle(xy(self.intercept.position), Ball.radius)
+        draw.point(self.intercept.position)
 
         if self.target:
-            strike_direction = ground_direction(self.intercept.ground_pos, self.target)
+            strike_direction = ground_direction(self.intercept, self.target)
             draw.color(draw.cyan)
-            draw.triangle(self.intercept.ground_pos + strike_direction * 150, strike_direction, length=100)
+            draw.triangle(xy(self.intercept.position) + strike_direction * 150, strike_direction, length=100)
 
         if not self._has_drawn_prediction:
             self._has_drawn_prediction = True

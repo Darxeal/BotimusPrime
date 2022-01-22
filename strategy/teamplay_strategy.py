@@ -5,7 +5,7 @@ from rlutilities.simulation import Car
 from strategy import offense, kickoffs, defense
 from strategy.boost_management import choose_boostpad_to_pickup
 from tools.game_info import GameInfo
-from tools.intercept import Intercept
+from tools.intercept import Intercept, intercept_estimate
 from tools.vector_math import align, ground, distance, ground_distance
 
 
@@ -34,11 +34,11 @@ def choose_maneuver(info: GameInfo, my_car: Car):
 
     info.predict_ball()
 
-    my_intercept = Intercept(my_car, info.ball_predictions)
-    teammates_intercepts = [Intercept(mate, info.ball_predictions) for mate in teammates]
+    my_intercept = intercept_estimate(my_car, info.ball_predictions)
+    teammates_intercepts = [intercept_estimate(mate, info.ball_predictions) for mate in teammates]
     our_intercepts = teammates_intercepts + [my_intercept]
 
-    good_intercepts = [i for i in our_intercepts if align(i.car.position, i.ball, their_goal) > 0.0]
+    good_intercepts = [i for i in our_intercepts if align(i.car.position, i, their_goal) > 0.0]
     if good_intercepts:
         best_intercept = min(good_intercepts, key=lambda intercept: intercept.time)
     else:
@@ -49,7 +49,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     if best_intercept is my_intercept:
         # if not completely out of position, go for a shot
         if (
-            align(my_intercept.car.position, my_intercept.ball, their_goal) > 0
+            align(my_intercept.car.position, my_intercept, their_goal) > 0
             or ground_distance(my_intercept, my_goal) > 6000
         ):
             return offense.any_shot(info, my_intercept.car, their_goal, my_intercept)
