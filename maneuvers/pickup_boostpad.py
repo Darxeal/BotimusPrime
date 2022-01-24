@@ -29,12 +29,14 @@ class PickupBoostPad(Maneuver):
 
         # finish when someone picks up the pad
         if self.pad_was_active and self.pad.state == BoostPadState.Unavailable:
-            self.finished = True
+            self.expire("Pad picked up.")
         self.pad_was_active = self.pad.state == BoostPadState.Available
 
-        # finish when we picked the boost up but the previous condition somehow wasn't true
-        if self.car.boost > 99 or distance(self.car, self.pad) < 100:
-            self.finished = True
+        if self.car.boost > 99:
+            self.expire("I got 100 boost somehow else?")
+
+        if distance(self.car, self.pad) < 100:
+            self.expire("I got close enough to the pad but didn't pick it up somehow?")
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)

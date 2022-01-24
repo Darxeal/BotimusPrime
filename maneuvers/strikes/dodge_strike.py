@@ -1,7 +1,7 @@
 from maneuvers.jumps.aim_dodge import AimDodge
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import norm, dot, normalize, xy
-from rlutilities.simulation import Car, Ball
+from rlutilities.simulation import Ball
 from tools.intercept import estimate_time
 from tools.math import clamp
 from tools.vector_math import ground_direction
@@ -57,15 +57,17 @@ class DodgeStrike(Strike):
             self.controls = self.dodge.controls
         else:
             super().step(dt)
-            if (
-                self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13
-                and abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000
-                and (
-                    dot(normalize(self.car.velocity), ground_direction(self.car, self.arrive.target)) > 0.95
-                    or norm(self.car.velocity) < 500
-                )
-            ):
-                self.dodging = True
+            if self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13:
+                if abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000:
+                    if (
+                            dot(normalize(self.car.velocity), ground_direction(self.car, self.arrive.target)) > 0.95
+                            or norm(self.car.velocity) < 500
+                    ):
+                        self.dodging = True
+                    else:
+                        self.explain("Not dodging yet because my velocity is not towards the target.", slowmo=True)
+                else:
+                    self.explain("Not dodging yet because my speed is way slower than it should be.", slowmo=True)
 
         if self.dodge.finished:
-            self.expire("Dodge finished")
+            self.expire("Dodge finished.")

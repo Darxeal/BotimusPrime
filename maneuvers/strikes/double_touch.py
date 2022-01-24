@@ -12,6 +12,7 @@ class DoubleTouch(Maneuver):
     """
     Execute a regular AerialStrike, but when it finishes, look if we could continue aerialing for a second hit.
     """
+
     def __init__(self, aerial_strike: AerialStrike):
         super().__init__(aerial_strike.car)
         self.aerial_strike = aerial_strike
@@ -33,14 +34,15 @@ class DoubleTouch(Maneuver):
             if distance(final_car, self.aerial.target_position) < 50:
                 return
 
-        self.finished = True
+        self.expire("Second touch not found.")
 
     def step(self, dt: float):
         if self.aerial_strike.finished:
             self.aerial.step(dt)
             self.controls = self.aerial.controls
             self.finished = self.aerial.finished
-            if self.car.on_ground: self.finished = True
+            if self.car.on_ground:
+                self.expire("Accidentally landed?")
 
         else:
             self.aerial_strike.step(dt)
@@ -50,7 +52,7 @@ class DoubleTouch(Maneuver):
                 if not self.car.on_ground:
                     self.find_second_touch()
                 else:
-                    self.finished = True
+                    self.expire("Car is on the ground, probably failed to take off?")
 
     def interruptible(self) -> bool:
         return self.aerial_strike.interruptible()

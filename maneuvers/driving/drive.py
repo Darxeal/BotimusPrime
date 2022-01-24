@@ -1,7 +1,7 @@
 import math
 
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3, dot, norm, normalize
+from rlutilities.linear_algebra import vec3, dot, normalize
 from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.math import abs_clamp, clamp11, clamp
@@ -25,14 +25,16 @@ class Drive(Maneuver):
         target = Arena.clamp(target, 100)
 
         # smoothly escape goal
-        if abs(self.car.position[1]) > Arena.size[1] - 50:
+        if abs(self.car.position.y) > Arena.size.y - 50 and abs(self.car.position.x) < 700:
             target = Arena.clamp(target, 200)
-            target[0] = abs_clamp(target[0], 700)
+            target.x = abs_clamp(target.x, 700)
+            self.explain("Escaping goal.")
 
         if not self.drive_on_walls:
-            seam_radius = 100 if abs(self.car.position[1]) > Arena.size[1] - 100 else 200
+            seam_radius = 100 if abs(self.car.position.y) > Arena.size.y - 100 else 200
             if self.car.position[2] > seam_radius:
                 target = ground(self.car)
+                self.explain("Driving down wall.")
 
         local_target = local(self.car, target)
 
@@ -47,10 +49,10 @@ class Drive(Maneuver):
         # powersliding
         self.controls.handbrake = 0
         if (
-            abs(phi) > 1.5
-            and self.car.position[2] < 300
-            and (ground_distance(self.car, target) < 3500 or abs(self.car.position[0]) > 3500)
-            and dot(normalize(self.car.velocity), self.car.forward()) > 0.85
+                abs(phi) > 1.5
+                and self.car.position[2] < 300
+                and (ground_distance(self.car, target) < 3500 or abs(self.car.position[0]) > 3500)
+                and dot(normalize(self.car.velocity), self.car.forward()) > 0.85
         ):
             self.controls.handbrake = 1
 
@@ -84,7 +86,7 @@ class Drive(Maneuver):
             self.controls.handbrake = 0
 
         # don't boost if not facing target
-        if abs(phi) > 0.3:
+        if abs(phi) > 0.3 and self.controls.boost:
             self.controls.boost = 0
 
         # finish when close

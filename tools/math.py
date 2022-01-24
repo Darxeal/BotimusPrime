@@ -23,5 +23,13 @@ def nonzero(value) -> float:
     return max(value, 0.000001)
 
 
+def lerp(a, b, t):
+    return (b - a) * t + a
+
+
+def invlerp(a, b, v):
+    return (v - a) / (b - a)
+
+
 def range_map(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min

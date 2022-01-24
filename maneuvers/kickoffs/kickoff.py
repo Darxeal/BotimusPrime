@@ -23,6 +23,8 @@ class Kickoff(Maneuver):
         self.action: Maneuver = self.drive
         self.phase = 1
 
+        self.is_kickoff = True  # this is just a workaround for isinstance not working after hot reload
+
     def interruptible(self) -> bool:
         return False
 
@@ -32,6 +34,7 @@ class Kickoff(Maneuver):
 
         self.phase = "anti-fake-kickoff"
         self.action = self.drive
+        self.announce("Commencing anti-fake procedure.")
 
     def step(self, dt: float):
         if self.phase == "anti-fake-kickoff":

@@ -1,4 +1,3 @@
-import math
 from typing import List, Optional
 
 from maneuvers.driving.arrive import Arrive
@@ -47,8 +46,8 @@ class Strike(Maneuver):
 
     def step(self, dt):
         if (
-            self._last_update_time + self.update_interval < self.car.time < self.intercept.time - self.stop_updating
-            and self.car.on_ground and not self.controls.jump
+                self._last_update_time + self.update_interval < self.car.time < self.intercept.time - self.stop_updating
+                and self.car.on_ground and not self.controls.jump
         ):
             self.info.predict_ball(duration=self.intercept.time - self.car.time + 1)
             self._has_drawn_prediction = False
@@ -60,11 +59,12 @@ class Strike(Maneuver):
         self.arrive.step(dt)
         self.controls = self.arrive.controls
 
-        if self.arrive.drive.target_speed < 300:
-            self.controls.throttle = 0
+        # if self.arrive.drive.target_speed < 300:
+        #     self.controls.throttle = 0
+        #     self.explain("Target speed low, stopping instead.")
 
         if self.arrive.finished:
-            self.expire("Arrive finished")
+            self.expire("Arrive finished.")
 
     def render(self, draw: DrawingTool):
         self.arrive.render(draw)
@@ -83,4 +83,5 @@ class Strike(Maneuver):
 
     def pick_easiest_target(self, car: Car, ball: Ball, targets: List[vec3]) -> vec3:
         to_goal = ground_direction(ball, self.info.their_goal.center)
-        return max(targets, key=lambda target: dot(ground_direction(car, ball) + to_goal * 0.5, ground_direction(ball, target)))
+        return max(targets,
+                   key=lambda target: dot(ground_direction(car, ball) + to_goal * 0.5, ground_direction(ball, target)))

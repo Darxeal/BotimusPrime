@@ -1,14 +1,12 @@
-from typing import List
-
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import vec3, norm, normalize, look_at, dot, xy, vec2, axis_to_rotation
+from rlutilities.linear_algebra import vec3, norm, normalize, look_at, dot, vec2, axis_to_rotation
 from rlutilities.mechanics import Aerial, Dodge
 from rlutilities.simulation import Car, Ball
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 from tools.intercept import estimate_time
 from tools.math import range_map
-from tools.vector_math import ground_direction, angle_to, distance, ground_distance, direction
+from tools.vector_math import ground_direction, angle_to, ground_distance, direction
 
 
 class AerialStrike(Strike):
@@ -89,13 +87,16 @@ class AerialStrike(Strike):
         else:
             super().step(dt)
 
-            if (
-                angle_to(self.car, self.aerial.target_position) < 0.1
-                and norm(self.car.angular_velocity) < 0.5
-                and time_left < self.required_aerial_time() + 0.1
-                and dot(self.car.velocity, ground_direction(self.car, self.intercept)) < ground_distance(self.car, self.intercept) / time_left
-            ):
-                self.aerialing = True
+            if time_left < self.required_aerial_time() + 0.1:
+                if angle_to(self.car, self.aerial.target_position) > 0.1:
+                    self.explain("Not taking off yet, because not facing target.")
+                elif norm(self.car.angular_velocity) > 0.5:
+                    self.explain("Not taking off yet, because angular velocity too high.")
+                elif dot(self.car.velocity, ground_direction(self.car, self.aerial.target_position)) > ground_distance(
+                        self.car, self.intercept) / time_left:
+                    self.explain("Not taking off yet, because I'm too fast!")
+                else:
+                    self.aerialing = True
 
     def render(self, draw: DrawingTool):
         super().render(draw)
@@ -113,8 +114,8 @@ class FastAerialStrike(AerialStrike):
 class AirRollStrike(AerialStrike):
     MINIMAL_HEIGHT = 300
     MAXIMAL_HEIGHT = 800
-    MINIMAL_HEIGHT_TIME = 0.5
-    MAXIMAL_HEIGHT_TIME = 1.6
+    MINIMAL_HEIGHT_TIME = 0.8
+    MAXIMAL_HEIGHT_TIME = 1.8
 
     additional_z_intercept_offset = 200
 

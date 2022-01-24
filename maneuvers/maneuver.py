@@ -1,6 +1,5 @@
-from rlbot.utils.logging_utils import get_logger
-
 from rlutilities.simulation import Input, Car
+from tools.announcer import Announcer
 from tools.drawing import DrawingTool
 
 
@@ -10,11 +9,10 @@ class Maneuver:
         self.controls: Input = Input()
         self.finished: bool = False
 
-        self.logger = get_logger(type(self).__name__)
-
     def expire(self, reason: str):
+        if not self.finished:
+            self.announce(f"expiring: {reason}")
         self.finished = True
-        self.logger.debug(f"Aborting: {reason}")
 
     def step(self, dt: float):
         pass
@@ -24,3 +22,9 @@ class Maneuver:
 
     def render(self, draw: DrawingTool):
         pass
+
+    def announce(self, message: str):
+        Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=True)
+
+    def explain(self, message: str, slowmo=False):
+        Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=slowmo)

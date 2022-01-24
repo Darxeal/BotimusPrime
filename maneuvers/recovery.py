@@ -35,13 +35,14 @@ class Recovery(Maneuver):
 
         # jump if the car is upside down and has wheel contact
         if (
-            self.jump_when_upside_down
-            and self.car.on_ground
-            and dot(self.car.up(), vec3(0, 0, 1)) < -0.95
+                self.jump_when_upside_down
+                and self.car.on_ground
+                and dot(self.car.up(), vec3(0, 0, 1)) < -0.95
         ):
             self.controls.jump = True
             self.landing = False
-            
+            self.announce("Jumping of the ceiling probably")
+
         else:
             self.finished = self.car.on_ground
 
@@ -53,7 +54,7 @@ class Recovery(Maneuver):
         self.landing = False
         collision_normal: Optional[vec3] = None
 
-        dt = 1/60
+        dt = 1 / 60
         simulation_duration = 0.8
         for i in range(int(simulation_duration / dt)):
             pos += vel * dt

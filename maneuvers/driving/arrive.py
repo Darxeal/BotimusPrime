@@ -71,21 +71,22 @@ class Arrive(Maneuver):
         time_left = nonzero(shifted_arrival_time - car.time)
         target_speed = clamp(dist_to_target / time_left, 0, 2300)
 
-        if target_speed < 800 and dist_to_target > 500 and angle_to(self.car, shifted_target) < 0.1:
+        if target_speed < 500 and dist_to_target > 1000 and angle_to(self.car, shifted_target) < 0.1:
             target_speed = 0
+            self.explain("Target speed low, stopping instead.")
 
         self.drive.target_speed = target_speed
         self.drive.backwards = self.backwards
 
         # dodges and wavedashes can mess up correctly arriving, so we use them only if we really need them
         if (
-            (
-                self.allow_dodges_and_wavedashes
-                and norm(car.velocity) < target_speed - 600
-                and car.boost < 20
-                and not self.backwards
-            )
-            or not self.travel.driving  # a dodge/wavedash is in progress
+                (
+                        self.allow_dodges_and_wavedashes
+                        and norm(car.velocity) < target_speed - 600
+                        and car.boost < 20
+                        and not self.backwards
+                )
+                or not self.travel.driving  # a dodge/wavedash is in progress
         ):
             self.action = self.travel
         else:
