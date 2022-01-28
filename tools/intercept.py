@@ -1,13 +1,11 @@
 import math
-from typing import Optional, List, Callable
+from typing import List, Callable
 
-from data.acceleration_lut import AccelerationLUT, BOOST, THROTTLE
+from data.acceleration_lut import BOOST, THROTTLE
 from rlutilities.linear_algebra import norm, angle_between, dot
-from rlutilities.mechanics import Aerial, Drive
+from rlutilities.mechanics import Drive
 from rlutilities.simulation import Car, Ball
-from tools.math import clamp
-
-from tools.vector_math import distance, direction, ground, ground_distance
+from tools.vector_math import direction, ground_distance
 
 
 def find_intercept(predictions: List[Ball], predicate: Callable[[Ball], bool]) -> Ball:
@@ -32,6 +30,7 @@ def estimate_time(car: Car, target, dd=1, max_accelerate_time=math.inf) -> float
     turning_radius = 1 / Drive.max_turning_curvature(norm(car.velocity) + 500)
     turning = angle_between(car.forward() * dd, direction(car, target)) * turning_radius / 1800
     if turning < 0.5: turning = 0
+    turning *= 1.5
 
     dist = max(ground_distance(car, target) - 100, 1)
     speed = dot(car.velocity, car.forward())

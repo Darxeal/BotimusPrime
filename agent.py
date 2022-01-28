@@ -48,7 +48,7 @@ class BotimusPrime(BaseAgent):
         # cancel maneuver if a kickoff is happening and current maneuver isn't a kickoff maneuver
         if packet.game_info.is_kickoff_pause and not hasattr(self.maneuver, "is_kickoff"):
             self.maneuver = None
-            Announcer.announce("Kickoff is happening, aborting maneuver.")
+            # Announcer.announce("Kickoff is happening, aborting maneuver.")
 
         # reset maneuver when another car hits the ball
         touch = packet.game_ball.latest_touch
@@ -61,7 +61,7 @@ class BotimusPrime(BaseAgent):
             # don't reset when we're dodging, wavedashing or recovering
             if self.maneuver and self.maneuver.interruptible():
                 self.maneuver = None
-                Announcer.announce("Someone touched the ball, aborting maneuver.")
+                # Announcer.announce("Someone touched the ball, aborting maneuver.")
 
         # choose maneuver
         if self.maneuver is None:
@@ -73,7 +73,7 @@ class BotimusPrime(BaseAgent):
                 self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
             else:
                 self.maneuver = solo_strategy.choose_maneuver(self.info, self.info.cars[self.index])
-            Announcer.announce(type(self.maneuver).__name__)
+            # Announcer.announce(type(self.maneuver).__name__)
 
         # execute maneuver
         if self.maneuver is not None:

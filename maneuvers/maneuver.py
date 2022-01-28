@@ -27,4 +27,4 @@ class Maneuver:
         Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=True)
 
     def explain(self, message: str, slowmo=False):
-        Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=slowmo)
+        Announcer.explain(f"[{type(self).__name__}] {message}", slowmo=slowmo)

@@ -37,7 +37,8 @@ class GeneralDefense(Maneuver):
         near_goal = abs(car.position[1] - info.my_goal.center[1]) < 3000
         side_shift = 400 if near_goal else 1800
         points = target_pos + vec3(side_shift, 0, 0), target_pos - vec3(side_shift, 0, 0)
-        target_pos = nearest_point(face_target, points) if near_goal or force_nearest else farthest_point(face_target, points)
+        target_pos = nearest_point(face_target, points) if near_goal or force_nearest else farthest_point(face_target,
+                                                                                                          points)
         if abs(face_target[0]) < 1000 or ground_distance(car, face_target) < 1000:
             target_pos = nearest_point(car.position, points)
         target_pos = Arena.clamp(target_pos, 500)
@@ -66,6 +67,7 @@ class GeneralDefense(Maneuver):
                 self.drive.step(dt)
                 self.controls = self.drive.controls
                 self.controls.handbrake = False
+                self.explain("Turning towards target.")
             else:
                 self.stop.step(dt)
                 self.controls = self.stop.controls
@@ -81,14 +83,15 @@ class GeneralDefense(Maneuver):
                     to_pad = ground_direction(self.car, pad)
 
                     if (
-                        pad.state == BoostPadState.Available and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
-                        and angle_between(to_target, to_pad) < self.BOOST_LOOK_ANGLE
+                            pad.state == BoostPadState.Available and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
+                            and angle_between(to_target, to_pad) < self.BOOST_LOOK_ANGLE
                     ):
                         self.pad = pad
                         self.drive.target_pos = pad.position
                         self.drive.target_speed = 2200
                         self.drive.step(dt)
                         self.controls = self.drive.controls
+                        self.explain("Collecting small pad.")
                         break
 
             # go to the actual target
@@ -96,7 +99,9 @@ class GeneralDefense(Maneuver):
                 self.controls = self.travel.controls
 
         # don't waste boost during downtime
-        if self.car.boost < 100 and ground_distance(self.car, self.travel.target) < 4000: self.controls.boost = False
+        if self.car.boost < 100 and ground_distance(self.car, self.travel.target) < 4000:
+            self.controls.boost = False
+            self.explain("Saving boost.")
 
         self.finished = self.travel.driving and self.car.time > self.start_time + self.DURATION
 
@@ -107,4 +112,3 @@ class GeneralDefense(Maneuver):
         if self.pad:
             draw.color(draw.blue)
             draw.circle(self.pad.position, 50)
-

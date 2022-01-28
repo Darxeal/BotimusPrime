@@ -89,12 +89,12 @@ class AerialStrike(Strike):
 
             if time_left < self.required_aerial_time() + 0.1:
                 if angle_to(self.car, self.aerial.target_position) > 0.1:
-                    self.explain("Not taking off yet, because not facing target.")
+                    self.explain("Not taking off yet, because not facing target.", slowmo=True)
                 elif norm(self.car.angular_velocity) > 0.5:
-                    self.explain("Not taking off yet, because angular velocity too high.")
+                    self.explain("Not taking off yet, because angular velocity too high.", slowmo=True)
                 elif dot(self.car.velocity, ground_direction(self.car, self.aerial.target_position)) > ground_distance(
                         self.car, self.intercept) / time_left:
-                    self.explain("Not taking off yet, because I'm too fast!")
+                    self.explain("Not taking off yet, because I'm too fast!", slowmo=True)
                 else:
                     self.aerialing = True
 

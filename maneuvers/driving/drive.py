@@ -25,7 +25,7 @@ class Drive(Maneuver):
         target = Arena.clamp(target, 100)
 
         # smoothly escape goal
-        if abs(self.car.position.y) > Arena.size.y - 50 and abs(self.car.position.x) < 700:
+        if abs(self.car.position.y) > Arena.size.y - 50 and abs(self.car.position.x) < 1000:
             target = Arena.clamp(target, 200)
             target.x = abs_clamp(target.x, 700)
             self.explain("Escaping goal.")
