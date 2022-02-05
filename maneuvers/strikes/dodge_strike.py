@@ -44,10 +44,10 @@ class DodgeStrike(Strike):
 
         self.dodge.jump.duration = self.get_jump_duration(intercept.position[2])
         self.dodge.target = intercept.position
-        self.arrive.additional_shift = self.get_jump_duration(intercept.position[2]) * 1000
+        self.arrive.additional_shift = self.get_jump_duration(intercept.position[2]) * 500
 
     def interruptible(self) -> bool:
-        if self.info.ball.position[2] > 150 and self.dodging:
+        if self.info.ball.position[2] > 300 and self.dodging:
             return True
         return not self.dodging and super().interruptible()
 
@@ -60,7 +60,7 @@ class DodgeStrike(Strike):
             if self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13:
                 if abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000:
                     if (
-                            dot(normalize(self.car.velocity), ground_direction(self.car, self.arrive.target)) > 0.95
+                            dot(normalize(self.car.velocity), ground_direction(self.car, self.arrive.target)) > 0.9
                             or norm(self.car.velocity) < 500
                     ):
                         self.dodging = True

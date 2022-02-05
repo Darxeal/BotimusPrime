@@ -8,7 +8,6 @@ from tools.vector_math import distance
 
 
 class Goal:
-
     WIDTH = 1784.0
     HEIGHT = 640.0
     DISTANCE = 5120.0
@@ -97,14 +96,14 @@ class GameInfo(Game):
             centre_to_car = vec2(car.position - centre)
             return [
                 vec3(dot(rotation(ang_vel_z * dt * i), centre_to_car)) + centre
-                    for i in range(time_steps)]
+                for i in range(time_steps)]
 
         # predict straight path
         return [car.position + car.velocity * dt * i for i in range(time_steps)]
 
     COLLISION_THRESHOLD = 150
 
-    def detect_collisions(self, time_limit=0.5, dt=1/60) -> List[Tuple[int, int, float]]:
+    def detect_collisions(self, time_limit=0.5, dt=1 / 60) -> List[Tuple[int, int, float]]:
         """Returns a list of tuples, where the first two elements are
         indices of cars and the last is time from now until the collision.
         """
@@ -113,7 +112,7 @@ class GameInfo(Game):
         collisions = []
         for i in range(len(self.cars)):
             for j in range(len(self.cars)):
-                if i >= j: 
+                if i >= j:
                     continue
 
                 for step in range(time_steps):
@@ -122,5 +121,5 @@ class GameInfo(Game):
                     if distance(pos1, pos2) < self.COLLISION_THRESHOLD:
                         collisions.append((i, j, step * dt))
                         break
-        
+
         return collisions

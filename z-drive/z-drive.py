@@ -82,9 +82,9 @@ class MyScript(BaseScript):
             self.gameplay_paused = False
 
         actions = {
-            "4": prev_snapshot,
-            "5": play,
-            "6": next_snapshot,
+            ",": prev_snapshot,
+            "enter": play,
+            ".": next_snapshot,
         }
 
         def play_action_factory(name):
@@ -122,13 +122,17 @@ class MyScript(BaseScript):
         while True:
             packet = self.wait_game_tick_packet()
 
-            try:
-                message = self.matchcomms.incoming_broadcast.get_nowait()
+            message = None
+            while True:
+                try:
+                    message = self.matchcomms.incoming_broadcast.get_nowait()
+                except queue.Empty:
+                    break
+
+            if message:
                 print(message)
                 if isinstance(message, dict) and message.get("event", "") == "checkpoint":
                     self.checkpoint(packet, message)
-            except queue.Empty:
-                pass
 
 
 # You can use this __name__ == '__main__' thing to ensure that the script doesn't start accidentally if you

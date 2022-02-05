@@ -60,10 +60,10 @@ class Travel(Maneuver):
             # check if it's a good idea to dodge, wavedash or halfflip
             if (
                     self._time_on_ground > 0.2
-                    and car.position[2] < 200
+                    and car.position.z < 100
                     and car_speed < 2000
                     and angle_to(car, target, backwards=forward_speed < 0) < 0.1
-                    and Game.gravity[2] < -500  # don't dodge in low gravity
+                    and Game.gravity.z < -500  # don't dodge in low gravity
             ):
                 # if going forward, use a dodge or a wavedash
                 if forward_speed > 0:

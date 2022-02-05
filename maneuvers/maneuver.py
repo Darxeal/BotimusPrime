@@ -1,6 +1,13 @@
+from dataclasses import dataclass
+
 from rlutilities.simulation import Input, Car
 from tools.announcer import Announcer
 from tools.drawing import DrawingTool
+
+
+@dataclass
+class PushToStackException(Exception):
+    pushed_maneuver: "Maneuver"
 
 
 class Maneuver:
@@ -9,13 +16,18 @@ class Maneuver:
         self.controls: Input = Input()
         self.finished: bool = False
 
-    def expire(self, reason: str):
-        if not self.finished:
+        # self.uninterruptible_subaction: Optional[Maneuver] = None
+
+    def expire(self, reason: str = None):
+        if not self.finished and reason:
             self.announce(f"expiring: {reason}")
         self.finished = True
 
+    def push(self, maneuver: "Maneuver"):
+        raise PushToStackException(maneuver)
+
     def step(self, dt: float):
-        pass
+        raise NotImplementedError
 
     def interruptible(self) -> bool:
         return True

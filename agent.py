@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerState
 
-from maneuvers.maneuver import Maneuver
+from maneuvers.maneuver import Maneuver, PushToStackException
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
 from strategy import solo_strategy, teamplay_strategy, matchcomms_strategy
@@ -24,7 +24,7 @@ class BotimusPrime(BaseAgent):
         self.tick_counter = 0
         self.last_latest_touch_time = 0
 
-        self.maneuver: Optional[Maneuver] = None
+        self.stack: List[Maneuver] = []
         self.controls: SimpleControllerState = SimpleControllerState()
 
         self.teleport_detector = TeleportDetector()
@@ -37,6 +37,14 @@ class BotimusPrime(BaseAgent):
 
     def is_hot_reload_enabled(self):
         return True
+
+    @property
+    def maneuver(self) -> Optional[Maneuver]:
+        return self.stack[-1] if self.stack else None
+
+    @maneuver.setter
+    def maneuver(self, value: Maneuver):
+        self.stack = [value]
 
     def get_output(self, packet: GameTickPacket):
         # wait a few ticks after initialization, so we work correctly in rlbottraining
@@ -74,11 +82,10 @@ class BotimusPrime(BaseAgent):
             if self.RENDERING:
                 self.draw.clear()
 
-            if packet.game_info.is_round_active:
-                self.matchcomms.outgoing_broadcast.put_nowait({
-                    "event": "checkpoint",
-                    "actions": list(matchcomms_strategy.ACTIONS.keys())
-                })
+            self.matchcomms.outgoing_broadcast.put_nowait({
+                "event": "checkpoint",
+                "actions": list(matchcomms_strategy.ACTIONS.keys())
+            })
 
             if self.info.get_teammates(self.info.cars[self.index]):
                 self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
@@ -88,18 +95,22 @@ class BotimusPrime(BaseAgent):
 
         # execute maneuver
         if self.maneuver is not None:
-            self.maneuver.step(self.info.time_delta)
-            self.controls = self.maneuver.controls
+            try:
+                self.maneuver.step(self.info.time_delta)
+                self.controls = self.maneuver.controls
+            except PushToStackException as push:
+                self.stack.append(push.pushed_maneuver)
 
             if self.RENDERING:
                 self.draw.group("maneuver")
                 self.draw.color(self.draw.yellow)
-                self.draw.string(self.info.cars[self.index].position + vec3(0, 0, 50), type(self.maneuver).__name__)
+                stack_str = "\n".join(type(maneuver).__name__ for maneuver in self.stack)
+                self.draw.string(self.info.cars[self.index].position + vec3(0, 0, 50), stack_str)
                 self.maneuver.render(self.draw)
 
             # cancel maneuver when finished
             if self.maneuver.finished:
-                self.maneuver = None
+                self.stack.pop()
 
         # if self.teleport_detector.teleport_happened(self.info):
         #     self.maneuver = None

@@ -3,27 +3,22 @@ from maneuvers.driving.stop import Stop
 from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
-from rlutilities.simulation import Car, BoostPadState
+from rlutilities.simulation import Car
 from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
-from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to, \
-    distance, angle_between
+from tools.vector_math import nearest_point, farthest_point, ground_distance, ground_direction, ground, angle_to
 
 
 class GeneralDefense(Maneuver):
     """
     First, attempt to rotate on the far side, and when far away enough from the target (usually the ball),
     turn around to face it. If already far enough and facing the target, just stop and wait.
-    Also try to pickup boost pads along the way.
     This state expires after a short amount of time, so we can look if there's something better to do. If not,
     it can be simply instantiated again.
     """
 
     DURATION = 0.5
-
-    BOOST_LOOK_RADIUS = 1200
-    BOOST_LOOK_ANGLE = 0.5
 
     def __init__(self, car: Car, info: GameInfo, face_target: vec3, distance_from_target: float, force_nearest=False):
         super().__init__(car)
@@ -50,15 +45,10 @@ class GeneralDefense(Maneuver):
 
         self.start_time = car.time
 
-        self.pad = None
-
     def interruptible(self) -> bool:
         return self.travel.interruptible()
 
     def step(self, dt):
-        # update finished state even if we are not using the controls
-        self.travel.step(dt)
-
         if self.travel.finished:
             # turn around to face the target direction
             if angle_to(self.car, self.face_target) > 0.3:
@@ -73,30 +63,8 @@ class GeneralDefense(Maneuver):
                 self.controls = self.stop.controls
 
         else:
-            self.pad = None
-
-            # collect boost pads on the way (greedy algorithm, assumes first found is best)
-            if self.car.boost < 90 and self.travel.interruptible():
-                to_target = ground_direction(self.car, self.travel.target)
-
-                for pad in self.info.large_boost_pads + self.info.small_boost_pads:
-                    to_pad = ground_direction(self.car, pad)
-
-                    if (
-                            pad.state == BoostPadState.Available and distance(self.car, pad) < self.BOOST_LOOK_RADIUS
-                            and angle_between(to_target, to_pad) < self.BOOST_LOOK_ANGLE
-                    ):
-                        self.pad = pad
-                        self.drive.target_pos = pad.position
-                        self.drive.target_speed = 2200
-                        self.drive.step(dt)
-                        self.controls = self.drive.controls
-                        self.explain("Collecting small pad.")
-                        break
-
-            # go to the actual target
-            if self.pad is None:
-                self.controls = self.travel.controls
+            self.travel.step(dt)
+            self.controls = self.travel.controls
 
         # don't waste boost during downtime
         if self.car.boost < 100 and ground_distance(self.car, self.travel.target) < 4000:
@@ -107,8 +75,3 @@ class GeneralDefense(Maneuver):
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)
-
-        # render target pad
-        if self.pad:
-            draw.color(draw.blue)
-            draw.circle(self.pad.position, 50)
