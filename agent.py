@@ -5,10 +5,12 @@ from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerS
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
-from strategy import solo_strategy, teamplay_strategy
+from strategy import solo_strategy, teamplay_strategy, matchcomms_strategy
+from strategy.matchcomms_strategy import get_maneuver_from_comms
 from tools.announcer import Announcer
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
+from tools.teleport_detector import TeleportDetector
 
 
 class BotimusPrime(BaseAgent):
@@ -25,6 +27,8 @@ class BotimusPrime(BaseAgent):
         self.maneuver: Optional[Maneuver] = None
         self.controls: SimpleControllerState = SimpleControllerState()
 
+        self.teleport_detector = TeleportDetector()
+
     def initialize_agent(self):
         self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
@@ -35,9 +39,6 @@ class BotimusPrime(BaseAgent):
         return True
 
     def get_output(self, packet: GameTickPacket):
-        if not packet.game_info.is_round_active:
-            return Input()
-
         # wait a few ticks after initialization, so we work correctly in rlbottraining
         if self.tick_counter < 20:
             self.tick_counter += 1
@@ -63,11 +64,21 @@ class BotimusPrime(BaseAgent):
                 self.maneuver = None
                 # Announcer.announce("Someone touched the ball, aborting maneuver.")
 
+        advised_maneuver = get_maneuver_from_comms(self.matchcomms, self.info.cars[self.index], self.info)
+        if advised_maneuver:
+            self.maneuver = advised_maneuver
+
         # choose maneuver
         if self.maneuver is None:
 
             if self.RENDERING:
                 self.draw.clear()
+
+            if packet.game_info.is_round_active:
+                self.matchcomms.outgoing_broadcast.put_nowait({
+                    "event": "checkpoint",
+                    "actions": list(matchcomms_strategy.ACTIONS.keys())
+                })
 
             if self.info.get_teammates(self.info.cars[self.index]):
                 self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
@@ -89,6 +100,9 @@ class BotimusPrime(BaseAgent):
             # cancel maneuver when finished
             if self.maneuver.finished:
                 self.maneuver = None
+
+        # if self.teleport_detector.teleport_happened(self.info):
+        #     self.maneuver = None
 
         if self.RENDERING:
             Announcer.step(self.set_game_state, self.renderer)

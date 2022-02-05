@@ -11,6 +11,7 @@ class SpeedFlipDodgeKickoff(Kickoff):
     """
     Speed flip and then dodge into the ball. Works only on corner kickoffs.
     """
+
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car, info)
         self.drive.target_pos = self.info.my_goal.center * 0.05
@@ -40,6 +41,7 @@ class SpeedFlipDodgeKickoff(Kickoff):
                 self.finished = True
 
         # abort when taking too long
-        if car.time > self._speed_flip_start_time + 3.0: self.finished = True
+        if car.time > self._speed_flip_start_time + 3.0 and self.phase > 1:
+            self.expire("Took too long.")
 
         super().step(dt)

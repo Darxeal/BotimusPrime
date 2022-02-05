@@ -117,7 +117,7 @@ class AirRollStrike(AerialStrike):
     MINIMAL_HEIGHT_TIME = 0.8
     MAXIMAL_HEIGHT_TIME = 1.8
 
-    additional_z_intercept_offset = 200
+    additional_z_intercept_offset = 0
 
     def __init__(self, car: Car, info: GameInfo, target: vec3 = None):
         super().__init__(car, info, target)
