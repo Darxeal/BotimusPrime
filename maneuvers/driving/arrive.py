@@ -80,13 +80,10 @@ class Arrive(Maneuver):
 
         # dodges and wavedashes can mess up correctly arriving, so we use them only if we really need them
         if (
-                (
-                        self.allow_dodges_and_wavedashes
-                        and norm(car.velocity) < target_speed - 600
-                        and car.boost < 20
-                        and not self.backwards
-                )
-                or not self.travel.driving  # a dodge/wavedash is in progress
+                self.allow_dodges_and_wavedashes
+                and norm(car.velocity) < target_speed - 600
+                and car.boost < 20
+                and not self.backwards
         ):
             self.action = self.travel
         else:

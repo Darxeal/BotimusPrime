@@ -71,7 +71,7 @@ class GeneralDefense(Maneuver):
             self.controls.boost = False
             self.explain("Saving boost.")
 
-        self.finished = self.travel.driving and self.car.time > self.start_time + self.DURATION
+        self.finished = self.car.time > self.start_time + self.DURATION
 
     def render(self, draw: DrawingTool):
         self.travel.render(draw)

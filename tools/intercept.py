@@ -2,8 +2,7 @@ import math
 from typing import List, Callable
 
 from data.acceleration_lut import BOOST, THROTTLE
-from rlutilities.linear_algebra import norm, angle_between, dot
-from rlutilities.mechanics import Drive
+from rlutilities.linear_algebra import angle_between, dot
 from rlutilities.simulation import Car, Ball
 from tools.vector_math import direction, ground_distance
 
@@ -27,10 +26,12 @@ def intercept_estimate(car: Car, predictions: List[Ball]) -> Intercept:
 
 
 def estimate_time(car: Car, target, dd=1, max_accelerate_time=math.inf) -> float:
-    turning_radius = 1 / Drive.max_turning_curvature(norm(car.velocity) + 500)
-    turning = angle_between(car.forward() * dd, direction(car, target)) * turning_radius / 1800
+    # turning_radius = 1 / Drive.max_turning_curvature(norm(car.velocity) + 500)
+    # turning = angle_between(car.forward() * dd, direction(car, target)) * turning_radius / 1000
+    # if turning < 0.5: turning = 0
+    # turning *= 1.2
+    turning = angle_between(car.forward() * dd, direction(car, target)) * 0.3
     if turning < 0.5: turning = 0
-    turning *= 1.5
 
     dist = max(ground_distance(car, target) - 100, 1)
     speed = dot(car.velocity, car.forward())

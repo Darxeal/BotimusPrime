@@ -2,6 +2,7 @@ import math
 
 from maneuvers.jumps.jump_off_wall_dash import JumpOffTheWallDash
 from maneuvers.maneuver import Maneuver
+from maneuvers.recovery import Recovery
 from rlutilities.linear_algebra import vec3, dot, normalize, norm
 from tools.arena import Arena
 from tools.drawing import DrawingTool
@@ -27,6 +28,10 @@ class Drive(Maneuver):
         if not Arena.inside(target, threshold):
             self.explain("Clamping target inside arena.")
             target = Arena.clamp(target, threshold)
+
+        if not self.car.on_ground:
+            self.announce("Not on ground!")
+            self.push(Recovery(self.car))
 
         # smoothly escape goal
         if abs(self.car.position.y) > Arena.size.y - 50 and abs(self.car.position.x) < 1000:

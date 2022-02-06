@@ -12,20 +12,10 @@ class PushToStackException(Exception):
 
 
 class Maneuver:
-    def __init__(self, car):
+    def __init__(self, car: Car):
         self.car: Car = car
         self.controls: Input = Input()
         self.finished: bool = False
-
-        # self.uninterruptible_subaction: Optional[Maneuver] = None
-
-    def expire(self, reason: str = None):
-        if not self.finished and reason:
-            self.announce(f"expiring: {reason}")
-        self.finished = True
-
-    def push(self, maneuver: "Maneuver"):
-        raise PushToStackException(maneuver)
 
     def step(self, dt: float):
         raise NotImplementedError
@@ -35,6 +25,14 @@ class Maneuver:
 
     def render(self, draw: DrawingTool):
         pass
+
+    def expire(self, reason: str = None):
+        if not self.finished and reason:
+            self.announce(f"expiring: {reason}")
+        self.finished = True
+
+    def push(self, maneuver: "Maneuver"):
+        raise PushToStackException(maneuver)
 
     def announce(self, message: str):
         Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=True)

@@ -1,17 +1,16 @@
+from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec2, dot, sgn
 from rlutilities.mechanics import Dodge
-from rlutilities.simulation import Car, Input
+from rlutilities.simulation import Car
+
 
 # Most of this class is from the old RLUtilities, made by chip
 
 
-class HalfFlip:
-    """
-    """
+class HalfFlip(Maneuver):
     def __init__(self, car: Car, use_boost=False):
-        self.car = car
+        super().__init__(car)
         self.use_boost = use_boost
-        self.controls = Input()
 
         self.dodge = Dodge(car)
         self.dodge.jump_duration = 0.12
@@ -20,8 +19,6 @@ class HalfFlip:
         self.s = 0.95 * sgn(dot(self.car.angular_velocity, self.car.up()) + 0.01)
 
         self.timer = 0.0
-
-        self.finished = False
 
     def interruptible(self) -> bool:
         return False
