@@ -19,19 +19,8 @@ class Drive(Maneuver):
         self.backwards = backwards
         self.drive_on_walls = False
 
-        # self.__jump_off_wall: Optional[JumpOffTheWallDash] = None
-
     def step(self, dt):
         target = self.target_pos
-
-        # if self.__jump_off_wall:
-        #     self.__jump_off_wall.target = target
-        #     self.__jump_off_wall.step(dt)
-        #     self.controls = self.__jump_off_wall.controls
-        #     if self.__jump_off_wall.finished:
-        #         self.__jump_off_wall = None
-        #         self.controls = Input()
-        #     return
 
         # don't try driving outside the arena
         threshold = 100 if abs(target.y) > 5000 else 50
@@ -48,22 +37,18 @@ class Drive(Maneuver):
         # escape walls
         if not self.drive_on_walls:
             seam_radius = 100 if abs(self.car.position.y) > Arena.size.y - 100 else 200
-            if self.car.position.z > seam_radius:
-                target = (ground(self.car) + ground(self.target_pos)) / 2
+            if self.car.position.z > seam_radius and self.car.on_ground:
+                target = (ground(self.car) * 2 + ground(self.target_pos)) / 3
                 self.explain("Driving down wall.")
 
-                if ground_distance(self.car, target) > 1500:
-                    if self.car.position.z < 800:
-                        if norm(self.car.velocity) < 300 or self.car.velocity.z < -100 and norm(
-                                self.car.velocity) > 500:
-                            self.announce("Jumping off wall.")
-                            self.push(JumpOffTheWallDash(self.car, self.target_pos))
-                        else:
-                            self.explain("Bad speed")
-                    else:
-                        self.explain("Bad height")
-                else:
-                    self.explain("Target too close")
+                if self.explainable_and([
+                    ("distance from target", ground_distance(self.car, target) > 1500),
+                    ("low height", self.car.position.z < 800),
+                    ("good vel",
+                     norm(self.car.velocity) < 300 or self.car.velocity.z < -100 and norm(self.car.velocity) > 500),
+                ]):
+                    self.announce("Jumping off wall.")
+                    self.push(JumpOffTheWallDash(self.car, self.target_pos))
 
         local_target = local(self.car, target)
 

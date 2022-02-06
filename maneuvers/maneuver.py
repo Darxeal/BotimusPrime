@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List, Tuple
 
 from rlutilities.simulation import Input, Car
 from tools.announcer import Announcer
@@ -40,3 +41,9 @@ class Maneuver:
 
     def explain(self, message: str, slowmo=False):
         Announcer.explain(f"[{type(self).__name__}] {message}", slowmo=slowmo)
+
+    def explainable_and(self, conditions: List[Tuple[str, bool]], slowmo=False) -> bool:
+        for name, cond in conditions:
+            color = DrawingTool.lime if cond else DrawingTool.red
+            Announcer.explain(f"[{type(self).__name__}] - {name}", slowmo, color)
+        return all(cond for name, cond in conditions)

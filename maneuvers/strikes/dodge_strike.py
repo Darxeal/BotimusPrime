@@ -57,17 +57,14 @@ class DodgeStrike(Strike):
             self.controls = self.dodge.controls
         else:
             super().step(dt)
+
             if self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13:
-                if abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000:
-                    if (
-                            dot(normalize(self.car.velocity), ground_direction(self.car, self.arrive.target)) > 0.9
-                            or norm(self.car.velocity) < 500
-                    ):
-                        self.dodging = True
-                    else:
-                        self.explain("Not dodging yet because my velocity is not towards the target.", slowmo=True)
-                else:
-                    self.explain("Not dodging yet because my speed is way slower than it should be.", slowmo=True)
+                if self.explainable_and([
+                    ("speed diff", abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000),
+                    ("velocity dir", dot(normalize(self.car.velocity), ground_direction(self.car, self.intercept)) > 0.9
+                                     or norm(self.car.velocity) < 500),
+                ], slowmo=True):
+                    self.dodging = True
 
         if self.dodge.finished:
             self.expire("Dodge finished.")

@@ -101,11 +101,11 @@ class MyScript(BaseScript):
 
         if "actions" in message:
             for i, name in enumerate(message["actions"]):
-                actions.update({f"ctrl+{i + 1}": play_action_factory(name)})
+                actions.update({str(i + 1): play_action_factory(name)})
 
         self.renderer.begin_rendering("controls")
         controls_overlay_text = "\n".join(f"[{key}] {action.__name__}" for key, action in actions.items())
-        self.renderer.draw_string_2d(10, 50, 2, 2, controls_overlay_text, self.renderer.yellow())
+        self.renderer.draw_string_2d(1500, 50, 2, 2, controls_overlay_text, self.renderer.yellow())
         self.renderer.end_rendering()
 
         for key, action in actions.items():

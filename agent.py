@@ -6,6 +6,7 @@ from maneuvers.maneuver import Maneuver, PushToStackException
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
 from strategy import solo_strategy, teamplay_strategy, matchcomms_strategy
+from strategy.kickoffs import choose_kickoff
 from strategy.matchcomms_strategy import get_maneuver_from_comms
 from tools.announcer import Announcer
 from tools.drawing import DrawingTool
@@ -53,11 +54,11 @@ class BotimusPrime(BaseAgent):
             return Input()
 
         self.info.read_packet(packet)
+        my_car = self.info.cars[self.index]
 
         # cancel maneuver if a kickoff is happening and current maneuver isn't a kickoff maneuver
-        if packet.game_info.is_kickoff_pause and not hasattr(self.maneuver, "is_kickoff"):
-            self.maneuver = None
-            # Announcer.announce("Kickoff is happening, aborting maneuver.")
+        if self.info.ball.position.x == self.info.ball.position.y == 0 and not hasattr(self.maneuver, "is_kickoff"):
+            self.maneuver = choose_kickoff(self.info, my_car)
 
         # reset maneuver when another car hits the ball
         touch = packet.game_ball.latest_touch
@@ -72,7 +73,7 @@ class BotimusPrime(BaseAgent):
                 self.maneuver = None
                 # Announcer.announce("Someone touched the ball, aborting maneuver.")
 
-        advised_maneuver = get_maneuver_from_comms(self.matchcomms, self.info.cars[self.index], self.info)
+        advised_maneuver = get_maneuver_from_comms(self.matchcomms, my_car, self.info)
         if advised_maneuver:
             self.maneuver = advised_maneuver
 
@@ -87,10 +88,10 @@ class BotimusPrime(BaseAgent):
                 "actions": list(matchcomms_strategy.ACTIONS.keys())
             })
 
-            if self.info.get_teammates(self.info.cars[self.index]):
-                self.maneuver = teamplay_strategy.choose_maneuver(self.info, self.info.cars[self.index])
+            if self.info.get_teammates(my_car):
+                self.maneuver = teamplay_strategy.choose_maneuver(self.info, my_car)
             else:
-                self.maneuver = solo_strategy.choose_maneuver(self.info, self.info.cars[self.index])
+                self.maneuver = solo_strategy.choose_maneuver(self.info, my_car)
             # Announcer.announce(type(self.maneuver).__name__)
 
         # execute maneuver
@@ -105,7 +106,7 @@ class BotimusPrime(BaseAgent):
                 self.draw.group("maneuver")
                 self.draw.color(self.draw.yellow)
                 stack_str = "\n".join(type(maneuver).__name__ for maneuver in self.stack)
-                self.draw.string(self.info.cars[self.index].position + vec3(0, 0, 50), stack_str)
+                self.draw.string(my_car.position + vec3(0, 0, 50), stack_str)
                 self.maneuver.render(self.draw)
 
             # cancel maneuver when finished

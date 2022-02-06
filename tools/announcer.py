@@ -5,6 +5,7 @@ from typing import List, Callable
 from rlbot.utils.game_state_util import GameState, GameInfoState
 from rlbot.utils.rendering.rendering_manager import RenderingManager
 
+from tools.drawing import DrawingTool
 from tools.math import lerp
 
 
@@ -18,6 +19,7 @@ class Announcement:
 class Explanation:
     message: str
     time_last_active: float
+    color: tuple = DrawingTool.yellow
     active = True
 
 
@@ -40,14 +42,15 @@ class Announcer:
             cls.new_announcement_wants_slowmo = True
 
     @classmethod
-    def explain(cls, message: str, slowmo=True):
+    def explain(cls, message: str, slowmo=True, color=None):
+        now = time.time()
         for e in cls.explanations:
             if e.message == message:
-                e.time_last_active = time.time()
+                e.time_last_active = now
                 e.active = True
                 break
         else:
-            cls.explanations.append(Explanation(message, time.time()))
+            cls.explanations.append(Explanation(message, now, color) if color else Explanation(message, now))
 
         if slowmo:
             cls.new_announcement_wants_slowmo = True
@@ -106,7 +109,7 @@ class Announcer:
             if dt > fade_duration:
                 continue
             lerp_t = dt / fade_duration
-            color = renderer.yellow() if explanation.active else \
+            color = renderer.create_color(255, *explanation.color) if explanation.active else \
                 renderer.create_color(int(lerp(255, 0, lerp_t)), 0, 255, 255)
             renderer.draw_string_2d(box_x, box_y + i * line_height, 1, 1, explanation.message, color)
             explanation.active = False

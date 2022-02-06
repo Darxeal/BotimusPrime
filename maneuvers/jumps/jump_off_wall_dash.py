@@ -16,10 +16,12 @@ class JumpOffTheWallDash(Maneuver):
 
         self.__start_time = car.time
 
+    def interruptible(self) -> bool:
+        return False
+
     def step(self, dt: float):
         if self.car.time - self.__start_time < 0.1:
             self.controls.jump = True
-            self.explain("Jumping off wall.")
             return
 
         if self.car.on_ground:
@@ -33,6 +35,6 @@ class JumpOffTheWallDash(Maneuver):
             self.controls = self.dodge.controls
             self.explain("Almost landing, attempting wavedash.", slowmo=True)
         else:
-            self.reorient.target_orientation = look_at(to_target + vec3(z=0.3), vec3(z=1))
+            self.reorient.target_orientation = look_at(to_target + vec3(z=0.5), vec3(z=1))
             self.reorient.step(dt)
             self.controls = self.reorient.controls
