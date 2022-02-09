@@ -1,6 +1,5 @@
 from typing import Optional
 
-from maneuvers.strikes.double_touch import DoubleTouch
 from maneuvers.dribbling.carry_and_flick import CarryAndFlick
 from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike, AirRollStrike
@@ -9,8 +8,10 @@ from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_strike import GroundStrike
 from maneuvers.strikes.mirror_strike import MirrorStrike
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import vec3, dot
+from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car, Ball
+from strategy import defense
+from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.vector_math import distance, ground_distance, align
 
@@ -34,21 +35,21 @@ def direct_shot(info: GameInfo, car: Car, target: vec3) -> Strike:
     aerial_strike = aerial_shot(info, car, target)
 
     if (
-        aerial_strike is not None
-        and aerial_strike.intercept.time < dodge_shot.intercept.time
-        and abs(aerial_strike.intercept.position[1] - info.their_goal.center[1]) > 500
+            aerial_strike is not None
+            and aerial_strike.intercept.time < dodge_shot.intercept.time
+            and abs(aerial_strike.intercept.position[1] - info.their_goal.center[1]) > 500
     ):
         return aerial_strike
 
     if (
-        dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
-        or ground_distance(dodge_shot.intercept, target) < 2000
-        or distance(ground_shot.intercept.velocity, car.velocity) < 500
-        or is_opponent_close(info, 300)
+            dodge_shot.intercept.time < ground_shot.intercept.time - 0.1
+            or ground_distance(dodge_shot.intercept, target) < 2000
+            or distance(ground_shot.intercept.velocity, car.velocity) < 500
+            or is_opponent_close(info, 300)
     ):
         if (
-            ground_distance(dodge_shot.intercept, target) < 4000
-            and abs(dodge_shot.intercept.position.x) < 2000
+                ground_distance(dodge_shot.intercept, target) < 4000
+                and abs(dodge_shot.intercept.position.x) < 2000
         ):
             return CloseShot(car, info, target)
         return dodge_shot
@@ -57,13 +58,13 @@ def direct_shot(info: GameInfo, car: Car, target: vec3) -> Strike:
 
 def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Ball, allow_dribble=False) -> Maneuver:
     if (
-        allow_dribble
-        and (intercept.position[2] > 100 or abs(intercept.velocity[2]) > 250 or distance(car, info.ball) < 300)
-        and abs(intercept.velocity[2]) < 700
-        and ground_distance(car, intercept) < 1500
-        and ground_distance(intercept, info.my_goal.center) > 1000
-        and ground_distance(intercept, info.their_goal.center) > 1000
-        and not is_opponent_close(info, info.ball.position[2] * 2 + 1000)
+            allow_dribble
+            and (intercept.position[2] > 100 or abs(intercept.velocity[2]) > 250 or distance(car, info.ball) < 300)
+            and abs(intercept.velocity[2]) < 700
+            and ground_distance(car, intercept) < 1500
+            and ground_distance(intercept, info.my_goal.center) > 1000
+            and ground_distance(intercept, info.their_goal.center) > 1000
+            and not is_opponent_close(info, info.ball.position[2] * 2 + 1000)
     ):
         return CarryAndFlick(car, info, target)
 
@@ -71,7 +72,10 @@ def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Ball, allow_drib
 
     if not isinstance(direct, GroundStrike) and intercept.time < car.time + 4.0:
         alignment = align(car.position, intercept, target)
-        if alignment < -0.3 and abs(intercept.position[1] - target[1]) > 3000:
+        if alignment < -0.3:
+            Announcer.announce("[Strategy] Alignment is so bad I'll rather clear this")
+            return defense.any_clear(info, car)
+        if alignment < 0 and abs(intercept.position.y - target.y) > 3000:
             return MirrorStrike(car, info, target)
 
     return direct

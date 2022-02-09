@@ -1,18 +1,17 @@
-from rlutilities.simulation import Input
+from maneuvers.maneuver import Maneuver
+from rlutilities.simulation import Car
+
 
 # Most of this class is from the old RLUtilities, made by chip
 
 
-class Jump:
-    def __init__(self, duration):
-
+class Jump(Maneuver):
+    def __init__(self, car: Car, duration: float):
+        super().__init__(car)
         self.duration = duration
-        self.controls = Input()
 
         self.timer = 0
         self.counter = 0
-
-        self.finished = False
 
     def interruptible(self) -> bool:
         return False

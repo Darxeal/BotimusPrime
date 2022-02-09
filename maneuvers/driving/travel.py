@@ -1,13 +1,12 @@
 from maneuvers.driving.drive import Drive
 from maneuvers.jumps.half_flip import HalfFlip
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3, norm, dot, vec2
+from rlutilities.linear_algebra import vec3, norm, dot, vec2, xy, normalize
 from rlutilities.mechanics import Wavedash, Dodge
 from rlutilities.simulation import Car, Game
 from tools.arena import Arena
 from tools.drawing import DrawingTool
-from tools.intercept import estimate_time
-from tools.vector_math import ground, distance, ground_distance, angle_to, direction
+from tools.vector_math import ground, ground_distance, angle_to, direction, ground_direction
 
 
 class TravelDodge(Maneuver):
@@ -15,7 +14,7 @@ class TravelDodge(Maneuver):
         super().__init__(car)
         self.dodge = Dodge(car)
         self.dodge.direction = vec2(direction(car, target))
-        self.dodge.jump_duration = 0.07
+        self.dodge.jump_duration = 0.05
 
     def step(self, dt: float):
         self.dodge.step(dt)
@@ -60,7 +59,7 @@ class Travel(Maneuver):
     HALFFLIP_DURATION = 2
     WAVEDASH_DURATION = 1.45
 
-    def __init__(self, car: Car, target: vec3 = vec3(0, 0, 0), waste_boost=False):
+    def __init__(self, car: Car, target: vec3 = vec3(0, 0, 0), waste_boost=False, allow_backwards=False):
         super().__init__(car)
 
         self.target = Arena.clamp(ground(target), 100)
@@ -70,17 +69,7 @@ class Travel(Maneuver):
         self._time_on_ground = 0
         self.driving = True
 
-        # decide whether to start driving backwards and halfflip later
-        forward_estimate = estimate_time(car, self.target)
-        backwards_estimate = estimate_time(car, self.target, -1) + 0.5
-        backwards = (
-                dot(car.velocity, car.forward()) < 500
-                and backwards_estimate < forward_estimate
-                and (distance(car, self.target) > 3000 or distance(car, self.target) < 300)
-                and car.position[2] < 200
-        )
-
-        self.drive = Drive(car, self.target, 2300, backwards)
+        self.drive = Drive(car, self.target, 2300)
 
     def step(self, dt):
         car = self.car
@@ -100,6 +89,7 @@ class Travel(Maneuver):
                     and car.position.z < 100
                     and car_speed < 2000
                     and angle_to(car, target, backwards=forward_speed < 0) < 0.1
+                    and dot(normalize(xy(car.velocity)), ground_direction(car, target)) > 0.9
                     and Game.gravity.z < -500  # don't dodge in low gravity
             ):
                 # if going forward, use a dodge or a wavedash
@@ -108,13 +98,16 @@ class Travel(Maneuver):
 
                     if car_speed > 1200 and not use_boost_instead:
                         if time_left > self.DODGE_DURATION:
+                            self._time_on_ground = 0
                             self.push(TravelDodge(car, target))
 
                         elif time_left > self.WAVEDASH_DURATION:
+                            self._time_on_ground = 0
                             self.push(TravelWavedash(car, target))
 
                 # if going backwards, use a halfflip
                 elif time_left > self.HALFFLIP_DURATION and car_speed > 800:
+                    self._time_on_ground = 0
                     self.push(HalfFlip(car, self.waste_boost and time_left > 3))
 
         self.drive.step(dt)

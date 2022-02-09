@@ -98,7 +98,7 @@ class AerialStrike(Strike):
                 ], slowmo=True):
                     self.aerialing = True
                 elif too_fast_towards_target:
-                    self.controls.throttle = 0
+                    self.controls.throttle = -1
                     self.controls.boost = False
                     self.explain("Slowing down.")
 
@@ -128,6 +128,9 @@ class AirRollStrike(AerialStrike):
         self.dodge = Dodge(car)
         self.dodge.jump_duration = 0.0
         self.dodge.delay = 0.0
+
+    def boost_required(self):
+        return self.required_aerial_time() * 33
 
     def step(self, dt):
         super().step(dt)

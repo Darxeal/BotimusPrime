@@ -2,10 +2,11 @@ from maneuvers.general_defense import GeneralDefense
 from maneuvers.pickup_boostpad import PickupBoostPad
 from maneuvers.recovery import Recovery
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import dot
+from rlutilities.linear_algebra import dot, norm
 from rlutilities.simulation import Car
 from strategy import offense, defense
 from strategy.boost_management import choose_boostpad_to_pickup
+from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.intercept import intercept_estimate
 from tools.vector_math import align, ground, ground_distance, ground_direction
@@ -36,15 +37,21 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     # if ball is in a dangerous position, clear it
     if (
             ground_distance(my_intercept, my_goal) < 3000
-            and (abs(my_intercept.position[0]) < 2000 or abs(my_intercept.position[1]) < 4500)
-            and my_car.position[2] < 300
+            and (abs(my_intercept.position.x) < 2000 or abs(my_intercept.position.y) < 4500)
     ):
         if align(my_car.position, my_intercept, their_goal) > 0.5:
+            Announcer.announce("[Strategy] Dangerous ball, but alignment good enough for a shot.")
             return offense.any_shot(info, my_intercept.car, their_goal, my_intercept, allow_dribble=True)
         return defense.any_clear(info, my_intercept.car)
 
     # if I'm low on boost and the ball is not near my goal, go for boost
-    if my_car.boost < 10 and ground_distance(my_intercept, their_goal) > 3000 and best_boostpad_to_pickup is not None:
+    if (
+            my_car.boost < 10
+            and best_boostpad_to_pickup is not None
+            and ground_distance(my_car, best_boostpad_to_pickup) < 3000
+            and norm(my_car.velocity) < 1500
+            and ground_distance(my_intercept, their_goal) > 3000
+    ):
         return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     ball_in_their_half = abs(my_intercept.position[1] - their_goal[1]) < 3000
@@ -62,14 +69,15 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     if (
             align(my_car.position, my_intercept, their_goal) > -0.5
             or ground_distance(my_intercept, their_goal) < 2000
-            or ground_distance(opponent, their_intercept) < 300
+            # or ground_distance(opponent, their_intercept) < 300
+            or opponent.boost < 10
     ):
         if my_car.position[2] < 300:
             shot = offense.any_shot(info, my_intercept.car, their_goal, my_intercept, allow_dribble=True)
             if (
                     not isinstance(shot, Strike)
                     or shot.intercept.time < their_intercept.time
-                    or abs(shot.intercept.position[0]) < 3500
+                    or abs(shot.intercept.position.x) < 3500
             ):
                 return shot
 

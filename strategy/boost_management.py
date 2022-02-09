@@ -1,9 +1,14 @@
 from typing import Optional, Set
 
+from rlutilities.linear_algebra import dot
 from rlutilities.simulation import Car, BoostPad, BoostPadState
 from tools.game_info import GameInfo
 from tools.intercept import estimate_time
-from tools.vector_math import distance
+from tools.vector_math import distance, ground_direction, ground_distance
+
+
+def pad_available_in_time(pad: BoostPad, car: Car) -> bool:
+    return pad.state == BoostPadState.Available or estimate_time(car, pad) > pad.timer
 
 
 def choose_boostpad_to_pickup(info: GameInfo, car: Car, forbidden_pads: Set[BoostPad] = None) -> Optional[BoostPad]:
@@ -11,10 +16,9 @@ def choose_boostpad_to_pickup(info: GameInfo, car: Car, forbidden_pads: Set[Boos
         forbidden_pads = set()
 
     # consider pads which are available or going to spawn before we can reach them
-    active_pads = {pad for pad in info.large_boost_pads if pad.state == BoostPadState.Available}
-    soon_active_pads = {pad for pad in info.large_boost_pads if estimate_time(car, pad.position) * 0.7 > pad.timer}
+    active_pads = {pad for pad in info.large_boost_pads if pad_available_in_time(pad, car)}
 
-    valid_pads = active_pads | soon_active_pads - forbidden_pads
+    valid_pads = active_pads - forbidden_pads
     if not valid_pads:
         return None
 
@@ -24,3 +28,23 @@ def choose_boostpad_to_pickup(info: GameInfo, car: Car, forbidden_pads: Set[Boos
 
     # and pick the closest valid pad to that position
     return min(valid_pads, key=lambda pad: distance(pad.position, pos))
+
+
+def best_pad_on_the_way_to_ball(car: Car, info: GameInfo) -> Optional[BoostPad]:
+    ball_to_goal = ground_direction(info.ball, info.their_goal.center)
+    boosts_before_ball = [pad for pad in info.large_boost_pads if
+                          dot(ball_to_goal, ground_direction(pad, info.ball)) > 0]
+    if not boosts_before_ball:
+        return None
+    best_pad = min(boosts_before_ball, key=lambda pad: ground_distance(car, pad) + ground_distance(pad, info.ball))
+    if not pad_available_in_time(best_pad, car):
+        return None
+    return best_pad
+
+
+def best_pad_on_the_way_to_my_goal(car: Car, info: GameInfo) -> Optional[BoostPad]:
+    best_pad = min(info.large_boost_pads,
+                   key=lambda pad: ground_distance(car, pad) + ground_distance(pad, info.my_goal.center))
+    if not pad_available_in_time(best_pad, car):
+        return None
+    return best_pad

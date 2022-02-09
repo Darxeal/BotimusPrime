@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from rlutilities.simulation import Input, Car
 from tools.announcer import Announcer
@@ -8,7 +8,7 @@ from tools.drawing import DrawingTool
 
 @dataclass
 class PushToStackException(Exception):
-    pushed_maneuver: "Maneuver"
+    pushed_maneuvers: List["Maneuver"]
 
 
 class Maneuver:
@@ -31,8 +31,8 @@ class Maneuver:
             self.announce(f"expiring: {reason}")
         self.finished = True
 
-    def push(self, maneuver: "Maneuver"):
-        raise PushToStackException(maneuver)
+    def push(self, maneuver: Union["Maneuver", List["Maneuver"]]):
+        raise PushToStackException(reversed(maneuver) if isinstance(maneuver, list) else [maneuver])
 
     def announce(self, message: str):
         Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=True)

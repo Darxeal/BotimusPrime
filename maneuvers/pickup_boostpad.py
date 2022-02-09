@@ -1,6 +1,6 @@
 from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3, norm
+from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car, BoostPad, BoostPadState
 from tools.drawing import DrawingTool
 from tools.vector_math import distance
@@ -20,10 +20,6 @@ class PickupBoostPad(Maneuver):
         return self.travel.interruptible()
 
     def step(self, dt):
-        # slow down when we're about to pick up the boost, so we can turn faster afterwards
-        if distance(self.car, self.pad) < norm(self.car.velocity) * 0.2:
-            self.travel.drive.target_speed = 1400
-
         self.travel.step(dt)
         self.controls = self.travel.controls
 

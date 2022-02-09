@@ -35,9 +35,9 @@ class GameInfo(Game):
         self.their_goal = Goal(1 - team)
 
         self.ball_predictions: List[Ball] = []
-        self.about_to_score = False
-        self.about_to_be_scored_on = False
-        self.time_of_goal = -1
+
+        self._last_score_sum = -1
+        self.is_ball_present = True
 
         self.large_boost_pads: List[BoostPad] = []
         self.small_boost_pads: List[BoostPad] = []
@@ -56,6 +56,16 @@ class GameInfo(Game):
         for pad in self.small_boost_pads:
             pad.timer = 4.0 - pad.timer
 
+        score_sum = packet.teams[0].score + packet.teams[1].score
+        if self._last_score_sum == -1:
+            self._last_score_sum = score_sum
+        elif score_sum > self._last_score_sum:
+            self._last_score_sum = score_sum
+            self.is_ball_present = False
+
+        if not self.is_ball_present and packet.game_info.is_kickoff_pause:
+            self.is_ball_present = True
+
     def get_teammates(self, my_car: Car) -> List[Car]:
         return [car for car in self.cars if car.team == self.team and car.id != my_car.id]
 
@@ -63,24 +73,14 @@ class GameInfo(Game):
         return [car for car in self.cars if car.team != self.team]
 
     def predict_ball(self, duration=5.0, dt=1 / 120):
-        self.about_to_score = False
-        self.about_to_be_scored_on = False
-        self.time_of_goal = -1
-
         self.ball_predictions = []
         prediction = Ball(self.ball)
 
         while prediction.time < self.time + duration:
             prediction.step(dt)
             self.ball_predictions.append(Ball(prediction))
-
-            if self.time_of_goal == -1:
-                if self.my_goal.inside(prediction.position):
-                    self.about_to_be_scored_on = True
-                    self.time_of_goal = prediction.time
-                if self.their_goal.inside(prediction.position):
-                    self.about_to_score = True
-                    self.time_of_goal = prediction.time
+            if self.their_goal.inside(prediction.position) or self.my_goal.inside(prediction.position):
+                break
 
     @staticmethod
     def predict_car_drive(car: Car, time_limit=2.0, dt=1 / 60) -> List[vec3]:

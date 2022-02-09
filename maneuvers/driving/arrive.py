@@ -25,7 +25,7 @@ class Arrive(Maneuver):
         self.travel.drive.backwards = False
         self.action = self.drive
 
-        self.target_direction: Optional[None] = None
+        self.target_direction: Optional[vec3] = None
         self.target: vec3 = None
         self.arrival_time: float = 0
         self.backwards: bool = False

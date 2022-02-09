@@ -5,13 +5,12 @@ from rlbot.agents.base_agent import BaseAgent, GameTickPacket, SimpleControllerS
 from maneuvers.maneuver import Maneuver, PushToStackException
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Input
-from strategy import solo_strategy, teamplay_strategy, matchcomms_strategy
+from strategy import solo_strategy, teamplay_strategy
 from strategy.kickoffs import choose_kickoff
 from strategy.matchcomms_strategy import get_maneuver_from_comms
 from tools.announcer import Announcer
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
-from tools.teleport_detector import TeleportDetector
 
 
 class BotimusPrime(BaseAgent):
@@ -19,7 +18,7 @@ class BotimusPrime(BaseAgent):
 
     def __init__(self, name, team, index):
         super().__init__(name, team, index)
-        self.info: GameInfo = None
+        self.info = GameInfo(self.team)
         self.draw: DrawingTool = None
 
         self.tick_counter = 0
@@ -28,10 +27,7 @@ class BotimusPrime(BaseAgent):
         self.stack: List[Maneuver] = []
         self.controls: SimpleControllerState = SimpleControllerState()
 
-        self.teleport_detector = TeleportDetector()
-
     def initialize_agent(self):
-        self.info = GameInfo(self.team)
         self.info.set_mode("soccar")
         self.info.read_field_info(self.get_field_info())
         self.draw = DrawingTool(self.renderer, self.team)
@@ -78,15 +74,15 @@ class BotimusPrime(BaseAgent):
             self.maneuver = advised_maneuver
 
         # choose maneuver
-        if self.maneuver is None:
+        if self.maneuver is None and self.info.is_ball_present:
 
             if self.RENDERING:
                 self.draw.clear()
 
-            self.matchcomms.outgoing_broadcast.put_nowait({
-                "event": "checkpoint",
-                "actions": list(matchcomms_strategy.ACTIONS.keys())
-            })
+            # self.matchcomms.outgoing_broadcast.put_nowait({
+            #     "event": "checkpoint",
+            #     "actions": list(matchcomms_strategy.ACTIONS.keys())
+            # })
 
             if self.info.get_teammates(my_car):
                 self.maneuver = teamplay_strategy.choose_maneuver(self.info, my_car)
@@ -100,7 +96,7 @@ class BotimusPrime(BaseAgent):
                 self.maneuver.step(self.info.time_delta)
                 self.controls = self.maneuver.controls
             except PushToStackException as push:
-                self.stack.append(push.pushed_maneuver)
+                self.stack.extend(push.pushed_maneuvers)
 
             if self.RENDERING:
                 self.draw.group("maneuver")

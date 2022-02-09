@@ -47,7 +47,8 @@ class DodgeStrike(Strike):
         self.arrive.additional_shift = self.get_jump_duration(intercept.position[2]) * 500
 
     def interruptible(self) -> bool:
-        if self.info.ball.position[2] > 300 and self.dodging:
+        if self.info.ball.position.z > 400 and self.dodging:
+            self.announce("Opponent hit the ball at a decent height, interrupting")
             return True
         return not self.dodging and super().interruptible()
 
@@ -61,8 +62,8 @@ class DodgeStrike(Strike):
             if self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13:
                 if self.explainable_and([
                     ("speed diff", abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000),
-                    ("velocity dir", dot(normalize(self.car.velocity), ground_direction(self.car, self.intercept)) > 0.9
-                                     or norm(self.car.velocity) < 500),
+                    ("velocity dir", dot(normalize(self.car.velocity), ground_direction(self.car, self.intercept)) > 0.8
+                                     or norm(self.car.velocity) < 1000),
                 ], slowmo=True):
                     self.dodging = True
 

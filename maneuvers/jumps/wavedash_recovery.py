@@ -4,7 +4,7 @@ from rlutilities.mechanics import Reorient, Dodge
 from tools.vector_math import ground_direction
 
 
-class JumpOffTheWallDash(Maneuver):
+class WavedashRecovery(Maneuver):
     def __init__(self, car, target: vec3):
         super().__init__(car)
         self.target = target
@@ -14,16 +14,10 @@ class JumpOffTheWallDash(Maneuver):
         self.dodge.jump_duration = 0
         self.dodge.delay = 0
 
-        self.__start_time = car.time
-
     def interruptible(self) -> bool:
         return False
 
     def step(self, dt: float):
-        if self.car.time - self.__start_time < 0.1:
-            self.controls.jump = True
-            return
-
         if self.car.on_ground:
             self.expire()
 

@@ -24,10 +24,11 @@ class Strike(Maneuver):
         self.arrive = Arrive(car)
         self.intercept: Ball = None
 
+        self._start_time = car.time
         self._has_drawn_prediction = False
         self._last_update_time = car.time
         self.update_intercept()
-        self._initial_time = self.intercept.time
+        self._initial_intercept_time = self.intercept.time
 
     def intercept_predicate(self, ball: Ball):
         return estimate_time(self.car, ball.position) < ball.time - self.car.time
@@ -53,7 +54,7 @@ class Strike(Maneuver):
             self._has_drawn_prediction = False
             self.update_intercept()
 
-            if self.intercept.time > self._initial_time + self.max_additional_time:
+            if self.intercept.time > self._initial_intercept_time + self.max_additional_time:
                 self.expire("This strike has delayed the intercept too much.")
 
         self.arrive.step(dt)
@@ -62,6 +63,9 @@ class Strike(Maneuver):
         # if self.arrive.drive.target_speed < 300:
         #     self.controls.throttle = 0
         #     self.explain("Target speed low, stopping instead.")
+
+        if self.intercept.time - self.car.time > 2.0 and self.car.time > self._start_time + 1.0:
+            self.expire("Plenty of time left, see if there's something better to do.")
 
         if self.arrive.finished:
             self.expire("Arrive finished.")

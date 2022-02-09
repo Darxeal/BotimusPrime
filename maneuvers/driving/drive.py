@@ -1,13 +1,14 @@
 import math
 
-from maneuvers.jumps.jump_off_wall_dash import JumpOffTheWallDash
+from maneuvers.jumps.jump import Jump
+from maneuvers.jumps.wavedash_recovery import WavedashRecovery
 from maneuvers.maneuver import Maneuver
 from maneuvers.recovery import Recovery
-from rlutilities.linear_algebra import vec3, dot, normalize, norm
+from rlutilities.linear_algebra import vec3, dot, norm, sgn
 from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.math import abs_clamp, clamp11, clamp
-from tools.vector_math import ground, local, ground_distance, distance, direction
+from tools.vector_math import ground, local, ground_distance, distance, direction, world
 
 
 class Drive(Maneuver):
@@ -43,7 +44,7 @@ class Drive(Maneuver):
         if not self.drive_on_walls:
             seam_radius = 100 if abs(self.car.position.y) > Arena.size.y - 100 else 200
             if self.car.position.z > seam_radius and self.car.on_ground:
-                target = (ground(self.car) * 2 + ground(self.target_pos)) / 3
+                target = (ground(self.car) * 4 + ground(self.target_pos)) / 5
                 self.explain("Driving down wall.")
 
                 if self.explainable_and([
@@ -53,7 +54,7 @@ class Drive(Maneuver):
                      norm(self.car.velocity) < 300 or self.car.velocity.z < -100 and norm(self.car.velocity) > 500),
                 ]):
                     self.announce("Jumping off wall.")
-                    self.push(JumpOffTheWallDash(self.car, self.target_pos))
+                    self.push([Jump(self.car, 0.1), WavedashRecovery(self.car, self.target_pos)])
 
         local_target = local(self.car, target)
 
@@ -65,15 +66,38 @@ class Drive(Maneuver):
         phi = math.atan2(local_target[1], local_target[0])
         self.controls.steer = clamp11(2.5 * phi)
 
+        turn_radius = Drive.turn_radius(norm(self.car.velocity))
+        local_turn_center = vec3(0, turn_radius * sgn(local_target.y), 0)
+
+        if (
+                not Arena.inside(world(self.car, local_turn_center))
+                and abs(phi) > 1.0
+                # and ground_distance(self.car, target) > 1000
+                and abs(self.car.position.y) < Arena.size.y
+        ):
+            self.controls.steer *= -1
+            self.explain("Turning other way to avoid wall", slowmo=True)
+
+        target_speed = self.target_speed
+
         # powersliding
         self.controls.handbrake = 0
-        if (
-                abs(phi) > 1.5
-                and self.car.position[2] < 300
-                and (ground_distance(self.car, target) < 3500 or abs(self.car.position[0]) > 3500)
-                and dot(normalize(self.car.velocity), self.car.forward()) > 0.85
-        ):
-            self.controls.handbrake = 1
+        if abs(phi) > 1.4:
+            if (
+                    self.car.position[2] < 300
+                    and ground_distance(self.car, target) < 1500
+                    and dot(self.car.velocity, self.car.forward()) > 500
+            ):
+                self.controls.handbrake = 1
+                self.explain("Powersliding")
+            else:
+                target_speed = 1000
+                self.explain("Slowing down to turn faster")
+
+        # slow down if target inside turn circle
+        if ground_distance(local_target, local_turn_center) < turn_radius:
+            target_speed = 1000
+            self.explain("Slowing down (target inside turn circle)")
 
         # forward velocity
         vf = dot(self.car.velocity, self.car.forward())
@@ -81,16 +105,16 @@ class Drive(Maneuver):
             vf *= -1
 
         # speed controller
-        if vf < self.target_speed:
+        if vf < target_speed:
             self.controls.throttle = 1.0
-            if self.target_speed > 1400 and vf < 2250 and self.target_speed - vf > 50:
+            if target_speed > 1400 and vf < 2250 and target_speed - vf > 50:
                 self.controls.boost = 1
             else:
                 self.controls.boost = 0
         else:
-            if (vf - self.target_speed) > 400:  # 75
+            if (vf - target_speed) > 400:  # 75
                 self.controls.throttle = -1.0
-            elif (vf - self.target_speed) > 100:
+            elif (vf - target_speed) > 100:
                 if self.car.up()[2] > 0.85:
                     self.controls.throttle = 0.0
                 else:

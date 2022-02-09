@@ -3,21 +3,22 @@ from typing import Optional
 from maneuvers.jumps.jump import Jump
 from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, dot, normalize, sgn
+from tools.math import clamp11
+
 
 # Most of this class is from the old RLUtilities, made by chip.
 # The dodge in the new RLUtilities is a bit different, and my shot mechanics are tuned for this one, so I kept it.
-from tools.math import clamp11
-
 
 class AirDodge(Maneuver):
     """
     Dodge towards a target position. If target is None, do a double jump.
     """
+
     def __init__(self, car, jump_duration=0.0, target=None):
         super().__init__(car)
         self.target: Optional[vec3] = target
 
-        self.jump = Jump(jump_duration)
+        self.jump = Jump(car, jump_duration)
 
         if jump_duration <= 0:
             self.jump.finished = True
