@@ -4,7 +4,6 @@ from maneuvers.maneuver import Maneuver
 from rlutilities.linear_algebra import vec3, norm, dot, vec2, xy, normalize
 from rlutilities.mechanics import Wavedash, Dodge
 from rlutilities.simulation import Car, Game
-from tools.arena import Arena
 from tools.drawing import DrawingTool
 from tools.vector_math import ground, ground_distance, angle_to, direction, ground_direction
 
@@ -62,7 +61,7 @@ class Travel(Maneuver):
     def __init__(self, car: Car, target: vec3 = vec3(0, 0, 0), waste_boost=False, allow_backwards=False):
         super().__init__(car)
 
-        self.target = Arena.clamp(ground(target), 100)
+        self.target = target
         self.waste_boost = waste_boost
         self.finish_distance = 500
 

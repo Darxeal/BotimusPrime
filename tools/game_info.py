@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from rlbot.utils.structures.game_data_struct import GameTickPacket, FieldInfoPacket
 
-from rlutilities.linear_algebra import vec3, vec2, norm, normalize, cross, rotation, dot, xy
+from rlutilities.linear_algebra import vec3, vec2, norm, normalize, cross, rotation, dot, xy, sgn
 from rlutilities.simulation import Game, Car, Ball, BoostPad, BoostPadType
 from tools.vector_math import distance
 
@@ -27,6 +27,8 @@ class Goal:
 
 
 class GameInfo(Game):
+    large_boost_pads: List[BoostPad] = None
+    small_boost_pads: List[BoostPad] = None
 
     def __init__(self, team):
         super().__init__()
@@ -39,13 +41,10 @@ class GameInfo(Game):
         self._last_score_sum = -1
         self.is_ball_present = True
 
-        self.large_boost_pads: List[BoostPad] = []
-        self.small_boost_pads: List[BoostPad] = []
-
     def read_field_info(self, field_info: FieldInfoPacket):
         super().read_field_info(field_info)
-        self.large_boost_pads = [pad for pad in self.pads if pad.type == BoostPadType.Full]
-        self.small_boost_pads = [pad for pad in self.pads if pad.type == BoostPadType.Partial]
+        GameInfo.large_boost_pads = [pad for pad in self.pads if pad.type == BoostPadType.Full]
+        GameInfo.small_boost_pads = [pad for pad in self.pads if pad.type == BoostPadType.Partial]
 
     def read_packet(self, packet: GameTickPacket):
         super().read_packet(packet)
@@ -79,7 +78,11 @@ class GameInfo(Game):
         while prediction.time < self.time + duration:
             prediction.step(dt)
             self.ball_predictions.append(Ball(prediction))
-            if self.their_goal.inside(prediction.position) or self.my_goal.inside(prediction.position):
+            offset = vec3(0, sgn(self.their_goal.center.y) * Ball.radius, 0)
+            if (
+                    self.their_goal.inside(prediction.position - offset)
+                    or self.my_goal.inside(prediction.position + offset)
+            ):
                 break
 
     @staticmethod

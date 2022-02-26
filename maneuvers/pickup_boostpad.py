@@ -1,9 +1,10 @@
 from maneuvers.driving.travel import Travel
 from maneuvers.maneuver import Maneuver
-from rlutilities.linear_algebra import vec3
+from rlutilities.linear_algebra import vec3, norm
 from rlutilities.simulation import Car, BoostPad, BoostPadState
 from tools.drawing import DrawingTool
-from tools.vector_math import distance
+from tools.math import clamp
+from tools.vector_math import distance, ground_distance
 
 
 class PickupBoostPad(Maneuver):
@@ -17,7 +18,8 @@ class PickupBoostPad(Maneuver):
         self.travel = Travel(car, self.pad.position, waste_boost=True)
 
     def interruptible(self) -> bool:
-        return self.travel.interruptible()
+        time_left = ground_distance(self.car, self.pad) / clamp(norm(self.car.velocity), 1000, 2300)
+        return time_left > 1.0
 
     def step(self, dt):
         self.travel.step(dt)

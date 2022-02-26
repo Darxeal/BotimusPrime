@@ -1,3 +1,4 @@
+from maneuvers.fake_challenge import FakeChallenge
 from maneuvers.general_defense import GeneralDefense
 from maneuvers.pickup_boostpad import PickupBoostPad
 from maneuvers.recovery import Recovery
@@ -9,7 +10,7 @@ from strategy.boost_management import choose_boostpad_to_pickup
 from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.intercept import intercept_estimate
-from tools.vector_math import align, ground, ground_distance, ground_direction
+from tools.vector_math import align, ground, ground_distance, ground_direction, distance
 
 
 def choose_maneuver(info: GameInfo, my_car: Car):
@@ -53,6 +54,14 @@ def choose_maneuver(info: GameInfo, my_car: Car):
             and ground_distance(my_intercept, their_goal) > 3000
     ):
         return PickupBoostPad(my_car, best_boostpad_to_pickup)
+
+    if (
+            distance(opponent, ball) < 300
+            and ball.position.z > 100
+            and norm(opponent.velocity - ball.velocity) < 500
+            and opponent.on_ground
+    ):
+        return FakeChallenge(my_car, info)
 
     ball_in_their_half = abs(my_intercept.position[1] - their_goal[1]) < 3000
     shadow_distance = 4000 if ball_in_their_half else 6000

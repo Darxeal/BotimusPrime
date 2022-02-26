@@ -14,11 +14,13 @@ class Kickoff(Maneuver):
     Just write your phase logic in your step function, set the 'self.action' attribute and call super().step().
     If you don't want that, just override step() normally.
     """
+
     def __init__(self, car: Car, info: GameInfo):
         super().__init__(car)
         self.info: GameInfo = info
 
         self.drive = Drive(car, target_speed=2300)
+        self.drive.detour_for_pads = False
 
         self.action: Maneuver = self.drive
         self.phase = 1

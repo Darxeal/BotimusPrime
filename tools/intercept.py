@@ -3,7 +3,7 @@ from typing import List, Callable
 
 from data.acceleration_lut import BOOST, THROTTLE
 from rlutilities.linear_algebra import angle_between, dot
-from rlutilities.simulation import Car, Ball
+from rlutilities.simulation import Car, Ball, BoostPad, BoostPadState
 from tools.vector_math import direction, ground_distance
 
 
@@ -30,8 +30,9 @@ def estimate_time(car: Car, target, dd=1, max_accelerate_time=math.inf) -> float
     # turning = angle_between(car.forward() * dd, direction(car, target)) * turning_radius / 1000
     # if turning < 0.5: turning = 0
     # turning *= 1.2
-    turning = angle_between(car.forward() * dd, direction(car, target)) * 0.2
-    if turning < 0.4: turning = 0
+    turning = angle_between(car.forward() * dd, direction(car, target)) * 0.3
+    if turning < 0.2: turning = 0
+    turning = min(turning, 0.8)
 
     dist = max(ground_distance(car, target) - 100, 1)
     speed = dot(car.velocity, car.forward())
@@ -59,3 +60,7 @@ def estimate_time(car: Car, target, dd=1, max_accelerate_time=math.inf) -> float
         time += dist / speed
 
     return time + turning
+
+
+def pad_available_in_time(pad: BoostPad, car: Car) -> bool:
+    return pad.state == BoostPadState.Available or estimate_time(car, pad) > pad.timer

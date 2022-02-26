@@ -35,7 +35,9 @@ class Maneuver:
         raise PushToStackException(reversed(maneuver) if isinstance(maneuver, list) else [maneuver])
 
     def announce(self, message: str):
-        Announcer.announce(f"[{type(self).__name__}] {message}", slowmo=True)
+        full_message = f"[{type(self).__name__}] {message}"
+        Announcer.announce(full_message, slowmo=True)
+        print(full_message)
 
     def explain(self, message: str, slowmo=False):
         Announcer.explain(f"[{type(self).__name__}] {message}", slowmo=slowmo)

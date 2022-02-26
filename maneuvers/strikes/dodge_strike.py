@@ -1,10 +1,10 @@
 from maneuvers.jumps.aim_dodge import AimDodge
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import norm, dot, normalize, xy
+from rlutilities.linear_algebra import norm, xy
 from rlutilities.simulation import Ball
 from tools.intercept import estimate_time
 from tools.math import clamp
-from tools.vector_math import ground_direction
+from tools.vector_math import ground_direction, ground_distance
 
 
 class DodgeStrike(Strike):
@@ -16,7 +16,7 @@ class DodgeStrike(Strike):
 
     def intercept_predicate(self, ball: Ball):
         time_left = ball.time - self.car.time
-        jump_duration = self.get_jump_duration(ball.position[2])
+        jump_duration = self.get_jump_duration(ball.position.z)
 
         if jump_duration >= time_left: return False
 
@@ -42,9 +42,9 @@ class DodgeStrike(Strike):
         self.arrive.target_direction = hit_dir
         self.arrive.arrival_time = intercept.time
 
-        self.dodge.jump.duration = self.get_jump_duration(intercept.position[2])
+        self.dodge.jump.duration = self.get_jump_duration(intercept.position.z)
         self.dodge.target = intercept.position
-        self.arrive.additional_shift = self.get_jump_duration(intercept.position[2]) * 500
+        self.arrive.additional_shift = self.get_jump_duration(intercept.position.z) * 500
 
     def interruptible(self) -> bool:
         if self.info.ball.position.z > 400 and self.dodging:
@@ -59,13 +59,19 @@ class DodgeStrike(Strike):
         else:
             super().step(dt)
 
-            if self.arrive.arrival_time - self.car.time < self.dodge.jump.duration + 0.13:
-                if self.explainable_and([
-                    ("speed diff", abs(self.arrive.drive.target_speed - norm(self.car.velocity)) < 1000),
-                    ("velocity dir", dot(normalize(self.car.velocity), ground_direction(self.car, self.intercept)) > 0.8
-                                     or norm(self.car.velocity) < 1000),
-                ], slowmo=True):
+            if self.arrive.arrival_time - self.car.time < self.get_jump_duration(self.intercept.position.z) + 0.13:
+                time_left = max(0.1, self.intercept.time - self.car.time)
+                dist_left = ground_distance(self.car, self.intercept)
+                to_intercept = ground_direction(self.car, self.intercept)
+                required_speed = clamp(dist_left / time_left, 0, 2300)
+                required_velocity = to_intercept * required_speed
+                if (
+                        norm(required_velocity - self.car.velocity) < 1000
+                        or ground_distance(self.car, self.intercept) < 200
+                ):
                     self.dodging = True
+                else:
+                    self.explain("Not matching required velocity.")
 
         if self.dodge.finished:
             self.expire("Dodge finished.")

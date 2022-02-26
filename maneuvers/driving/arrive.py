@@ -7,7 +7,7 @@ from rlutilities.linear_algebra import vec3, norm, normalize
 from rlutilities.simulation import Car
 from tools.drawing import DrawingTool
 from tools.math import clamp, nonzero
-from tools.vector_math import ground_distance, angle_to
+from tools.vector_math import ground_distance, angle_to, distance, direction
 
 
 class Arrive(Maneuver):
@@ -34,6 +34,8 @@ class Arrive(Maneuver):
         self.allow_dodges_and_wavedashes: bool = True
         self.additional_shift = 0
 
+        self.__shifted_target = None  # just for rendering
+
     def interruptible(self) -> bool:
         return self.action.interruptible()
 
@@ -50,7 +52,7 @@ class Arrive(Maneuver):
             shift = clamp(ground_distance(car.position, target) * self.lerp_t, 0, clamp(car_speed, 1500, 2300) * 1.6)
 
             # if we're too close to the target, aim for the actual target so we don't miss it
-            if shift - self.additional_shift * 0.8 < Drive.turn_radius(clamp(car_speed, 500, 2300)) * 1.1:
+            if shift - self.additional_shift * 0.9 < Drive.turn_radius(clamp(car_speed, 500, 2300)) * 1.1:
                 shift = 0
             else:
                 shift += self.additional_shift
@@ -63,6 +65,8 @@ class Arrive(Maneuver):
         else:
             shifted_target = target
             shifted_arrival_time = self.arrival_time
+
+        self.__shifted_target = shifted_target
 
         self.drive.target_pos = shifted_target
         self.travel.target = shifted_target
@@ -96,6 +100,11 @@ class Arrive(Maneuver):
 
     def render(self, draw: DrawingTool):
         self.drive.render(draw)
+
+        if self.__shifted_target is not None and distance(self.target, self.__shifted_target) > 100:
+            draw.color(draw.pink)
+            draw.vector(self.__shifted_target, direction(self.__shifted_target, self.target) * 300)
+            draw.vector(self.__shifted_target, direction(self.__shifted_target, self.car) * 300)
 
         if self.target_direction is not None:
             draw.color(draw.lime)

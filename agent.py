@@ -8,7 +8,6 @@ from rlutilities.simulation import Input
 from strategy import solo_strategy, teamplay_strategy
 from strategy.kickoffs import choose_kickoff
 from strategy.matchcomms_strategy import get_maneuver_from_comms
-from tools.announcer import Announcer
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 
@@ -33,7 +32,7 @@ class BotimusPrime(BaseAgent):
         self.draw = DrawingTool(self.renderer, self.team)
 
     def is_hot_reload_enabled(self):
-        return True
+        return False
 
     @property
     def maneuver(self) -> Optional[Maneuver]:
@@ -113,7 +112,7 @@ class BotimusPrime(BaseAgent):
         #     self.maneuver = None
 
         if self.RENDERING:
-            Announcer.step(self.set_game_state, self.renderer)
+            # Announcer.step(self.set_game_state, self.renderer)
             self.draw.execute()
 
         return self.controls

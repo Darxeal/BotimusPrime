@@ -1,4 +1,4 @@
-from maneuvers.strikes.clears import DodgeClear, AerialClear, DoubleJumpClear, FastAerialClear
+from maneuvers.strikes.clears import DodgeClear, FastAerialClear
 from maneuvers.strikes.strike import Strike
 from rlutilities.simulation import Car
 from tools.game_info import GameInfo

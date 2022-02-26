@@ -1,14 +1,15 @@
 import math
 
-from maneuvers.jumps.jump import Jump
-from maneuvers.jumps.wavedash_recovery import WavedashRecovery
 from maneuvers.maneuver import Maneuver
 from maneuvers.recovery import Recovery
 from rlutilities.linear_algebra import vec3, dot, norm, sgn
+from rlutilities.simulation import BoostPadType
 from tools.arena import Arena
 from tools.drawing import DrawingTool
+from tools.game_info import GameInfo
+from tools.intercept import pad_available_in_time
 from tools.math import abs_clamp, clamp11, clamp
-from tools.vector_math import ground, local, ground_distance, distance, direction, world
+from tools.vector_math import ground, local, ground_distance, distance, direction, world, angle_to
 
 
 class Drive(Maneuver):
@@ -20,6 +21,9 @@ class Drive(Maneuver):
         self.target_speed = target_speed
         self.backwards = backwards
         self.drive_on_walls = False
+        self.detour_for_pads = True
+
+        self.__changed_target = target_pos  # just for rendering
 
     def step(self, dt):
         target = self.target_pos
@@ -47,15 +51,39 @@ class Drive(Maneuver):
                 target = (ground(self.car) * 4 + ground(self.target_pos)) / 5
                 self.explain("Driving down wall.")
 
-                if self.explainable_and([
-                    ("distance from target", ground_distance(self.car, target) > 1500),
-                    ("low height", self.car.position.z < 800),
-                    ("good vel",
-                     norm(self.car.velocity) < 300 or self.car.velocity.z < -100 and norm(self.car.velocity) > 500),
-                ]):
-                    self.announce("Jumping off wall.")
-                    self.push([Jump(self.car, 0.1), WavedashRecovery(self.car, self.target_pos)])
+                # if self.explainable_and([
+                #     ("distance from target", ground_distance(self.car, target) > 1500),
+                #     ("low height", self.car.position.z < 800),
+                #     ("good vel",
+                #      norm(self.car.velocity) < 300 or self.car.velocity.z < -100 and norm(self.car.velocity) > 500),
+                # ]):
+                #     self.announce("Jumping off wall.")
+                #     self.push([Jump(self.car, 0.1), WavedashRecovery(self.car, self.target_pos)])
 
+        # picking up boost pads along the way
+        if self.detour_for_pads:
+            good_pads = []
+            for pad in GameInfo.large_boost_pads + GameInfo.small_boost_pads:
+                car_to_target = ground_distance(self.car, target)
+                car_to_pad = ground_distance(self.car, pad)
+                pad_to_target = ground_distance(pad, target)
+                tolerance = 1.3 if pad.type == BoostPadType.Full else 1.1
+                boost_threshold = 99 if pad.type == BoostPadType.Full else 50
+                angle_threshold = (2500 - norm(self.car.velocity)) / 2500 * tolerance
+                if (
+                        angle_to(self.car, pad.position) < angle_threshold
+                        and pad_to_target > 1000
+                        and self.car.boost < boost_threshold
+                        and car_to_pad + pad_to_target < car_to_target * tolerance
+                        and ground_distance(self.car, pad) < 2000
+                        and pad_available_in_time(pad, self.car)
+                ):
+                    good_pads.append(pad)
+            if good_pads:
+                self.explain("Detouring for a boostpad.")
+                target = min(good_pads, key=lambda pad: distance(self.car, pad)).position
+
+        self.__changed_target = target
         local_target = local(self.car, target)
 
         if self.backwards:
@@ -64,7 +92,7 @@ class Drive(Maneuver):
 
         # steering
         phi = math.atan2(local_target[1], local_target[0])
-        self.controls.steer = clamp11(2.5 * phi)
+        self.controls.steer = clamp11(3.0 * phi)
 
         turn_radius = Drive.turn_radius(norm(self.car.velocity))
         local_turn_center = vec3(0, turn_radius * sgn(local_target.y), 0)
@@ -85,18 +113,18 @@ class Drive(Maneuver):
         if abs(phi) > 1.4:
             if (
                     self.car.position[2] < 300
-                    and ground_distance(self.car, target) < 1500
-                    and dot(self.car.velocity, self.car.forward()) > 500
+                    and (ground_distance(self.car, target) < 1000 or not Arena.inside(self.car.position, 200))
+                    # and dot(self.car.velocity, self.car.forward()) > 500
             ):
                 self.controls.handbrake = 1
                 self.explain("Powersliding")
             else:
-                target_speed = 1000
+                target_speed = min(target_speed, 1000)
                 self.explain("Slowing down to turn faster")
 
         # slow down if target inside turn circle
         if ground_distance(local_target, local_turn_center) < turn_radius:
-            target_speed = 1000
+            target_speed = min(target_speed, 1000)
             self.explain("Slowing down (target inside turn circle)")
 
         # forward velocity
@@ -145,5 +173,10 @@ class Drive(Maneuver):
         draw.color(draw.cyan)
         draw.square(self.target_pos, 50)
 
-        target_direction = direction(self.car.position, self.target_pos)
+        if self.__changed_target is not self.target_pos:
+            draw.square(self.__changed_target, 40)
+            draw.vector(self.__changed_target, direction(self.__changed_target, self.target_pos) * 300)
+            draw.vector(self.__changed_target, direction(self.__changed_target, self.car) * 300)
+
+        target_direction = direction(self.car.position, self.__changed_target)
         draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())

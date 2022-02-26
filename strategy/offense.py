@@ -1,8 +1,9 @@
 from typing import Optional
 
 from maneuvers.dribbling.carry_and_flick import CarryAndFlick
+from maneuvers.general_defense import GeneralDefense
 from maneuvers.maneuver import Maneuver
-from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike, AirRollStrike
+from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_strike import DodgeStrike
 from maneuvers.strikes.ground_strike import GroundStrike
@@ -10,15 +11,13 @@ from maneuvers.strikes.mirror_strike import MirrorStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car, Ball
-from strategy import defense
-from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.vector_math import distance, ground_distance, align
 
 
 def aerial_shot(info: GameInfo, car: Car, target: vec3) -> Optional[AerialStrike]:
     aerial_strikes = [
-        AirRollStrike(car, info, target),
+        # AirRollStrike(car, info, target),
         FastAerialStrike(car, info, target),
     ]
 
@@ -72,10 +71,11 @@ def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Ball, allow_drib
 
     if not isinstance(direct, GroundStrike) and intercept.time < car.time + 4.0:
         alignment = align(car.position, intercept, target)
-        if alignment < -0.3:
-            Announcer.announce("[Strategy] Alignment is so bad I'll rather clear this")
-            return defense.any_clear(info, car)
-        if alignment < 0 and abs(intercept.position.y - target.y) > 3000:
+        if alignment < 0:
+            if alignment < -0.3 or abs(intercept.position.y - target.y) < 3000:
+                # Announcer.announce("[Strategy] Alignment is so bad I'll rather clear this")
+                # return defense.any_clear(info, car)
+                return GeneralDefense(car, info, intercept.position, 3000, force_nearest=True)
             return MirrorStrike(car, info, target)
 
     return direct
