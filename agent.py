@@ -8,6 +8,7 @@ from rlutilities.simulation import Input
 from strategy import solo_strategy, teamplay_strategy
 from strategy.kickoffs import choose_kickoff
 from strategy.matchcomms_strategy import get_maneuver_from_comms
+from tools.announcer import Announcer
 from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 
@@ -87,7 +88,7 @@ class BotimusPrime(BaseAgent):
                 self.maneuver = teamplay_strategy.choose_maneuver(self.info, my_car)
             else:
                 self.maneuver = solo_strategy.choose_maneuver(self.info, my_car)
-            # Announcer.announce(type(self.maneuver).__name__)
+            Announcer.announce(type(self.maneuver).__name__)
 
         # execute maneuver
         if self.maneuver is not None:
@@ -112,7 +113,7 @@ class BotimusPrime(BaseAgent):
         #     self.maneuver = None
 
         if self.RENDERING:
-            # Announcer.step(self.set_game_state, self.renderer)
+            Announcer.step(self.set_game_state, self.renderer)
             self.draw.execute()
 
         return self.controls

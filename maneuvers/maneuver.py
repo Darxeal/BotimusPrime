@@ -37,7 +37,6 @@ class Maneuver:
     def announce(self, message: str):
         full_message = f"[{type(self).__name__}] {message}"
         Announcer.announce(full_message, slowmo=True)
-        print(full_message)
 
     def explain(self, message: str, slowmo=False):
         Announcer.explain(f"[{type(self).__name__}] {message}", slowmo=slowmo)

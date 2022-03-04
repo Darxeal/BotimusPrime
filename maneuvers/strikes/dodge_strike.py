@@ -12,7 +12,7 @@ class DodgeStrike(Strike):
     Strike the ball by dodging into it.
     """
 
-    jump_time_multiplier = 1.0
+    jump_time_multiplier = 0.9
 
     def intercept_predicate(self, ball: Ball):
         time_left = ball.time - self.car.time

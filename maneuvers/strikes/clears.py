@@ -2,6 +2,7 @@ from typing import List
 
 from maneuvers.strikes.aerial_strike import FastAerialStrike
 from maneuvers.strikes.dodge_strike import DodgeStrike
+from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Ball, Car
 from tools.arena import Arena
@@ -20,6 +21,12 @@ def get_target_points(car: Car, intercept: Ball) -> List[vec3]:
 
 
 class DodgeClear(DodgeStrike):
+    def configure(self, intercept: Ball):
+        self.target = self.pick_easiest_target(self.car, intercept, get_target_points(self.car, intercept))
+        super().configure(intercept)
+
+
+class DoubleJumpClear(DoubleJumpStrike):
     def configure(self, intercept: Ball):
         self.target = self.pick_easiest_target(self.car, intercept, get_target_points(self.car, intercept))
         super().configure(intercept)

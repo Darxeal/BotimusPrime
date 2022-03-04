@@ -36,6 +36,7 @@ class Announcer:
 
     @classmethod
     def announce(cls, message: str, slowmo=True):
+        print(message)
         cls.announcements.append(Announcement(message, time.time()))
 
         if slowmo:

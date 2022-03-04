@@ -11,10 +11,12 @@ from tools.vector_math import forward, three_vec3_to_mat3
 class Recovery(Maneuver):
     """Boost down and try to land smoothly"""
 
-    def __init__(self, car: Car, jump_when_upside_down=True):
+    def __init__(self, car: Car, jump_when_upside_down=True, optional_target: vec3 = None):
         super().__init__(car)
 
         self.jump_when_upside_down = jump_when_upside_down
+        self.optional_target = optional_target
+
         self.landing = False
         self.reorient = Reorient(self.car)
 
@@ -72,8 +74,12 @@ class Recovery(Maneuver):
                 break
 
         if self.landing:
+            landing_target_forward = vel
+            if self.optional_target and norm(vel) < 1000:
+                landing_target_forward = self.optional_target - self.landing_pos
+
             u = collision_normal
-            f = normalize(vel - dot(vel, u) * u)
+            f = normalize(landing_target_forward - dot(landing_target_forward, u) * u)
             l = normalize(cross(u, f))
             self.reorient.target_orientation = three_vec3_to_mat3(f, l, u)
         else:

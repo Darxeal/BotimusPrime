@@ -1,7 +1,6 @@
 from maneuvers.fake_challenge import FakeChallenge
 from maneuvers.general_defense import GeneralDefense
 from maneuvers.pickup_boostpad import PickupBoostPad
-from maneuvers.recovery import Recovery
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import dot, norm
 from rlutilities.simulation import Car
@@ -10,7 +9,7 @@ from strategy.boost_management import choose_boostpad_to_pickup
 from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.intercept import intercept_estimate
-from tools.vector_math import align, ground, ground_distance, ground_direction, distance
+from tools.vector_math import align, ground, ground_distance, ground_direction
 
 
 def choose_maneuver(info: GameInfo, my_car: Car):
@@ -20,8 +19,8 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     opponents = info.get_opponents()
 
     # recovery
-    if not my_car.on_ground:
-        return Recovery(my_car)
+    # if not my_car.on_ground:
+    #     return Recovery(my_car)
 
     info.predict_ball()
 
@@ -49,14 +48,15 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     if (
             my_car.boost < 10
             and best_boostpad_to_pickup is not None
-            and ground_distance(my_car, best_boostpad_to_pickup) < 3000
+            and ground_distance(my_car, best_boostpad_to_pickup) < 2000
             and norm(my_car.velocity) < 1500
             and ground_distance(my_intercept, their_goal) > 3000
+            and ground_distance(their_intercept, my_goal) > 4000
     ):
         return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     if (
-            distance(opponent, ball) < 300
+            ground_distance(opponent, ball) < 500
             and ball.position.z > 100
             and norm(opponent.velocity - ball.velocity) < 500
             and opponent.on_ground
@@ -64,7 +64,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         return FakeChallenge(my_car, info)
 
     ball_in_their_half = abs(my_intercept.position[1] - their_goal[1]) < 3000
-    shadow_distance = 4000 if ball_in_their_half else 6000
+    shadow_distance = 1000 if ball_in_their_half else 2000
     # if they can hit the ball sooner than me and they aren't out of position, wait in defense
     if (
             their_intercept.time < my_intercept.time
@@ -90,7 +90,11 @@ def choose_maneuver(info: GameInfo, my_car: Car):
             ):
                 return shot
 
-    if my_car.boost < 30 and best_boostpad_to_pickup is not None:
+    if (
+            my_car.boost < 30
+            and best_boostpad_to_pickup is not None
+            and ground_distance(best_boostpad_to_pickup, my_car) < 2000
+    ):
         return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     # fallback

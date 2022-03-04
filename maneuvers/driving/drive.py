@@ -9,12 +9,12 @@ from tools.drawing import DrawingTool
 from tools.game_info import GameInfo
 from tools.intercept import pad_available_in_time
 from tools.math import abs_clamp, clamp11, clamp
-from tools.vector_math import ground, local, ground_distance, distance, direction, world, angle_to
+from tools.vector_math import ground, local, ground_distance, distance, direction, world, angle_to, ground_direction
 
 
 class Drive(Maneuver):
 
-    def __init__(self, car, target_pos: vec3 = vec3(0, 0, 0), target_speed: float = 0, backwards: bool = False):
+    def __init__(self, car, target_pos: vec3 = None, target_speed: float = 0, backwards: bool = False):
         super().__init__(car)
 
         self.target_pos = target_pos
@@ -30,13 +30,12 @@ class Drive(Maneuver):
 
         # don't try driving outside the arena
         threshold = 100 if abs(target.y) > 5000 else 50
-        if not Arena.inside(target, threshold):
+        if (
+                not Arena.inside(target, threshold)
+                and (abs(self.car.position.x) > 700 or abs(target.x) > 700)
+        ):
             self.explain("Clamping target inside arena.")
             target = Arena.clamp(target, threshold)
-
-        if not self.car.on_ground:
-            self.announce("Not on ground!")
-            self.push(Recovery(self.car))
 
         # smoothly escape goal
         if abs(self.car.position.y) > Arena.size.y - 50 and abs(self.car.position.x) < 1000:
@@ -72,18 +71,27 @@ class Drive(Maneuver):
                 angle_threshold = (2500 - norm(self.car.velocity)) / 2500 * tolerance
                 if (
                         angle_to(self.car, pad.position) < angle_threshold
-                        and pad_to_target > 1000
+                        # and pad_to_target > 1000
                         and self.car.boost < boost_threshold
                         and car_to_pad + pad_to_target < car_to_target * tolerance
-                        and ground_distance(self.car, pad) < 2000
+                        and car_to_pad < 1500
                         and pad_available_in_time(pad, self.car)
                 ):
                     good_pads.append(pad)
             if good_pads:
                 self.explain("Detouring for a boostpad.")
-                target = min(good_pads, key=lambda pad: distance(self.car, pad)).position
+                closest_pad = min(good_pads, key=lambda pad: distance(self.car, pad))
+                pad_to_target = ground_direction(closest_pad, target)
+                pad_to_car = ground_direction(closest_pad, self.car)
+                offset_radius = 100 if closest_pad.type == BoostPadType.Full else 70
+                target = ground(closest_pad) + (pad_to_target + pad_to_car) * offset_radius
 
         self.__changed_target = target
+
+        if not self.car.on_ground:
+            # self.announce("Not on ground!")
+            self.push(Recovery(self.car, optional_target=target))
+
         local_target = local(self.car, target)
 
         if self.backwards:
@@ -113,7 +121,7 @@ class Drive(Maneuver):
         if abs(phi) > 1.4:
             if (
                     self.car.position[2] < 300
-                    and (ground_distance(self.car, target) < 1000 or not Arena.inside(self.car.position, 200))
+                    and (ground_distance(self.car, target) < 2000 or not Arena.inside(self.car.position, 300))
                     # and dot(self.car.velocity, self.car.forward()) > 500
             ):
                 self.controls.handbrake = 1
@@ -157,7 +165,7 @@ class Drive(Maneuver):
             self.controls.handbrake = 0
 
         # don't boost if not facing target
-        if abs(phi) > 0.3 and self.controls.boost:
+        if abs(phi) > 1.5 * (1 - norm(self.car.velocity) / 2300) and self.controls.boost:
             self.controls.boost = 0
 
         # finish when close
@@ -170,13 +178,16 @@ class Drive(Maneuver):
         return 156 + 0.1 * spd + 0.000069 * spd ** 2 + 0.000000164 * spd ** 3 + -5.62E-11 * spd ** 4
 
     def render(self, draw: DrawingTool):
-        draw.color(draw.cyan)
-        draw.square(self.target_pos, 50)
+        if self.target_pos is not None:
+            draw.color(draw.cyan)
+            draw.square(self.target_pos, 50)
 
-        if self.__changed_target is not self.target_pos:
-            draw.square(self.__changed_target, 40)
-            draw.vector(self.__changed_target, direction(self.__changed_target, self.target_pos) * 300)
-            draw.vector(self.__changed_target, direction(self.__changed_target, self.car) * 300)
-
-        target_direction = direction(self.car.position, self.__changed_target)
-        draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())
+            if self.__changed_target and self.__changed_target is not self.target_pos:
+                draw.square(self.__changed_target, 40)
+                draw.vector(self.__changed_target, direction(self.__changed_target, self.target_pos) * 300)
+                # draw.vector(self.__changed_target, direction(self.__changed_target, self.car) * 300)
+                draw.line(ground(self.__changed_target), ground(self.car))
+            else:
+                draw.line(ground(self.car), ground(self.target_pos))
+            # target_direction = direction(self.car.position, self.__changed_target)
+            # draw.triangle(self.car.position + target_direction * 200, target_direction, up=self.car.up())

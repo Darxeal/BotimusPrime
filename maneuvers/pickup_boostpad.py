@@ -16,6 +16,7 @@ class PickupBoostPad(Maneuver):
         self.pad_was_active = self.pad.state == BoostPadState.Available
 
         self.travel = Travel(car, self.pad.position, waste_boost=True)
+        self.travel.drive.detour_for_pads = False
 
     def interruptible(self) -> bool:
         time_left = ground_distance(self.car, self.pad) / clamp(norm(self.car.velocity), 1000, 2300)

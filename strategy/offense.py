@@ -6,11 +6,14 @@ from maneuvers.maneuver import Maneuver
 from maneuvers.strikes.aerial_strike import AerialStrike, FastAerialStrike
 from maneuvers.strikes.close_shot import CloseShot
 from maneuvers.strikes.dodge_strike import DodgeStrike
+from maneuvers.strikes.double_jump_strike import DoubleJumpStrike
 from maneuvers.strikes.ground_strike import GroundStrike
 from maneuvers.strikes.mirror_strike import MirrorStrike
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import vec3
 from rlutilities.simulation import Car, Ball
+from strategy import defense
+from tools.announcer import Announcer
 from tools.game_info import GameInfo
 from tools.vector_math import distance, ground_distance, align
 
@@ -30,6 +33,7 @@ def aerial_shot(info: GameInfo, car: Car, target: vec3) -> Optional[AerialStrike
 
 def direct_shot(info: GameInfo, car: Car, target: vec3) -> Strike:
     dodge_shot = DodgeStrike(car, info, target)
+    double_jump_strike = DoubleJumpStrike(car, info, target)
     ground_shot = GroundStrike(car, info, target)
     aerial_strike = aerial_shot(info, car, target)
 
@@ -51,6 +55,12 @@ def direct_shot(info: GameInfo, car: Car, target: vec3) -> Strike:
                 and abs(dodge_shot.intercept.position.x) < 2000
         ):
             return CloseShot(car, info, target)
+
+        if (
+                double_jump_strike.intercept.time < dodge_shot.intercept.time
+                and is_opponent_close(info, 3000)
+        ):
+            return double_jump_strike
         return dodge_shot
     return ground_shot
 
@@ -73,8 +83,9 @@ def any_shot(info: GameInfo, car: Car, target: vec3, intercept: Ball, allow_drib
         alignment = align(car.position, intercept, target)
         if alignment < 0:
             if alignment < -0.3 or abs(intercept.position.y - target.y) < 3000:
-                # Announcer.announce("[Strategy] Alignment is so bad I'll rather clear this")
-                # return defense.any_clear(info, car)
+                if ground_distance(info.my_goal.center, intercept) < 4000:
+                    Announcer.announce("[Strategy] Alignment is so bad I'll rather clear this")
+                    return defense.any_clear(info, car)
                 return GeneralDefense(car, info, intercept.position, 3000, force_nearest=True)
             return MirrorStrike(car, info, target)
 

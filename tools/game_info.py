@@ -27,8 +27,8 @@ class Goal:
 
 
 class GameInfo(Game):
-    large_boost_pads: List[BoostPad] = None
-    small_boost_pads: List[BoostPad] = None
+    large_boost_pads: List[BoostPad] = []
+    small_boost_pads: List[BoostPad] = []
 
     def __init__(self, team):
         super().__init__()
