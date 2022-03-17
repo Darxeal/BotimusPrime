@@ -54,7 +54,7 @@ def choose_maneuver(info: GameInfo, my_car: Car):
         return PickupBoostPad(my_car, best_boostpad_to_pickup)
 
     ball_in_their_half = abs(my_intercept.position[1] - their_goal[1]) < 3000
-    shadow_distance = 4000 if ball_in_their_half else 6000
+    shadow_distance = 3000
     # if they can hit the ball sooner than me and they aren't out of position, wait in defense
     if (
         their_intercept.time < my_intercept.time
