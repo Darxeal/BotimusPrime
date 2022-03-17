@@ -42,7 +42,7 @@ class Drive(Maneuver):
 
         # steering
         phi = math.atan2(local_target[1], local_target[0])
-        self.controls.steer = clamp11(2.5 * phi)
+        self.controls.steer = clamp11(3.0 * phi)
 
         # powersliding
         self.controls.handbrake = 0
