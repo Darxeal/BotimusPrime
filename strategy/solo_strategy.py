@@ -33,9 +33,10 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     their_intercept = min(their_intercepts, key=lambda i: i.time)
     opponent = their_intercept.car
 
-    banned_boostpads = {pad for pad in info.large_boost_pads if
-                        abs(pad.position[1] - their_goal[1]) < abs(my_intercept.position[1] - their_goal[1])
-                        or abs(pad.position[0] - my_car.position[0]) > 6000}
+    banned_boostpads = {pad for pad in info.large_boost_pads if (
+            abs(pad.position[1] - their_goal[1]) < abs(my_intercept.position[1] - their_goal[1])
+            or abs(pad.position[0] - my_car.position[0]) > 6000
+    ) and ground_distance(my_car, pad) < 4000}
     best_boostpad_to_pickup = choose_boostpad_to_pickup(info, my_car, banned_boostpads)
 
     # if ball is in a dangerous position, clear it
