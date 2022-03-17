@@ -1,6 +1,6 @@
 from maneuvers.general_defense import GeneralDefense
-from maneuvers.recovery import Recovery
 from maneuvers.pickup_boostpad import PickupBoostPad
+from maneuvers.recovery import Recovery
 from maneuvers.strikes.strike import Strike
 from rlutilities.linear_algebra import dot
 from rlutilities.simulation import Car
@@ -8,7 +8,6 @@ from strategy import offense, defense, kickoffs
 from strategy.boost_management import choose_boostpad_to_pickup
 from tools.game_info import GameInfo
 from tools.intercept import Intercept
-from tools.math import sign
 from tools.vector_math import align, ground, ground_distance, ground_direction
 
 
@@ -41,9 +40,9 @@ def choose_maneuver(info: GameInfo, my_car: Car):
 
     # if ball is in a dangerous position, clear it
     if (
-        ground_distance(my_intercept, my_goal) < 3000
-        and (abs(my_intercept.position[0]) < 2000 or abs(my_intercept.position[1]) < 4500)
-        and my_car.position[2] < 300
+            ground_distance(my_intercept, my_goal) < 3000
+            and (abs(my_intercept.position[0]) < 2000 or abs(my_intercept.position[1]) < 4500)
+            and my_car.position[2] < 300
     ):
         if align(my_car.position, my_intercept.ball, their_goal) > 0.5:
             return offense.any_shot(info, my_intercept.car, their_goal, my_intercept, allow_dribble=True)
@@ -57,25 +56,25 @@ def choose_maneuver(info: GameInfo, my_car: Car):
     shadow_distance = 3000
     # if they can hit the ball sooner than me and they aren't out of position, wait in defense
     if (
-        their_intercept.time < my_intercept.time
-        and align(opponent.position, their_intercept.ball, my_goal) > -0.1 + opponent.boost / 100
-        and ground_distance(opponent, their_intercept) > 300
-        and dot(opponent.velocity, ground_direction(their_intercept, my_goal)) > 0
+            their_intercept.time < my_intercept.time
+            and align(opponent.position, their_intercept.ball, my_goal) > -0.1 + opponent.boost / 100
+            and ground_distance(opponent, their_intercept) > 300
+            and dot(opponent.velocity, ground_direction(their_intercept, my_goal)) > 0
     ):
         return GeneralDefense(my_car, info, my_intercept.position, shadow_distance, force_nearest=ball_in_their_half)
 
     # if not completely out of position, go for a shot
     if (
-        align(my_car.position, my_intercept.ball, their_goal) > -0.5
-        or ground_distance(my_intercept, their_goal) < 2000
-        or ground_distance(opponent, their_intercept) < 300
+            align(my_car.position, my_intercept.ball, their_goal) > -0.5
+            or ground_distance(my_intercept, their_goal) < 2000
+            or ground_distance(opponent, their_intercept) < 300
     ):
         if my_car.position[2] < 300:
             shot = offense.any_shot(info, my_intercept.car, their_goal, my_intercept, allow_dribble=True)
             if (
-                not isinstance(shot, Strike)
-                or shot.intercept.time < their_intercept.time
-                or abs(shot.intercept.position[0]) < 3500
+                    not isinstance(shot, Strike)
+                    or shot.intercept.time < their_intercept.time
+                    or abs(shot.intercept.position[0]) < 3500
             ):
                 return shot
 
