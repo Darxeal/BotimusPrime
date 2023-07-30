@@ -20,7 +20,7 @@ def choose_boostpad_to_pickup(info: GameInfo, car: Car, forbidden_pads: Set[Boos
 
     # a good candidate should be somewhere between us, our goal, and the ball
     # the easiest way to do that is to just take a weighted average of those positions
-    pos = (info.ball.position + car.position * 2 + info.my_goal.center) / 4
+    pos = (info.ball.position + car.position * 2 + info.my_goal.center * 2) / 5
 
     # and pick the closest valid pad to that position
     return min(valid_pads, key=lambda pad: distance(pad.position, pos))
