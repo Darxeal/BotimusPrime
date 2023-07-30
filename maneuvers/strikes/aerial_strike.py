@@ -84,6 +84,12 @@ class AerialStrike(Strike):
                 # else:
                 self.aerial.up = vec3(0, 0, -1) + xy(to_ball)
 
+            if time_left > 0.5:
+                self.info.predict_ball(3.0)
+                same_time_intercept = Intercept(self.car, self.info.ball_predictions, lambda car, ball: ball.time >= self.intercept.time, ignore_time_estimate=True)
+                self.intercept.ball.position = same_time_intercept.position  # just for rendering
+                self.configure(same_time_intercept)
+
             self.aerial.target_orientation = look_at(to_ball, vec3(0, 0, -3) + to_ball)
             self.aerial.step(dt)
 
