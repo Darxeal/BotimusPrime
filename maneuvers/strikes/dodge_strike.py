@@ -1,6 +1,6 @@
 from maneuvers.jumps.aim_dodge import AimDodge
 from maneuvers.strikes.strike import Strike
-from rlutilities.linear_algebra import norm, dot, normalize, xy
+from rlutilities.linear_algebra import cross, norm, dot, normalize, vec3, xy
 from rlutilities.simulation import Car, Ball
 from tools.intercept import Intercept
 from tools.math import clamp
@@ -35,8 +35,15 @@ class DodgeStrike(Strike):
         ball = intercept.ball
         target_direction = ground_direction(ball, self.target)
         hit_dir = ground_direction(ball.velocity, target_direction * (norm(ball.velocity) * 3 + 500))
+        hit_offset = 165
 
-        self.arrive.target = intercept.ground_pos - hit_dir * 165
+        to_ball = ground_direction(self.car, ball)
+        if dot(hit_dir, to_ball) < 0:
+            perpendicular_dir = cross(to_ball, vec3(0, 0, 1))
+            hit_dir = perpendicular_dir if dot(perpendicular_dir, hit_dir) > 0 else perpendicular_dir * -1
+            hit_offset = 130
+
+        self.arrive.target = intercept.ground_pos - hit_dir * hit_offset
         self.arrive.target_direction = hit_dir
 
         self.dodge.jump.duration = self.get_jump_duration(ball.position[2])
