@@ -13,7 +13,7 @@ class DodgeStrike(Strike):
     """
 
     allow_backwards = False
-    jump_time_multiplier = 1.0
+    additional_jump_time = 0.0
 
     def intercept_predicate(self, car: Car, ball: Ball):
         if (ball.time - car.time) < self.get_jump_duration(ball.position[2]):
@@ -27,7 +27,7 @@ class DodgeStrike(Strike):
         super().__init__(car, info, target)
 
     def get_jump_duration(self, ball_height: float) -> float:
-        return 0.05 + clamp((ball_height - 92) / 500, 0, 1.5) * self.jump_time_multiplier
+        return 0.05 + clamp((ball_height - 92) / 500, 0, 1.5) + self.additional_jump_time
 
     def configure(self, intercept: Intercept):
         super().configure(intercept)
